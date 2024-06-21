@@ -16,6 +16,6 @@ consumer.subscriptions.create("MessagesChannel", {
     console.log("MessagesChannel: received", data)
 
     const messages = document.getElementById('messages');
-    messages.insertAdjacentHTML('afterbegin', data);
+    messages.insertAdjacentHTML('afterbegin', data['rendered_message']);
   }
 });
