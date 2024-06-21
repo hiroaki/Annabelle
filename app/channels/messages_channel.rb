@@ -3,7 +3,7 @@ class MessagesChannel < ApplicationCable::Channel
     # stream_from "some_channel"
     logger.info("MessagesChannel#subscribed: subscribed")
 
-    stream_from 'hoge'
+    stream_from 'general_message_board'
   end
 
   def unsubscribed
