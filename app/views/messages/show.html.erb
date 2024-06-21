@@ -1,5 +1,12 @@
 <h1>Messages#show</h1>
 
-<ul>
+<div id="form-container">
+  <%= form_with url: messages_create_path do |form| %>
+    <%= form.text_area :content, rows: 3, cols: 80 %>
+    <%= form.submit "Submit" %>
+  <% end %>
+</div>
+
+<ul id="messages">
   <%= render @messages %>
 </ul>
