@@ -1,15 +1,23 @@
 <div id="messages-container" data-controller="messages">
-  <h1>Messages#show</h1>
+  <h1>Message Board</h1>
 
   <div id="form-container">
     <%= form_with(url: messages_create_path, html: { 'data-action' => 'turbo:submit-end->messages#resetForm' }) do |form| %>
-      <%= form.text_area :content, rows: 3, cols: 80 %>
+      <%= form.text_area :content, rows: 3, cols: 80 %><br>
       <%= form.file_field(:attachement) %>
       <%= form.submit('Submit')%>
     <% end %>
   </div>
 
-  <ul id="messages">
-    <%= render @messages %>
-  </ul>
+  <div id="container">
+    <div id="left">
+      <div id="messages">
+        <%= render @messages %>
+      </div>
+    </div>
+    <div id="right">
+      <div id="preview" data-messages-target="preview">
+      </div>
+    </div>
+  </div>
 </div>

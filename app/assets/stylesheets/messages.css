@@ -1,0 +1,77 @@
+#container {
+  display:flex;
+}
+
+#left {
+  width: 60%;
+}
+
+#right {
+  margin-left: 1rem;
+  margin-right: 1rem;
+  width: 40%;
+}
+
+.row {
+  display: flex;
+}
+
+#form-container {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  padding-bottom: .5rem;
+}
+
+form {
+  margin-bottom: 2rem;
+}
+
+#messages {
+  width: 100%;
+}
+
+.message {
+  min-height: 2em;
+  border-bottom: dashed 1px gray;
+}
+
+.message > .left {
+  min-width: 80%;
+  background-color: #fff;
+}
+
+.message > .right {
+  max-height: 4rem;
+  overflow: hidden;
+}
+
+.message .content {
+  padding: 0.5rem;
+}
+
+.col.created_at {
+  margin-right: 1rem;
+}
+
+img.fitting-width {
+  width: 100%;
+}
+
+video.fitting-width {
+  width: 100%;
+}
+
+.created_at, .content_type {
+  width: 10rem;
+}
+
+.meta-info {
+  font-size: small;
+  color: gray;
+}
+
+#preview {
+  position: sticky;
+  top: 1rem;
+}
