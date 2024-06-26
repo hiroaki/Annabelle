@@ -1,1 +1,17 @@
-<li class="message" data-messageid="<%= message.id %>"><%= message.content %></li>
+<li class="message" data-messageid="<%= message.id %>">
+  <div>
+    <%= message.created_at.in_time_zone('Asia/Tokyo').strftime('%Y-%m-%d %H:%M:%S') %>
+    -
+    <%= message.content %>
+  </div>
+  <div>
+    <% if message.attachement.present? %>
+      <% if message.attachement.representable? %>
+        <div class="preview">
+          <%= image_tag rails_blob_path(message.attachement), height: "32px"  %>
+        </div>
+      <% end %>
+      <%= link_to 'DL', rails_blob_path(message.attachement, disposition: "attachment") %>
+    <% end %>
+  </div>
+</li>
