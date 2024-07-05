@@ -1,47 +1,39 @@
 <div class="row message" data-message-id="<%= message.id %>">
-  <div class="col left">
-
-    <div class="row meta-info">
-      <div class="col created_at">
-        <%= message.created_at.in_time_zone('Asia/Tokyo').strftime('%Y-%m-%d %H:%M:%S') %>
-      </div>
-      <div class="col attachement-info">
-        <% if message.attachements.attached? %>
-          <% message.attachements.each do |att| %>
-            <div>
-              <%= link_to "&#x1F4BE;".html_safe, rails_blob_path(att, disposition: "attachment") %>
-              <span><%= att.content_type %></span>
-              <span><%= att.byte_size.to_fs(:human_size) %></span>
-            </div>
-          <% end %>
-        <% end %>
-      </div>
-    </div>
-
-    <div class="row content" data-action="click->messages#clearPreview">
-      <%= message.content %>
-    </div>
-
+  <div class="row meta-info">
+    <%= message.created_at.in_time_zone('Asia/Tokyo').strftime('%Y-%m-%d %H:%M:%S') %>
   </div>
 
-  <div class="col right thumbnail">
+  <div class="row content" data-action="click->messages#clearPreview">
+    <%= message.content %>
+  </div>
+
+  <div class="row attachements">
     <% if message.attachements.attached? %>
       <% message.attachements.each do |att| %>
-        <% if att.representable? %>
-          <div class="attachement-info preview"
-            data-action="click->messages#changePreview"
-            data-url="<%= rails_blob_path(att) %>"
-            data-type="<%= att.content_type %>"
-          >
-            <% if att.content_type == "video/quicktime" %>
-              <%#= image_tag message.attachement.preview(resize_to_limit: [100, 100]) %>
-              <%# LoadError (Generating image variants require the image_processing gem. Please add `gem 'image_processing', '~> 1.2'` to your Gemfile.): ... %>
-              <video src="<%= rails_blob_path(att) %>" muted width="100%"></video>
-            <% else %>
-              <%= image_tag rails_blob_path(att), width: "100%" %>
-            <% end %>
+        <div class="attachement">
+          <% if att.representable? %>
+            <div class="preview"
+              data-action="click->messages#changePreview"
+              data-url="<%= rails_blob_path(att) %>"
+              data-type="<%= att.content_type %>"
+            >
+              <% if att.content_type == "video/quicktime" %>
+                <%#= image_tag message.attachement.preview(resize_to_limit: [100, 100]) %>
+                <%# LoadError (Generating image variants require the image_processing gem. Please add `gem 'image_processing', '~> 1.2'` to your Gemfile.): ... %>
+                <video src="<%= rails_blob_path(att) %>" muted width="100%"></video>
+              <% else %>
+                <%= image_tag rails_blob_path(att), width: "100%" %>
+              <% end %>
+            </div>
+          <% end %>
+
+          <div class="info">
+            <%= link_to "&#x1F4BE;".html_safe, rails_blob_path(att, disposition: "attachment") %>
+            <span><%= att.content_type %></span>
+            <span><%= att.byte_size.to_fs(:human_size) %></span>
           </div>
-        <% end %>
+
+        </div>
       <% end %>
     <% end %>
   </div>
