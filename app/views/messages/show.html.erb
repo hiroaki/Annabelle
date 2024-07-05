@@ -4,7 +4,7 @@
   <div id="form-container">
     <%= form_with(url: messages_create_path, html: { 'data-action' => 'turbo:submit-end->messages#resetForm' }) do |form| %>
       <%= form.text_area :content, rows: 3, cols: 80 %><br>
-      <%= form.file_field(:attachement) %>
+      <%= form.file_field(:attachements, multiple: true) %>
       <%= form.submit('Submit')%>
     <% end %>
   </div>

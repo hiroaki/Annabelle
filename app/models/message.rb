@@ -1,3 +1,3 @@
 class Message < ApplicationRecord
-  has_one_attached :attachement
+  has_many_attached :attachements
 end

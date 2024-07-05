@@ -2,7 +2,7 @@ class MessagesController < ApplicationController
   include Factory
 
   def show
-    @messages = Message.all.limit(5).order(created_at: :desc)
+    @messages = Message.all.limit(25).order(created_at: :desc)
   end
 
   def create
@@ -14,6 +14,6 @@ class MessagesController < ApplicationController
   private
 
     def message_params
-        params.permit(:content, :attachement)
+        params.permit(:content, attachements: [])
     end
 end
