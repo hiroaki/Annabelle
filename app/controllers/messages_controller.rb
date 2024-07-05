@@ -14,6 +14,6 @@ class MessagesController < ApplicationController
   private
 
     def message_params
-        params.permit(:content, :attachement)
+        params.permit(:content, attachements: [])
     end
 end

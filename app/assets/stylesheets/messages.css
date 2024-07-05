@@ -42,7 +42,6 @@ form {
 }
 
 .message > .right {
-  max-height: 4rem;
   overflow: hidden;
 }
 
