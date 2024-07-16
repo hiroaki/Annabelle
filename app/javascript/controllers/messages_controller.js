@@ -19,12 +19,8 @@ export default class extends Controller {
     const content_type = evt.currentTarget.dataset.type;
     const data_url = evt.currentTarget.dataset.url;
 
-    if (content_type == 'image/jpeg' || content_type == 'image/png' || content_type == 'image/gif') {
-      controller.previewTarget.innerHTML = '<img class="fitting-width" src="'+ data_url +'">';
-    }
-    else if (content_type == 'video/mp4' || content_type == 'video/quicktime') {
-      controller.previewTarget.innerHTML = '<video class="fitting-width" src="'+ data_url +'" controls></video>';
-    }
+    controller.previewTarget.innerHTML = '';
+    controller.previewTarget.appendChild(evt.currentTarget.firstElementChild.cloneNode());
   }
 
   clearPreview(evt) {
