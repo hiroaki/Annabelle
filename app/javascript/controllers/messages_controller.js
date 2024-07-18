@@ -4,7 +4,7 @@ export default class extends Controller {
   static targets = ['preview']
 
   connect() {
-    console.log('Hello, Stimulus!', this.element)
+    console.log('Hello, Stimulus!', this.element.id)
   }
 
   resetForm(evt) {
