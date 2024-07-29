@@ -7,6 +7,10 @@
       <%= form.file_field(:attachements, multiple: true) %>
       <%= form.submit('Submit')%>
     <% end %>
+
+    <div id="flash-message-container">
+      <%= render "flash" %>
+    </div>
   </div>
 
   <div id="container">

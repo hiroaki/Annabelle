@@ -7,12 +7,14 @@ class MessagesController < ApplicationController
 
   def create
     create_message!(message_params)
-    head :no_content
+  rescue => ex
+    flash.now.notice = "Error: #{ex.message}"
   end
 
   def destroy
     destroy_message!(params[:id])
-    head :no_content
+  rescue => ex
+    flash.now.notice = "Error: #{ex.message}"
   end
 
   private
