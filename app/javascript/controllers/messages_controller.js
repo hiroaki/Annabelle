@@ -20,7 +20,7 @@ export default class extends Controller {
     const data_url = evt.currentTarget.dataset.url;
 
     controller.previewTarget.innerHTML = '';
-    controller.previewTarget.appendChild(evt.currentTarget.firstElementChild.cloneNode());
+    controller.previewTarget.appendChild(evt.currentTarget.firstElementChild.cloneNode(true));
   }
 
   clearPreview(evt) {

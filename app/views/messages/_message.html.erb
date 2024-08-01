@@ -16,9 +16,18 @@
           <% if att.representable? %>
             <div class="preview" data-action="click->messages#changePreview">
               <% if ['video/quicktime', 'video/mp4'].include?(att.content_type) %>
-                <video src="<%= rails_blob_path(att) %>" controls muted width="100%"></video>
+                <!-- TODO: NEED A POSTER IMAGE HERE -->
+                <video
+                  class="lazyload"
+                  preload="none"
+                  controls
+                  muted
+                  width="100%"
+                >
+                  <source src="<%= rails_blob_path(att) %>" type="video/mp4">
+                </video>
               <% else %>
-                <%= image_tag rails_blob_path(att), width: "100%" %>
+                <%= image_tag "blank.png", width: "100%", "data-src" => rails_blob_path(att), class: "lazyload" %>
               <% end %>
             </div>
           <% end %>
