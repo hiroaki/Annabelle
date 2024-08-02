@@ -1,24 +1,23 @@
-# README
+# Annabelle アナベル
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+A simple message board.
 
-Things you may want to cover:
+簡易な掲示板です。
 
-* Ruby version
+I started developing this project as part of my own Ruby on Rails training, to facilitate file and message exchange between PCs and smartphones on a LAN. It is not suitable for use as a publicly accessible site.
 
-* System dependencies
+私自身の Ruby on Rails のトレーニングを兼ねて、 LAN 内の PC やスマートフォン間でファイルやメッセージをやりとりするために作り始めたもので、外部に公開するサイトとして使用するには適していません。
 
-* Configuration
 
-* Database creation
+## Usage 使い方
 
-* Database initialization
+It is just a web server, so start it with `rails s` and access the top page with your browser.
 
-* How to run the test suite
+ただの Web サーバですので、 `rails s` で起動し、ブラウザーでトップページにアクセスしてください。
 
-* Services (job queues, cache servers, search engines, etc.)
 
-* Deployment instructions
+## License ライセンス
 
-* ...
+MIT License
+
+MIT ライセンス
