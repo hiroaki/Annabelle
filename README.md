@@ -9,6 +9,13 @@ I started developing this project as part of my own Ruby on Rails training, to f
 私自身の Ruby on Rails のトレーニングを兼ねて、 LAN 内の PC やスマートフォン間でファイルやメッセージをやりとりするために作り始めたもので、外部に公開するサイトとして使用するには適していません。
 
 
+## Requirements 要件
+
+This project requires [libvips](https://github.com/libvips/libvips) to be installed on the system for Active Storage.
+
+このプロジェクトでは、Active Storage のために libvips がシステムにインストールされている必要があります。
+
+
 ## Usage 使い方
 
 It is just a web server, so start it with `rails s` and access the top page with your browser.
