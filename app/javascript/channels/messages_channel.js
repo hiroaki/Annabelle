@@ -16,6 +16,13 @@ consumer.subscriptions.create("MessagesChannel", {
     console.log("MessagesChannel: received", data)
 
     const messages = document.getElementById('messages');
-    messages.insertAdjacentHTML('afterbegin', data['rendered_message']);
+
+    if (data['created']) {
+      messages.insertAdjacentHTML('afterbegin', data['rendered_message']);
+    }
+    else if (data['destroyed']) {
+      const destroyed_message_id = data['destroyed']
+      messages.querySelector(`.message[data-message-id="${destroyed_message_id}"]`).remove();
+    }
   }
 });
