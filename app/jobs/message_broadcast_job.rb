@@ -1,7 +1,9 @@
 class MessageBroadcastJob < ApplicationJob
-  include MessagesHelper
-
   queue_as :default
+
+  def render_message(message)
+    ApplicationController.renderer.render(partial: 'messages/message', locals: { message: message })
+  end
 
   def perform(*args)
     # NOTE: perform_later での呼び出し時は、オブジェクトをシリアライズ／デシリアライズする都合で
