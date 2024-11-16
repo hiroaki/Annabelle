@@ -16,7 +16,7 @@
           <% if att.representable? %>
             <div class="preview" data-action="click->messages#changePreview">
               <% if ['video/quicktime', 'video/mp4'].include?(att.content_type) %>
-                <%= video_tag([att],
+                <%= video_tag([rails_blob_path(att)],
                   poster: url_for(att.representation(resize_to_limit: [640, 480])),
                   width: '100%',
                   controls: true,
