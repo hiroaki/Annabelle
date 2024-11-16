@@ -24,4 +24,11 @@ module Annabelle
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
   end
+
+  # Set default_url_options For Entire Application
+  # https://github.com/jbranchaud/til/blob/master/rails/set-default-url-options-for-entire-application.md
+  Rails.application.default_url_options = {
+    host: ENV['ANNABELLE_HOST'].presence || 'localhost',
+    port: ENV['ANNABELLE_PORT'].presence,
+  }
 end
