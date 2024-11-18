@@ -2,4 +2,4 @@
 import "@hotwired/turbo-rails"
 import "controllers"
 import "channels"
-import "./lib/lazysizes.min"
+import "lib/lazysizes.min"

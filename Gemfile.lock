@@ -160,6 +160,11 @@ GEM
       racc (~> 1.4)
     nokogiri (1.16.7-x86_64-linux)
       racc (~> 1.4)
+    propshaft (1.1.0)
+      actionpack (>= 7.0.0)
+      activesupport (>= 7.0.0)
+      rack
+      railties (>= 7.0.0)
     psych (5.2.0)
       stringio
     public_suffix (6.0.1)
@@ -220,13 +225,6 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
-    sprockets (4.2.1)
-      concurrent-ruby (~> 1.0)
-      rack (>= 2.2.4, < 4)
-    sprockets-rails (3.5.2)
-      actionpack (>= 6.1)
-      activesupport (>= 6.1)
-      sprockets (>= 3.0.0)
     sqlite3 (2.2.0-aarch64-linux-gnu)
     sqlite3 (2.2.0-arm-linux-gnu)
     sqlite3 (2.2.0-arm64-darwin)
@@ -273,10 +271,10 @@ DEPENDENCIES
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
+  propshaft
   puma (>= 5.0)
   rails (~> 8.0.0)
   selenium-webdriver
-  sprockets-rails
   sqlite3 (>= 2.1)
   stimulus-rails
   turbo-rails
