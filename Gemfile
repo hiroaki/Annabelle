@@ -67,3 +67,5 @@ group :test do
 end
 
 gem "solid_cable", "~> 3.0"
+
+gem "tailwindcss-rails", "~> 3.0"
