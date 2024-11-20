@@ -69,3 +69,5 @@ end
 gem "solid_cable", "~> 3.0"
 
 gem "tailwindcss-rails", "~> 3.0"
+
+gem "kaminari", "~> 1.2"
