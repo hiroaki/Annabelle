@@ -20,6 +20,10 @@
       <div id="messages" class="container">
         <%= render @messages %>
       </div>
+
+      <div class="container" data-class="paginate">
+        <%= paginate @messages %>
+      </div>
     </div>
     <div id="right" class="w-2/5 m-4">
       <div id="preview" class="sticky top-4" data-messages-target="preview" data-action="click->messages#clearPreview">
