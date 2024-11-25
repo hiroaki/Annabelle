@@ -17,11 +17,15 @@
 
   <div id="container" class="flex">
     <div id="left" class="w-3/5">
+      <div class="container my-2" data-class="paginate">
+        <%= paginate @messages %>
+      </div>
+
       <div id="messages" class="container">
         <%= render @messages %>
       </div>
 
-      <div class="container" data-class="paginate">
+      <div class="container my-2" data-class="paginate">
         <%= paginate @messages %>
       </div>
     </div>

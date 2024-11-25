@@ -7,5 +7,8 @@
     remote:        data-remote
 -%>
 <span class="first">
-  <%= link_to_unless current_page.first?, t('views.pagination.first').html_safe, url, remote: remote %>
+  <%= link_to_unless(current_page.first?, t('views.pagination.first').html_safe, url,
+    remote: remote,
+    class: "bg-white hover:bg-gray-100 text-gray-800 font-light py-2 px-4 border border-gray-400 rounded shadow"
+  ) %>
 </span>
