@@ -2,7 +2,7 @@ class MessagesController < ApplicationController
   include Factory
 
   def index
-    @messages = Message.all.limit(25).order(created_at: :desc)
+    @messages = Message.order(created_at: :desc).page(params[:page])
   end
 
   def create
