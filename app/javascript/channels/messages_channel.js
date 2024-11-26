@@ -22,7 +22,7 @@ consumer.subscriptions.create("MessagesChannel", {
     }
     else if (data['destroyed']) {
       const destroyed_message_id = data['destroyed']
-      messages.querySelector(`.message[data-message-id="${destroyed_message_id}"]`).remove();
+      messages.querySelector(`[data-message-id="${destroyed_message_id}"]`).remove();
     }
   }
 });
