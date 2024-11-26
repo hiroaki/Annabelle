@@ -7,9 +7,15 @@
     remote:        data-remote
 -%>
 <span class="prev">
-  <%= link_to_unless(current_page.first?, t('views.pagination.previous').html_safe, url,
-    rel: 'prev',
-    remote: remote,
-    class: "bg-white hover:bg-gray-100 text-gray-600 font-light py-1 px-4 border border-gray-400 rounded shadow"
-  ) %>
+  <% if current_page.first? %>
+    <%= content_tag('span', t('views.pagination.previous').html_safe,
+      class: "bg-gray-100 text-gray-600 font-light py-1 px-4 rounded"
+    ) %>
+  <% else %>
+    <%= link_to(t('views.pagination.previous').html_safe, url,
+      rel: 'prev',
+      remote: remote,
+      class: "bg-white hover:bg-gray-100 text-gray-600 font-light py-1 px-4 border border-gray-400 rounded shadow"
+    ) %>
+  <% end %>
 </span>
