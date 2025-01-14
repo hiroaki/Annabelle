@@ -32,7 +32,16 @@
           <% end %>
 
           <div class="text-xs text-gray-400">
-            <%= link_to "&#x1F4BE;".html_safe, rails_blob_path(att, disposition: "attachment") %>
+            <%=
+              link_to('&#x1F4BE;'.html_safe, rails_blob_path(att, disposition: 'attachment'),
+                class: 'tooltip-trigger inline-block relative',
+                data: {
+                  controller: 'tooltips',
+                  tooltip: att.filename.to_s,
+                }
+              )
+            %>
+            <div class="tooltip hidden absolute bg-gray-800 text-white text-sm p-2 rounded-md max-w-xs z-10 whitespace-nowrap"></div>
             <span><%= att.content_type %></span>
             <span><%= att.byte_size.to_fs(:human_size) %></span>
           </div>
