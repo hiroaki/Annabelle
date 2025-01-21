@@ -51,8 +51,19 @@
       </div>
     </div>
 
-    <div id="right" class="">
-      <div id="preview" class="sticky top-4" data-messages-target="preview" data-action="click->messages#clearPreview">
+    <div id="right" class="container">
+      <div id="preview" class="" data-messages-target="preview" data-action="click->messages#clearPreview">
+      </div>
+
+      <div id="modal" data-messages-target="modal" class="fixed inset-0 hidden bg-black bg-opacity-50 flex justify-center items-center">
+        <div id="modal-content" class="bg-white rounded-lg shadow-lg max-w-3xl w-full max-h-full overflow-auto">
+          <div class="flex justify-end p-2">
+            <button id="close-modal" class="text-gray-500 hover:text-gray-800" data-action="click->messages#closeModal">✖</button>
+          </div>
+          <div id="modal-body" data-messages-target="modalBody" class="p-4">
+            <!-- モーダルコンテンツがここにロードされます -->
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -61,3 +72,4 @@
     <span>Annabelle</span>
   </footer>
 </div>
+

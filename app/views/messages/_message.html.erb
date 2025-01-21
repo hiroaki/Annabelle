@@ -1,4 +1,4 @@
-<div class="mb-2 container min-w-0 p-4 bg-white rounded-lg shadow-xs" data-message-id="<%= message.id %>">
+<div class="mb-2 container min-w-0 p-4 bg-white rounded-lg shadow-xs overflow-scroll" data-message-id="<%= message.id %>">
   <div class="text-xs pb-2">
     <%= link_to "&#x1f5d1;".html_safe, message_path(message), data: { turbo_method: :delete, turbo_confirm: 'Sure?' } %>
     <%= message.created_at.in_time_zone('Asia/Tokyo').strftime('%Y-%m-%d %H:%M:%S') %>
@@ -11,10 +11,10 @@
   <div class="container">
     <% if message.attachements.attached? %>
       <% message.attachements.each do |att| %>
-        <div class="attachement">
+        <div class="container">
 
           <% if att.representable? %>
-            <div class="h-40 w-40 bg-gray-200" data-action="click->messages#changePreview">
+            <div class="h-40 w-40 bg-gray-200 relative" data-action="click->messages#changePreview">
               <% if ['video/quicktime', 'video/mp4'].include?(att.content_type) %>
                 <%= video_tag([rails_blob_path(att)],
                   poster: url_for(att.representation(resize_to_limit: [640, 480])),
@@ -22,11 +22,9 @@
                   muted: true,
                   class: 'lazyload w-auto h-full object-contain',
                   preload: false,
-                  data: {
-                     action: "",
-                  }
                 )
                 %>
+                <div style="position: absolute; top:0; left:0; width: 100%; height: 100%;"></div>
               <% else %>
                 <%=
                   image_tag('blank.png',
@@ -40,7 +38,7 @@
             </div>
           <% end %>
 
-          <div class="">
+          <div class="text-xs">
             <%=
               link_to('&#x1F4BE;'.html_safe, rails_blob_path(att, disposition: 'attachment'),
                 class: 'tooltip-trigger inline-block relative',

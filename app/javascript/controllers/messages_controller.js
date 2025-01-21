@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ['preview']
+  static targets = ['preview', 'modal', 'modalBody']
 
   connect() {
     console.log('Hello, Stimulus!', this.element.id)
@@ -16,14 +16,25 @@ export default class extends Controller {
     evt.preventDefault();
 
     const controller = this;
-    controller.previewTarget.innerHTML = '';
-    controller.previewTarget.appendChild(evt.currentTarget.firstElementChild.cloneNode(true));
+    const content = evt.currentTarget.firstElementChild.cloneNode(true);
+    controller.modalBodyTarget.innerHTML = '';
+    controller.modalBodyTarget.appendChild(content);
+
+    this.openModal();
   }
 
   clearPreview(evt) {
     evt.preventDefault();
 
     const controller = this;
-    controller.previewTarget.innerHTML = '';
+    controller.modalBodyTarget.innerHTML = '';
+  }
+
+  openModal() {
+    this.modalTarget.classList.remove('hidden');
+  }
+
+  closeModal() {
+    this.modalTarget.classList.add('hidden');
   }
 }
