@@ -16,9 +16,6 @@ export default class extends Controller {
     evt.preventDefault();
 
     const controller = this;
-    const content_type = evt.currentTarget.dataset.type;
-    const data_url = evt.currentTarget.dataset.url;
-
     controller.previewTarget.innerHTML = '';
     controller.previewTarget.appendChild(evt.currentTarget.firstElementChild.cloneNode(true));
   }

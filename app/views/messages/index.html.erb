@@ -1,48 +1,63 @@
-<div id="messages-container" data-controller="messages" class="container mx-4 mt-4 px-5">
+<div id="messages-container" data-controller="messages" class="container">
 
-  <h1 class="text-2xl font-extrabold">Message Board</h1>
+  <header class="container p-1 text-xs text-center text-slate-400 bg-green-50">
+    <h1 class="text-2xl font-extrabold">
+      Message Board
+    </h1>
+  </header>
 
-  <div id="form-container" class="container sticky top-0 bg-white pb-4">
-    <%= form_with(url: messages_path, html: { 'data-action' => 'turbo:submit-end->messages#resetForm', 'class' => 'block w-[40rem]' }) do |form| %>
+  <div id="form-container" class="container p-4 bg-blue-50">
+    <%=
+      form_with(
+        url: messages_path,
+        html: {
+          'data-action' => 'turbo:submit-end->messages#resetForm',
+          'class' => 'block',
+        }
+      ) do |form|
+    %>
       <%= form.text_area(:content,
         rows: 3,
-        cols: 80,
-        class: 'text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 block mb-2 w-full'
+        class: 'w-full'
       ) %>
 
       <%= form.file_field(:attachements,
         multiple: true,
-        class: 'text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 p-2'
+        class: ''
       ) %>
 
       <%= form.submit('Submit',
-        class: 'text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 p-2'
+        class: ''
       ) %>
     <% end %>
 
     <div id="flash-message-container">
-      <%= render "flash" %>
+      <%= render 'flash' %>
     </div>
   </div>
 
-  <div id="container" class="container flex">
-    <div id="left" class="w-[40rem] shrink-0">
-      <div class="container my-2" data-class="paginate">
+  <div id="container" class="container p-4 bg-pink-50">
+    <div id="left" class="">
+      <div class="container" data-class="paginate">
         <%= paginate @messages %>
       </div>
 
-      <div id="messages" class="container">
+      <div id="messages" class="">
         <%= render @messages %>
       </div>
 
-      <div class="container my-2" data-class="paginate">
+      <div class="container" data-class="paginate">
         <%= paginate @messages %>
       </div>
     </div>
 
-    <div id="right" class="m-4">
+    <div id="right" class="">
       <div id="preview" class="sticky top-4" data-messages-target="preview" data-action="click->messages#clearPreview">
       </div>
     </div>
   </div>
+
+  <footer class="container p-1 text-xs text-center text-slate-400 bg-green-50">
+    <span>Annabelle</span>
+  </footer>
 </div>
