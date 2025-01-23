@@ -3,10 +3,6 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ['preview', 'modal', 'modalBody']
 
-  connect() {
-    console.log('Hello, Stimulus!', this.element.id)
-  }
-
   resetForm(evt) {
     const form = evt.target.closest('form')
     form.reset()
@@ -15,19 +11,36 @@ export default class extends Controller {
   changePreview(evt) {
     evt.preventDefault();
 
-    const controller = this;
-    const content = evt.currentTarget.firstElementChild.cloneNode(true);
-    controller.modalBodyTarget.innerHTML = '';
-    controller.modalBodyTarget.appendChild(content);
+    const content = evt.currentTarget.querySelector('img, video').cloneNode(true);
 
-    this.openModal();
+    if (this.isDisplayed(this.previewTarget)) {
+      this.clearPreview();
+      this.previewTarget.appendChild(content);
+    } else {
+      this.clearModal();
+      this.modalBodyTarget.appendChild(content);
+      this.openModal();
+    }
   }
 
-  clearPreview(evt) {
-    evt.preventDefault();
+  isDisplayed(elem) {
+    return elem.offsetParent !== null
+  }
 
-    const controller = this;
-    controller.modalBodyTarget.innerHTML = '';
+  handlerClearPreview(evt) {
+    this.clearPreview();
+  }
+
+  handlerCloseModal(evt) {
+    this.closeModal();
+  }
+
+  clearPreview() {
+    this.previewTarget.innerHTML = '';
+  }
+
+  clearModal() {
+    this.modalBodyTarget.innerHTML = '';
   }
 
   openModal() {

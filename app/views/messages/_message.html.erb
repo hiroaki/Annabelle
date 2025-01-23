@@ -11,16 +11,16 @@
   <div class="container">
     <% if message.attachements.attached? %>
       <% message.attachements.each do |att| %>
-        <div class="container">
+        <div class="container relative">
 
           <% if att.representable? %>
-            <div class="h-40 w-40 bg-gray-200 relative" data-action="click->messages#changePreview">
+            <div class="h-40 w-40 bg-gray-200 flex" data-action="click->messages#changePreview">
               <% if ['video/quicktime', 'video/mp4'].include?(att.content_type) %>
                 <%= video_tag([rails_blob_path(att)],
                   poster: url_for(att.representation(resize_to_limit: [640, 480])),
                   controls: true,
                   muted: true,
-                  class: 'lazyload w-auto h-full object-contain',
+                  class: 'lazyload object-contain max-h-full max-w-full',
                   preload: false,
                 )
                 %>
@@ -28,7 +28,7 @@
               <% else %>
                 <%=
                   image_tag('blank.png',
-                    class: 'lazyload w-auto h-full object-contain',
+                    class: 'lazyload object-contain max-h-full max-w-full',
                     data: {
                       src: url_for(att),
                     }

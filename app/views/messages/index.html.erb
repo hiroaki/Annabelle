@@ -1,11 +1,12 @@
 <div id="messages-container" data-controller="messages" class="container">
-
+  <!-- 1/4 -->
   <header class="container p-1 text-xs text-center text-slate-400 bg-green-50">
     <h1 class="text-2xl font-extrabold">
-      Message Board
+      Annabelle Message Board
     </h1>
   </header>
 
+  <!-- 2/4 -->
   <div id="form-container" class="container p-4 bg-blue-50">
     <%=
       form_with(
@@ -16,33 +17,39 @@
         }
       ) do |form|
     %>
-      <%= form.text_area(:content,
-        rows: 3,
-        class: 'w-full'
-      ) %>
-
-      <%= form.file_field(:attachements,
-        multiple: true,
-        class: ''
-      ) %>
-
-      <%= form.submit('Submit',
-        class: ''
-      ) %>
-    <% end %>
+      <div class="container">
+        <%= form.text_area(:content,
+          rows: 3,
+          class: 'w-full'
+        ) %>
+      </div>
+      <div class="container">
+        <%= form.file_field(:attachements,
+          multiple: true,
+          class: 'w-full'
+        ) %>
+      </div>
+      <div class="container">
+        <%= form.submit('Submit',
+          class: 'w-full'
+        ) %>
+      <% end %>
+    </div>
 
     <div id="flash-message-container">
       <%= render 'flash' %>
     </div>
   </div>
 
-  <div id="container" class="container p-4 bg-pink-50">
-    <div id="left" class="">
+  <!-- 3/4 -->
+  <div class="flex flex-col md:flex-row md:p-4">
+    <!-- A -->
+    <div id="left" class="md:w-1/2 p-2 bg-red-50">
       <div class="container" data-class="paginate">
         <%= paginate @messages %>
       </div>
 
-      <div id="messages" class="">
+      <div id="messages" class="container">
         <%= render @messages %>
       </div>
 
@@ -51,25 +58,27 @@
       </div>
     </div>
 
-    <div id="right" class="container">
-      <div id="preview" class="" data-messages-target="preview" data-action="click->messages#clearPreview">
+    <!-- B -->
+    <div id="right" class="md:w-1/2 p-2 hidden md:block bg-gray-100">
+      <div id="preview" class="sticky top-2" data-messages-target="preview" data-action="click->messages#handlerClearPreview">
       </div>
+    </div>
 
-      <div id="modal" data-messages-target="modal" class="fixed inset-0 hidden bg-black bg-opacity-50 flex justify-center items-center">
-        <div id="modal-content" class="bg-white rounded-lg shadow-lg max-w-3xl w-full max-h-full overflow-auto">
-          <div class="flex justify-end p-2">
-            <button id="close-modal" class="text-gray-500 hover:text-gray-800" data-action="click->messages#closeModal">✖</button>
-          </div>
-          <div id="modal-body" data-messages-target="modalBody" class="p-4">
-            <!-- モーダルコンテンツがここにロードされます -->
-          </div>
+    <!-- C -->
+    <div data-messages-target="modal" class="fixed inset-0 hidden bg-black bg-opacity-50 flex justify-center items-center">
+      <div class="bg-white rounded-lg shadow-lg max-w-3xl w-full max-h-full overflow-auto">
+        <div class="flex justify-end px-4">
+          <button class="text-gray-500 hover:text-gray-800" data-action="click->messages#handlerCloseModal">✖</button>
+        </div>
+        <div data-messages-target="modalBody" class="pb-4 px-4" data-action="click->messages#handlerCloseModal">
+          <!-- modal content is displayed here -->
         </div>
       </div>
     </div>
   </div>
 
+  <!-- 4/4 -->
   <footer class="container p-1 text-xs text-center text-slate-400 bg-green-50">
     <span>Annabelle</span>
   </footer>
 </div>
-
