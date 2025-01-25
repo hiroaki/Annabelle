@@ -1,40 +1,57 @@
-<div id="messages-container" data-controller="messages" class="container">
+<div id="messages-container" data-controller="messages" class="container bg-gray-100">
   <!-- 1/4 -->
-  <header class="container p-1 text-xs text-center text-slate-400 bg-green-50">
-    <h1 class="text-2xl font-extrabold">
-      Annabelle Message Board
+  <header class="container p-1 text-xs text-center text-slate-400">
+    <h1 class="text-xl font-extrabold">
+      Annabelle - Message Board
     </h1>
   </header>
 
   <!-- 2/4 -->
-  <div id="form-container" class="container p-4 bg-blue-50">
+  <div id="form-container" class="container md:px-4  sticky top-0 z-10 max-w-xl">
+    <!-- WORKAROUND: z-index:10 にしないと video が textarea の上に表示されてしまいます。
+    web インスペクタを操作して z-index: 1 にすると、その時は textarea が上になるのですが、
+    ここを z-1 に書き換えてページをリロードすると、 textarea が、やはり下になります。
+    ページのロード時に全体の z-index 関係のの計算を、どこかでしているのかもしれません？
+    -->
     <%=
       form_with(
         url: messages_path,
         html: {
           'data-action' => 'turbo:submit-end->messages#resetForm',
-          'class' => 'block',
+          'class' => 'block pb-4 mx-2',
         }
       ) do |form|
     %>
-      <div class="container">
-        <%= form.text_area(:content,
-          rows: 3,
-          class: 'w-full'
-        ) %>
+      <div class="border border-gray-200 rounded-lg bg-gray-50">
+        <div class="px-4 py-2 bg-white rounded-t-lg">
+          <label for="comment" class="sr-only">Comment</label>
+          <%= form.text_area(:content,
+            id: 'comment',
+            rows: 3,
+            class: 'w-full px-0 text-sm text-gray-900 bg-white border-0 focus:ring-0',
+            required: true,
+          ) %>
+        </div>
+        <div class="flex items-center justify-between px-3 py-2 border-t">
+
+          <div class="my-0 text-left">
+            <button type="submit" class=" items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 hover:bg-blue-800">
+            Post
+            </button>
+          </div>
+
+          <div class="flex ps-0 space-x-1 rtl:space-x-reverse sm:ps-2">
+            <label class="inline-flex justify-center items-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100">
+              <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 12 20">
+                <path stroke="currentColor" stroke-linejoin="round" stroke-width="2" d="M1 6v8a5 5 0 1 0 10 0V4.5a3.5 3.5 0 1 0-7 0V13a2 2 0 0 0 4 0V6"/>
+              </svg>
+              <%= form.file_field(:attachements, multiple: true, class: 'hidden') %>
+            </label>
+          </div>
+
+        </div>
       </div>
-      <div class="container">
-        <%= form.file_field(:attachements,
-          multiple: true,
-          class: 'w-full'
-        ) %>
-      </div>
-      <div class="container">
-        <%= form.submit('Submit',
-          class: 'w-full'
-        ) %>
-      <% end %>
-    </div>
+    <% end %>
 
     <div id="flash-message-container">
       <%= render 'flash' %>
@@ -44,7 +61,7 @@
   <!-- 3/4 -->
   <div class="flex flex-col md:flex-row md:p-4">
     <!-- A -->
-    <div id="left" class="md:w-1/2 p-2 bg-red-50">
+    <div id="left" class="md:w-1/2 p-2">
       <div class="container" data-class="paginate">
         <%= paginate @messages %>
       </div>
@@ -59,13 +76,13 @@
     </div>
 
     <!-- B -->
-    <div id="right" class="md:w-1/2 p-2 hidden md:block bg-gray-100">
+    <div id="right" class="z-10 md:w-1/2 p-2 hidden md:block">
       <div id="preview" class="sticky top-2" data-messages-target="preview" data-action="click->messages#handlerClearPreview">
       </div>
     </div>
 
     <!-- C -->
-    <div data-messages-target="modal" class="fixed inset-0 hidden bg-black bg-opacity-50 flex justify-center items-center">
+    <div data-messages-target="modal" class="z-10 fixed inset-0 hidden bg-black bg-opacity-50 flex justify-center items-center">
       <div class="bg-white rounded-lg shadow-lg max-w-3xl w-full max-h-full overflow-auto">
         <div class="flex justify-end px-4">
           <button class="text-gray-500 hover:text-gray-800" data-action="click->messages#handlerCloseModal">✖</button>
@@ -78,7 +95,7 @@
   </div>
 
   <!-- 4/4 -->
-  <footer class="container p-1 text-xs text-center text-slate-400 bg-green-50">
-    <span>Annabelle</span>
+  <footer class="container p-1 text-xs text-center text-slate-400 bg-green-500 text-white">
+    <span>Annabelle - Message Board</span>
   </footer>
 </div>
