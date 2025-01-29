@@ -19,6 +19,8 @@
         html: {
           'data-action' => 'turbo:submit-end->messages#resetForm',
           'class' => 'block pb-4 mx-2',
+          'data-controller' => 'file-upload',
+          'data-file-upload-target' => 'dropZone',
         }
       ) do |form|
     %>
@@ -40,12 +42,18 @@
             </button>
           </div>
 
-          <div class="flex ps-0 space-x-1 rtl:space-x-reverse sm:ps-2">
+          <div class="flex ps-0 space-x-1 rtl:space-x-reverse sm:ps-2" data-file-upload-target="reactionZone" data-reaction-class="bg-red-200">
             <label class="inline-flex justify-center items-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100">
               <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 12 20">
                 <path stroke="currentColor" stroke-linejoin="round" stroke-width="2" d="M1 6v8a5 5 0 1 0 10 0V4.5a3.5 3.5 0 1 0-7 0V13a2 2 0 0 0 4 0V6"/>
               </svg>
-              <%= form.file_field(:attachements, multiple: true, class: 'hidden') %>
+              <%=
+                form.file_field(:attachements,
+                  multiple: true,
+                  class: 'hidden',
+                  data: { 'file-upload-target' => 'fileInput' },
+                )
+              %>
             </label>
           </div>
 
