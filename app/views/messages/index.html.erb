@@ -17,7 +17,7 @@
       form_with(
         url: messages_path,
         html: {
-          'data-action' => 'turbo:submit-end->messages#resetForm',
+          'data-action' => 'turbo:submit-end->file-upload#resetForm',
           'class' => 'block pb-4 mx-2',
           'data-controller' => 'file-upload',
           'data-file-upload-target' => 'dropZone',
@@ -51,10 +51,16 @@
                 form.file_field(:attachements,
                   multiple: true,
                   class: 'hidden',
-                  data: { 'file-upload-target' => 'fileInput' },
+                  data: {
+                    'file-upload-target' => 'fileInput',
+                    'action' => 'change->file-upload#changeAttachements',
+                  },
+
                 )
               %>
             </label>
+
+            <span class="" data-file-upload-target="standbyFilesZone"></span>
           </div>
 
         </div>

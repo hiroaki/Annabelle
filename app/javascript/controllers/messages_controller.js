@@ -3,11 +3,6 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ['preview', 'modal', 'modalBody']
 
-  resetForm(evt) {
-    const form = evt.target.closest('form')
-    form.reset()
-  }
-
   changePreview(evt) {
     evt.preventDefault();
 
