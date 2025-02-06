@@ -1,4 +1,8 @@
-<div class="mb-2 container min-w-0 p-4 bg-white rounded-lg shadow-xs overflow-scroll" data-message-id="<%= message.id %>">
+<div
+  class="mb-2 container min-w-0 p-4 bg-white rounded-lg shadow-xs overflow-scroll"
+  data-message-id="<%= message.id %>"
+  <%= 'data-new-message="true"'.html_safe if defined?(as_new) && !!as_new %><%# see also tailwind definition %>
+>
   <div class="text-xs pb-2">
     <%= link_to "&#x1f5d1;".html_safe, message_path(message), data: { turbo_method: :delete, turbo_confirm: 'Sure?' } %>
     <%= message.created_at.in_time_zone('Asia/Tokyo').strftime('%Y-%m-%d %H:%M:%S') %>
