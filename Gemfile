@@ -71,3 +71,7 @@ gem "solid_cable", "~> 3.0"
 gem "tailwindcss-rails", "~> 3.0"
 
 gem "kaminari", "~> 1.2"
+
+# The version is specified to avoid "Unresolved or ambiguous specs" warnings.
+gem "stringio", "~> 3.1.5"
+
