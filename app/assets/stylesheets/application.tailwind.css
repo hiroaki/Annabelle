@@ -11,3 +11,9 @@
 }
 
 */
+
+@layer components {
+  #messages div[data-new-message="true"] {
+    @apply bg-red-100;
+  }
+}

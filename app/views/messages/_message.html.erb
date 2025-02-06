@@ -1,5 +1,9 @@
-<div class="container min-h-4 border-b-2 border-dotted border-gray-400 pb-4" data-message-id="<%= message.id %>">
-  <div class="text-xs text-gray-400 mb-2">
+<div
+  class="mb-2 container min-w-0 p-4 bg-white rounded-lg shadow-xs overflow-scroll"
+  data-message-id="<%= message.id %>"
+  <%= 'data-new-message="true"'.html_safe if defined?(as_new) && !!as_new %><%# see also tailwind definition %>
+>
+  <div class="text-xs pb-2">
     <%= link_to "&#x1f5d1;".html_safe, message_path(message), data: { turbo_method: :delete, turbo_confirm: 'Sure?' } %>
     <%= message.created_at.in_time_zone('Asia/Tokyo').strftime('%Y-%m-%d %H:%M:%S') %>
   </div>
@@ -8,35 +12,55 @@
     <%= message.content %>
   </div>
 
-  <div class="flex overflow-auto">
+  <div class="container">
     <% if message.attachements.attached? %>
       <% message.attachements.each do |att| %>
-        <div class="attachement">
-
+        <div class="container">
           <% if att.representable? %>
-            <div class="overflow-hidden h-20 w-56" data-action="click->messages#changePreview">
+            <div class="h-40 w-40 bg-gray-200 flex" data-action="click->messages#changePreview">
               <% if ['video/quicktime', 'video/mp4'].include?(att.content_type) %>
+                <div class="relative">
                 <%= video_tag([rails_blob_path(att)],
                   poster: url_for(att.representation(resize_to_limit: [640, 480])),
-                  width: '100%',
                   controls: true,
                   muted: true,
-                  class: 'lazyload w-full',
+                  class: 'lazyload object-contain max-h-full max-w-full my-2',
                   preload: false,
                 )
                 %>
+                <!-- WORKAROUND: In some cases, the video tag is not directly clickable in small displays,
+                  so a transparent layer is placed over it so that it can be clicked.
+                  The event is propagated to the parent element.
+                -->
+                <div style="position: absolute; top:0; left:0; width: 100%; height: 100%;"></div>
+                </div>
               <% else %>
-                <%= image_tag('blank.png', width: '100%', 'data-src' => url_for(att), class: 'lazyload w-full') %>
+                <%=
+                  image_tag('blank.png',
+                    class: 'lazyload object-contain max-h-full max-w-full mx-auto my-2',
+                    data: {
+                      src: url_for(att),
+                    }
+                  )
+                %>
               <% end %>
             </div>
           <% end %>
 
-          <div class="text-xs text-gray-400">
-            <%= link_to "&#x1F4BE;".html_safe, rails_blob_path(att, disposition: "attachment") %>
+          <div class="text-xs">
+            <%=
+              link_to('&#x1F4BE;'.html_safe, rails_blob_path(att, disposition: 'attachment'),
+                class: 'tooltip-trigger inline-block ',
+                data: {
+                  controller: 'tooltips',
+                  tooltip: att.filename.to_s,
+                }
+              )
+            %>
+            <div class="tooltip hidden absolute bg-gray-800 text-white text-sm p-2 rounded-md max-w-xs z-10 whitespace-nowrap"></div>
             <span><%= att.content_type %></span>
             <span><%= att.byte_size.to_fs(:human_size) %></span>
           </div>
-
         </div>
       <% end %>
     <% end %>

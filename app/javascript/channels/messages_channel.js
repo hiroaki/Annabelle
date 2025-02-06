@@ -16,9 +16,15 @@ consumer.subscriptions.create("MessagesChannel", {
     console.log("MessagesChannel: received", data)
 
     const messages = document.getElementById('messages');
+    const notificationTargets = document.querySelectorAll('[data-messages-channel="notification"]');
+    const page = document.querySelector('[data-current-page-number]')?.dataset?.currentPageNumber; // or undefined
 
     if (data['created']) {
-      messages.insertAdjacentHTML('afterbegin', data['rendered_message']);
+      if (page && page == '1') {
+        messages.insertAdjacentHTML('afterbegin', data['rendered_message']);
+      } else {
+        notificationTargets.forEach((nt) => nt.classList.remove('hidden'));
+      }
     }
     else if (data['destroyed']) {
       const destroyed_message_id = data['destroyed']

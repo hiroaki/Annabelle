@@ -2,7 +2,7 @@ class MessageBroadcastJob < ApplicationJob
   queue_as :default
 
   def render_message(message)
-    ApplicationController.renderer.render(partial: 'messages/message', locals: { message: message })
+    ApplicationController.renderer.render(partial: 'messages/message', locals: { message: message, as_new: true })
   end
 
   def perform(*args)

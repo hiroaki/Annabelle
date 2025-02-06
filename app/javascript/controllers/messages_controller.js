@@ -1,32 +1,48 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ['preview']
-
-  connect() {
-    console.log('Hello, Stimulus!', this.element.id)
-  }
-
-  resetForm(evt) {
-    const form = evt.target.closest('form')
-    form.reset()
-  }
+  static targets = ['preview', 'modal', 'modalBody']
 
   changePreview(evt) {
     evt.preventDefault();
 
-    const controller = this;
-    const content_type = evt.currentTarget.dataset.type;
-    const data_url = evt.currentTarget.dataset.url;
+    const content = evt.currentTarget.querySelector('img, video').cloneNode(true);
 
-    controller.previewTarget.innerHTML = '';
-    controller.previewTarget.appendChild(evt.currentTarget.firstElementChild.cloneNode(true));
+    if (this.isDisplayed(this.previewTarget)) {
+      this.clearPreview();
+      this.previewTarget.appendChild(content);
+    } else {
+      this.clearModal();
+      this.modalBodyTarget.appendChild(content);
+      this.openModal();
+    }
   }
 
-  clearPreview(evt) {
-    evt.preventDefault();
+  isDisplayed(elem) {
+    return elem.offsetParent !== null
+  }
 
-    const controller = this;
-    controller.previewTarget.innerHTML = '';
+  handlerClearPreview(evt) {
+    this.clearPreview();
+  }
+
+  handlerCloseModal(evt) {
+    this.closeModal();
+  }
+
+  clearPreview() {
+    this.previewTarget.innerHTML = '';
+  }
+
+  clearModal() {
+    this.modalBodyTarget.innerHTML = '';
+  }
+
+  openModal() {
+    this.modalTarget.classList.remove('hidden');
+  }
+
+  closeModal() {
+    this.modalTarget.classList.add('hidden');
   }
 }
