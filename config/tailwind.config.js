@@ -12,6 +12,9 @@ module.exports = {
       fontFamily: {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],
       },
+      scrollbarGutter: {
+        stable: 'stable',
+      },
     },
   },
   plugins: [
