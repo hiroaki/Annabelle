@@ -76,5 +76,7 @@ gem "kaminari", "~> 1.2"
 # The version is specified to avoid "Unresolved or ambiguous specs" warnings.
 gem "stringio", "~> 3.1.5"
 
-
 gem "devise", "~> 4.9"
+gem "omniauth"
+gem "omniauth-rails_csrf_protection"
+gem "omniauth-github"
