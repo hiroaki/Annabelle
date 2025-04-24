@@ -10,6 +10,11 @@
     </div>
 
     <div class="mb-6">
+      <%= f.label :username, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= f.text_field :username, autofocus: true, autocomplete: "username", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+    </div>
+
+    <div class="mb-6">
       <%= f.label :password, class: "block mb-2 text-sm font-medium text-gray-900" %>
       <div class="flex items-center mb-2">
         <% if @minimum_password_length %>
