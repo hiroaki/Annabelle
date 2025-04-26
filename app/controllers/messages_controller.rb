@@ -30,7 +30,7 @@ class MessagesController < ApplicationController
     end
 
     def admin_user
-      User.find_by(email: 'admin@localhost', admin: true)
+      User.admin_user
     end
 
   public
