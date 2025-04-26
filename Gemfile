@@ -69,6 +69,8 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+
+  gem 'shoulda-matchers', '~> 6.0'
 end
 
 gem "solid_cable", "~> 3.0"
@@ -84,3 +86,4 @@ gem "devise", "~> 4.9"
 gem "omniauth"
 gem "omniauth-rails_csrf_protection"
 gem "omniauth-github"
+
