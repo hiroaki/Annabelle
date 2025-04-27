@@ -48,6 +48,10 @@ group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ]
   gem 'dotenv-rails'
+
+  gem 'pry-rails'
+  gem 'rspec-rails', '~> 7.1', '>= 7.1.1'
+  gem 'factory_bot_rails'
 end
 
 group :development do
@@ -65,6 +69,8 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+
+  gem 'shoulda-matchers', '~> 6.0'
 end
 
 gem "solid_cable", "~> 3.0"
@@ -76,5 +82,8 @@ gem "kaminari", "~> 1.2"
 # The version is specified to avoid "Unresolved or ambiguous specs" warnings.
 gem "stringio", "~> 3.1.5"
 
-
 gem "devise", "~> 4.9"
+gem "omniauth"
+gem "omniauth-rails_csrf_protection"
+gem "omniauth-github"
+
