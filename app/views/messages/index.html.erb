@@ -1,18 +1,24 @@
 <div id="messages-container" data-controller="messages" class="container bg-gray-100">
   <!-- 1/4 -->
-  <header class="container flex p-2 md:px-6 text-xs text-center text-slate-400">
-    <div class="relative inline-flex items-center p-1 text-sm font-medium text-center">
-      <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
-        <path fill="white" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 5h9M5 9h5m8-8H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h4l3.5 4 3.5-4h5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"/>
-      </svg>
-      <span class="sr-only">Notifications</span>
-      <div data-messages-channel="notification" class="absolute inline-flex items-center justify-center w-4 h-4 text-xs text-white bg-red-500 border-white rounded-full -top-1 -end-1 hidden">
-        <%# see also app/javascript/channels/messages_channel.js #%>
-        &nbsp;
+  <header class="container flex p-2 md:px-6 text-xs text-center text-slate-400 items-center">
+    <div class="flex items-center">
+      <div class="relative inline-flex items-center p-1 text-sm font-medium text-center">
+        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
+          <path fill="white" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 5h9M5 9h5m8-8H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h4l3.5 4 3.5-4h5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"/>
+        </svg>
+        <span class="sr-only">Notifications</span>
+        <div data-messages-channel="notification" class="absolute inline-flex items-center justify-center w-4 h-4 text-xs text-white bg-red-500 border-white rounded-full -top-1 -end-1 hidden">
+          <%# see also app/javascript/channels/messages_channel.js #%>
+          &nbsp;
+        </div>
+      </div>
+      <div class="text-xl font-extrabold ml-2">
+        <span>Annabelle</span>
       </div>
     </div>
-    <div class="text-xl font-extrabold ml-2">
-      <span>Annabelle - Message Board</span>
+    <div class="flex ml-auto items-center space-x-4">
+      <%= link_to 'Sign out', destroy_user_session_path, data: { turbo_method: :delete }, class: 'text-gray-800 dark:text-white' %>
+      <%= link_to 'Edit Profile', edit_user_registration_path, class: 'text-gray-800 dark:text-white' %>
     </div>
   </header>
 
@@ -23,6 +29,9 @@
     ここを z-1 に書き換えてページをリロードすると、 textarea が、やはり下になります。
     ページのロード時に全体の z-index 関係のの計算を、どこかでしているのかもしれません？
     -->
+    <div id="flash-message-container" class="mx-2">
+      <%= render 'flash' %>
+    </div>
     <%=
       form_with(
         url: messages_path,
@@ -76,10 +85,6 @@
         </div>
       </div>
     <% end %>
-
-    <div id="flash-message-container">
-      <%= render 'flash' %>
-    </div>
   </div>
 
   <!-- 3/4 -->
