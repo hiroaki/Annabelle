@@ -8,7 +8,7 @@ class User < ApplicationRecord
   has_many :messages
 
   # ユーザの削除時は、そのユーザのメッセージは残し、所有者を管理者にします。
-  before_destroy :transfer_messages_to_admin
+  before_destroy :transfer_messages_to_admin!
 
   # devise の database_authenticatable を使用するため email は必須です。
   # その他追加のフィールドについては、必要に応じてバリデーションを追加してください。
@@ -16,6 +16,11 @@ class User < ApplicationRecord
     presence: true,
     uniqueness: { case_sensitive: false },
     format: { with: /\A[a-zA-Z0-9_]+\z/, message: 'can only contain letters, numbers, and underscores' }
+
+  #
+  def self.admin_user
+    User.find_by(email: 'admin@localhost', admin: true)
+  end
 
   # OAuth での登録時、初期ユーザ名はランダムな文字列にします。
   def self.generate_random_username
@@ -39,7 +44,7 @@ class User < ApplicationRecord
     if user.new_record?
       if auth.info.email.present?
         existing_user = User.find_by(email: auth.info.email)
-        unless existing_user&.confirmed?
+        if existing_user && !existing_user.confirmed?
           existing_user.destroy
         end
 
@@ -60,18 +65,15 @@ class User < ApplicationRecord
     user
   end
 
-  def admin_user
-    User.find_by(email: 'admin@localhost', admin: true)
-  end
-
   private
 
-  def transfer_messages_to_admin
-    admin = admin_user
+  def transfer_messages_to_admin!
+    admin = self.class.admin_user
+
     if admin
       messages.update_all(user_id: admin.id)
     else
-      logger.warn("Admin user not found. Cannot transfer messages for user_id: #{messages.first&.user_id}.")
+      raise "Admin user not found. Cannot transfer messages for user_id: #{id}."
     end
   end
 end

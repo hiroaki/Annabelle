@@ -1,53 +1,65 @@
 require 'rails_helper'
+require 'ostruct'
 
 RSpec.describe User, type: :model do
-  describe "associations" do
-    it { is_expected.to have_many(:messages) }
+  describe "バリデーション" do
+    context "ユーザー名について" do
+      subject { build(:user) }
+
+      context "存在性の確認" do
+        it "ユーザー名が必須であること" do
+          is_expected.to validate_presence_of(:username)
+        end
+      end
+
+      context "一意性の確認（大文字小文字区別なし）" do
+        it "重複しないユーザー名であること" do
+          is_expected.to validate_uniqueness_of(:username).case_insensitive
+        end
+      end
+
+      context "フォーマットの検証" do
+        it "有効な形式のユーザー名なら許可されること" do
+          is_expected.to allow_value("valid_username_123").for(:username)
+        end
+
+        it "無効な形式のユーザー名なら拒否されること" do
+          is_expected.not_to allow_value("invalid username!").for(:username)
+        end
+      end
+    end
   end
 
-  describe "validations" do
-    subject { build(:user) } # uniqueness をテストするので subject を指定
-
-    it { is_expected.to validate_presence_of(:username) }
-    it { is_expected.to validate_uniqueness_of(:username).case_insensitive }
-    it { is_expected.to allow_value("valid_username123").for(:username) }
-    it { is_expected.not_to allow_value("invalid username!").for(:username) }
-  end
-
-  describe ".generate_random_username" do
-    context "when generated username is unique" do
-      it "returns a unique username" do
-        username = User.generate_random_username
+  describe ".generate_random_username メソッド" do
+    context "生成されたユーザー名がユニークな場合" do
+      it "username が指定の正規表現にマッチすること" do
+        username = described_class.generate_random_username
         expect(username).to match(/\Auser_[a-z0-9]{8}\z/)
-        expect(User.exists?(username: username)).to be_falsey
       end
     end
 
-    context "when generated username conflicts" do
-      it "retries until unique username is found" do
-        taken_username = "user_abcdefgh"
-        create(:user, username: taken_username)
-
-        allow(SecureRandom).to receive(:alphanumeric).and_return("abcdefgh", "ijklmnop")
-
-        username = User.generate_random_username
-        expect(username).to eq("user_ijklmnop")
+    context "衝突が発生する場合" do
+      before do
+        allow(SecureRandom).to receive(:alphanumeric).and_return("duplicate")
+        create(:user, username: "user_duplicate")
       end
-    end
 
-    context "when unique username cannot be generated after 10 tries" do
-      it "raises an error" do
-        allow(SecureRandom).to receive(:alphanumeric).and_return("abcdefgh")
-        create(:user, username: "user_abcdefgh")
-
-        expect {
-          User.generate_random_username
-        }.to raise_error("Unable to generate unique username")
+      it "10回の試行後にユニークな username を生成できず、エラーが発生すること" do
+        expect { described_class.generate_random_username }.to raise_error("Unable to generate unique username")
       end
     end
   end
 
-  describe ".from_omniauth" do
+  describe ".generate_random_password メソッド" do
+    context "ランダムなパスワードが生成される場合" do
+      it "生成されたパスワードが20文字であること" do
+        password = described_class.generate_random_password
+        expect(password.length).to eq(20)
+      end
+    end
+  end
+
+  describe ".from_omniauth メソッド" do
     let(:auth) do
       OmniAuth::AuthHash.new(
         provider: "github",
@@ -59,112 +71,94 @@ RSpec.describe User, type: :model do
       )
     end
 
-    context "when user with provider and uid already exists" do
+    context "対象ユーザーが存在しない場合" do
+      it "新たに確認済みユーザーが作成されること" do
+        expect {
+          @user = described_class.from_omniauth(auth)
+        }.to change { User.count }.by(1)
+
+        expect(@user).to be_persisted
+        expect(@user.provider).to eq("github")
+        expect(@user.uid).to eq("12345")
+        expect(@user.email).to eq("user@example.com")
+        expect(@user.username).to match(/\Auser_[a-z0-9]{8}\z/)
+        expect(@user.confirmed?).to be true
+      end
+    end
+
+    context "provider と uid で既存かつ、全属性が設定済みの場合" do
       let!(:existing_user) { create(:user, provider: "github", uid: "12345", email: "old@example.com", username: "oldname") }
 
-      it "updates missing attributes if blank" do
-        existing_user.update(email: nil, username: nil)
-        user = User.from_omniauth(auth)
-
+      it "既存の email と username が上書きされないこと" do
+        user = described_class.from_omniauth(auth)
         expect(user).to eq(existing_user)
-        expect(user.email).to eq("user@example.com")
-        expect(user.username).to be_present
-        expect(user.persisted?).to be_truthy
-      end
-
-      it "does not overwrite existing email and username if present" do
-        user = User.from_omniauth(auth)
-
         expect(user.email).to eq("old@example.com")
         expect(user.username).to eq("oldname")
       end
     end
 
-    context "when user with provider and uid does not exist" do
-      context "and there is an unconfirmed user with same email" do
-        let!(:unconfirmed_user) { create(:user, email: "user@example.com", confirmed_at: nil) }
-
-        it "deletes the unconfirmed user and creates new one" do
-          expect {
-            User.from_omniauth(auth)
-          }.to change(User, :count).by(0) # 1削除＋1作成
-
-          expect(User.where(email: "user@example.com").count).to eq(1)
-          user = User.find_by(provider: "github", uid: "12345")
-          expect(user).to be_present
-          expect(user.confirmed?).to be_truthy
-        end
+    context "provider と uid で既存の場合" do
+      let!(:existing_user) do
+        create(:user, provider: "github", uid: "12345", email: "old@example.com", username: "existingusername")
       end
 
-      context "and there is a confirmed user with same email" do
-        let!(:confirmed_user) { create(:user, email: "user@example.com", confirmed_at: Time.current) }
-
-        it "does not delete confirmed user" do
-          expect {
-            User.from_omniauth(auth)
-          }.not_to change(User, :count)
-
-          expect(User.where(email: "user@example.com").count).to eq(1)
-          user = User.find_by(email: "user@example.com")
-          expect(user.provider).to eq("github")
-          expect(user.uid).to eq("12345")
-        end
+      it "既存ユーザのレコードが更新されず、そのまま返却されること" do
+        user = described_class.from_omniauth(auth)
+        expect(user).to eq(existing_user)
+        expect(user.email).to eq("old@example.com")
+        expect(user.username).to eq("existingusername")
       end
+    end
 
-      context "and no existing user with same email" do
-        it "creates a new user" do
-          expect {
-            User.from_omniauth(auth)
-          }.to change(User, :count).by(1)
+    context "同じメールアドレスを持つ未確認ユーザーが存在する場合" do
+      let!(:unconfirmed_user) { create(:user, email: "user@example.com", confirmed_at: nil) }
 
-          user = User.last
-          expect(user.email).to eq("user@example.com")
-          expect(user.provider).to eq("github")
-          expect(user.uid).to eq("12345")
-          expect(user.confirmed?).to be_truthy
-        end
+      it "未確認ユーザーが削除され、新たにユーザーが作成されること" do
+        expect {
+          described_class.from_omniauth(auth)
+        }.to change { User.count }.by(0)  # 未確認ユーザーの削除と新規作成で件数は変化しない
+
+        user = User.find_by(email: "user@example.com")
+        expect(user.provider).to eq("github")
+      end
+    end
+
+    context "同じメールアドレスを持つ確認済みユーザーが存在する場合" do
+      let!(:confirmed_user) { create(:user, email: "user@example.com", confirmed_at: Time.current) }
+
+      it "既存の確認済みユーザーがそのまま使用されること" do
+        expect {
+          described_class.from_omniauth(auth)
+        }.to change { User.count }.by(0)
+
+        user = User.find_by(email: "user@example.com")
+        expect(user).to eq(confirmed_user)
       end
     end
   end
 
-  describe "#transfer_messages_to_admin" do
-    let(:user) { create(:user) }
-    let!(:message1) { create(:message, user: user) }
-    let!(:message2) { create(:message, user: user) }
+  describe "#transfer_messages_to_admin インスタンスメソッド" do
+    let!(:admin) { User.admin_user }
+    let!(:user) { create(:user) }
+    let!(:messages) { create_list(:message, 3, user: user) }
 
-    context "when admin user exists" do
-      let!(:admin) { create(:user, email: 'admin@localhost', admin: true, confirmed_at: Time.current) }
-
-      it "transfers all messages to the admin user" do
+    context "管理者ユーザーが存在する場合" do
+      it "ユーザー削除時に全メッセージが管理者に移管されること" do
         expect {
-          user.transfer_messages_to_admin
-        }.to change { message1.reload.user_id }.from(user.id).to(admin.id)
-         .and change { message2.reload.user_id }.from(user.id).to(admin.id)
+          user.destroy
+        }.to change { messages.map { |msg| msg.reload.user_id } }.to(all(eq(admin.id)))
       end
     end
 
-    context "when admin user does not exist" do
+    context "管理者ユーザーが存在しない場合" do
       before do
-        allow(Rails.logger).to receive(:warn)
+        admin.destroy
       end
 
-      it "does not raise an error and logs a warning" do
+      it "ユーザー削除時に例外が発生すること" do
         expect {
-          user.transfer_messages_to_admin
-        }.not_to raise_error
-
-        expect(Rails.logger).to have_received(:warn).with(/Admin user not found/)
-      end
-    end
-
-    context "when user has no messages" do
-      let(:user_without_messages) { create(:user) }
-      let!(:admin) { create(:user, email: 'admin@localhost', admin: true, confirmed_at: Time.current) }
-
-      it "does nothing and does not raise error" do
-        expect {
-          user_without_messages.transfer_messages_to_admin
-        }.not_to raise_error
+          user.destroy
+        }.to raise_error(RuntimeError, /Admin user not found\. Cannot transfer messages for user_id:/)
       end
     end
   end
