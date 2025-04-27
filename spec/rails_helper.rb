@@ -73,6 +73,7 @@ RSpec.configure do |config|
 
   #
   config.include FactoryBot::Syntax::Methods
+  config.include ActionDispatch::TestProcess
 
   # https://github.com/thoughtbot/shoulda-matchers/tree/v6.4.0?tab=readme-ov-file#rails-apps
   Shoulda::Matchers.configure do |config|
