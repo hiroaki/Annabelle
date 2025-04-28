@@ -25,6 +25,10 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       @user = User.from_omniauth(auth)
 
       if @user.persisted?
+        if @user.saved_change_to_id?
+          session["user_return_to"] = edit_user_registration_path
+        end
+
         sign_in_and_redirect @user, event: :authentication # this will throw if @user is not activated
         set_flash_message(:notice, :success, kind: "github") if is_navigational_format?
       else
