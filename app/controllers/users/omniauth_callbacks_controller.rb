@@ -14,10 +14,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
         redirect_to edit_user_registration_path and return
       else
         # 未連携または同一の情報の場合は、連携を実施
-        current_user.update(
-          provider: auth.provider,
-          uid: auth.uid
-        )
+        current_user.link_with(auth.provider, auth.uid)
         flash[:notice] = "GitHub との連携が成功しました。"
         redirect_to edit_user_registration_path
       end

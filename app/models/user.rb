@@ -65,6 +65,15 @@ class User < ApplicationRecord
     user
   end
 
+  def link_with(provider, uid)
+    update(provider: provider, uid: uid)
+  end
+
+  # 指定した provider とアカウントを連携している場合は true を返します。
+  def linked_with?(provider)
+    self.provider == provider.to_s && self.uid.present?
+  end
+
   private
 
   def transfer_messages_to_admin!

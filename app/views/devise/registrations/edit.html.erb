@@ -54,6 +54,41 @@
     </div>
   <% end %>
 
+  <hr class="my-4">
+
+  <div class="mb-4">
+    <%- if devise_mapping.omniauthable? %>
+      <%- resource_class.omniauth_providers.each do |provider| %>
+
+        <% provider_name = OmniAuth::Utils.camelize(provider) %>
+
+        <% if resource.linked_with?(provider) %>
+          <%=
+            button_to("#{provider_name}アカウントの連携を解除", unlink_oauth_path,
+              method: :delete,
+              class: "w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2",
+              data: {
+                turbo: false,
+                confirm: '本当に#{provider_name}認証を無効化しますか？',
+              },
+              id: "unlink-button-#{provider}"
+            )
+          %>
+        <% else %>
+          <%=
+            button_to("#{provider_name}アカウントと連携", omniauth_authorize_path(resource_name, provider),
+              class: "w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2",
+              data: { turbo: false },
+              id: "oauth-button-#{provider}"
+            )
+          %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <hr class="my-4">
+
   <h3 class="text-xl font-bold mt-8 mb-4">Cancel my account</h3>
 
   <div class="mb-4">
