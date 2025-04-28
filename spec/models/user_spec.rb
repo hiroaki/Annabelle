@@ -162,4 +162,46 @@ RSpec.describe User, type: :model do
       end
     end
   end
+
+  describe ".admin_user メソッド" do
+    context "admin ユーザーが存在する場合" do
+      it "admin ユーザーを返すこと" do
+        admin = User.admin_user
+        expect(admin).to be_present
+        expect(admin.email).to eq('admin@localhost')
+        expect(admin.admin).to be true
+      end
+    end
+  
+    context "admin ユーザーが存在しない場合" do
+      it "nil を返すこと" do
+        admin = User.admin_user
+        admin.destroy
+  
+        expect(User.admin_user).to be_nil
+      end
+    end
+  end
+    
+  describe "#link_with メソッド" do
+    let!(:user) { create(:user) }
+
+    it "ユーザーの provider と uid を更新すること" do
+      user.link_with('github', '12345')
+      expect(user.provider).to eq('github')
+      expect(user.uid).to eq('12345')
+    end
+  end
+
+  describe "#linked_with? メソッド" do
+    let!(:user) { create(:user, provider: 'github', uid: '12345') }
+
+    it "provider と uid が一致する場合 true を返すこと" do
+      expect(user.linked_with?('github')).to be true
+    end
+
+    it "provider または uid が一致しない場合 false を返すこと" do
+      expect(user.linked_with?('google')).to be false
+    end
+  end
 end

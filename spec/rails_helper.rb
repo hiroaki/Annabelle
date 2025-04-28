@@ -23,7 +23,7 @@ require 'rspec/rails'
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
-# Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
+Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
@@ -74,6 +74,11 @@ RSpec.configure do |config|
   #
   config.include FactoryBot::Syntax::Methods
   config.include ActionDispatch::TestProcess
+  config.include OmniauthMacros # in support directory
+
+  config.include Warden::Test::Helpers
+  config.after(type: :system) { Warden.test_reset! }
+  config.after(type: :request) { Warden.test_reset! } # request でも使うなら
 
   # https://github.com/thoughtbot/shoulda-matchers/tree/v6.4.0?tab=readme-ov-file#rails-apps
   Shoulda::Matchers.configure do |config|
