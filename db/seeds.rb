@@ -16,7 +16,5 @@ unless User.exists?(email: 'admin@localhost', admin: true)
     admin: true,
     confirmed_at: Time.current
   )
-  puts "Admin user created."
-else
-  puts "Admin user already exists."
+  puts "seed: Admin user created."
 end
