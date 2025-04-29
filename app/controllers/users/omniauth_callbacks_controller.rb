@@ -30,12 +30,12 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
         set_flash_message(:notice, :success, kind: "github") if is_navigational_format?
       else
         session["devise.github_data"] = auth.except(:extra) # Removing extra as it can overflow some session stores
-        redirect_to new_user_registration_url, alert: "GitHub 認証に失敗しました。"
+        redirect_to new_user_registration_path, alert: "GitHub 認証に失敗しました。"
       end
     end
   end
 
   def failure
-    redirect_to root_path
+    redirect_to new_user_session_path
   end
 end

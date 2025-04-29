@@ -30,10 +30,10 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe ".generate_random_username メソッド" do
+  describe ".generate_random_username! メソッド" do
     context "生成されたユーザー名がユニークな場合" do
       it "username が指定の正規表現にマッチすること" do
-        username = described_class.generate_random_username
+        username = described_class.generate_random_username!
         expect(username).to match(/\Auser_[a-z0-9]{8}\z/)
       end
     end
@@ -45,7 +45,7 @@ RSpec.describe User, type: :model do
       end
 
       it "10回の試行後にユニークな username を生成できず、エラーが発生すること" do
-        expect { described_class.generate_random_username }.to raise_error("Unable to generate unique username")
+        expect { described_class.generate_random_username! }.to raise_error("Unable to generate unique username")
       end
     end
   end

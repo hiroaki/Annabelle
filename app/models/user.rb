@@ -23,7 +23,7 @@ class User < ApplicationRecord
   end
 
   # OAuth での登録時、初期ユーザ名はランダムな文字列にします。
-  def self.generate_random_username
+  def self.generate_random_username!
     10.times do
       username = "user_#{SecureRandom.alphanumeric(8).downcase}"
       return username unless User.exists?(username: username)
@@ -39,30 +39,31 @@ class User < ApplicationRecord
   # OAuth コールバックを処理します。認証結果の auth に基づいてユーザーを返します。
   # 存在しないユーザの場合は作成して返します。
   def self.from_omniauth(auth)
-    user = find_or_initialize_by(provider: auth.provider, uid: auth.uid)
+    find_or_initialize_by(provider: auth.provider, uid: auth.uid).tap do |user|
+      next unless user.new_record?
 
-    if user.new_record?
-      if auth.info.email.present?
-        existing_user = User.find_by(email: auth.info.email)
-        if existing_user && !existing_user.confirmed?
-          existing_user.destroy
+      begin
+        transaction do
+          if auth.info.email.present?
+            existing_user = find_by(email: auth.info.email)
+            existing_user.destroy if existing_user && !existing_user.confirmed?
+
+            user.email = auth.info.email
+            user.skip_confirmation! if user.respond_to?(:skip_confirmation!)
+          end
+
+          user.username = generate_random_username!
+          user.password = generate_random_password
+
+          unless user.save
+            Rails.logger.error("User creation failed: #{user.errors.full_messages.join(', ')}")
+            raise ActiveRecord::Rollback
+          end
         end
-
-        user.email = auth.info.email
-        user.skip_confirmation! if user.respond_to?(:skip_confirmation!)
-      end
-
-      user.username = generate_random_username
-      user.password = generate_random_password
-
-      if user.save
-        logger.info("User created: #{user.id}")
-      else
-        logger.error("User creation failed: #{user.errors.full_messages.join(', ')}")
+      rescue => e
+        Rails.logger.error("from_omniauth: #{e}")
       end
     end
-
-    user
   end
 
   def link_with(provider, uid)
