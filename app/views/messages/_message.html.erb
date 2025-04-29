@@ -1,11 +1,24 @@
 <div
   class="mb-2 w-full min-w-0 p-4 bg-white rounded-lg shadow-xs overflow-auto scrollbar-gutter-stable"
   data-message-id="<%= message.id %>"
+  data-owner-id="<%= message.user.id %>"
+  data-controller="message-ownership"
   <%= 'data-new-message="true"'.html_safe if defined?(as_new) && !!as_new %><%# see also tailwind definition %>
 >
-  <div class="text-xs pb-2">
-    <%= link_to "&#x1f5d1;".html_safe, message_path(message), data: { turbo_method: :delete, turbo_confirm: 'Sure?' } %>
-    <%= message.created_at.in_time_zone('Asia/Tokyo').strftime('%Y-%m-%d %H:%M:%S') %>
+  <div class="text-gray-400 text-xs pb-2">
+    <%=
+      link_to("&#x1f5d1;".html_safe, message_path(message),
+        data: {
+          turbo_method: :delete,
+          turbo_confirm: 'Sure?',
+          message_ownership_target: 'owner',
+        },
+        class: 'hidden',
+      )
+    %>
+    <span data-message-ownership-target="nonOwner" class="hidden">&#x270e;</span>
+    <span class="mx-1"><%= message.created_at.in_time_zone('Asia/Tokyo').strftime('%Y-%m-%d %H:%M:%S') %></span>
+    <span><%= message.user.username %></span>
   </div>
 
   <div class="container text-nowrap">

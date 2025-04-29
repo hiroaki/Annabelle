@@ -7,6 +7,10 @@
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <% if current_user %>
+      <meta name="current-user-id" content="<%= current_user.id %>" data-turbo-track="reload">
+    <% end %>
   </head>
 
   <body>
