@@ -1,0 +1,17 @@
+# enabled を true にセットするとユーザ認証は自動で admin ユーザでログインし、
+# ログイン画面はスキップされるようになります。
+# email を設定するとそのユーザでログインします。
+#
+# rails_env:
+#   enabled: boolean
+#   email: string
+#
+
+development:
+  enabled: false
+
+test:
+  enabled: false
+
+production:
+  enabled: false
