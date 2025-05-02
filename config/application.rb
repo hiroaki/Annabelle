@@ -31,4 +31,9 @@ module Annabelle
     host: ENV['ANNABELLE_HOST'].presence || 'localhost',
     port: ENV['ANNABELLE_PORT'].presence,
   }
+
+  # My experimental feature
+  Rails.application.configure do
+    config.x.auto_login = config_for(Rails.root.join('config/x/auto_login.yml'))
+  end
 end
