@@ -5,6 +5,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :confirmable, :omniauthable, omniauth_providers: %i[github]
 
+  has_many :authorizations, dependent: :destroy
   has_many :messages
 
   # ユーザの削除時は、そのユーザのメッセージは残し、所有者を管理者にします。
@@ -17,7 +18,8 @@ class User < ApplicationRecord
     uniqueness: { case_sensitive: false },
     format: { with: /\A[a-zA-Z0-9_]+\z/, message: 'can only contain letters, numbers, and underscores' }
 
-  #
+  # 管理者ユーザを返します。（これは db:seed で追加されている特別なレコードです）
+  # TODO: 変更不可にする
   def self.admin_user
     User.find_by(email: 'admin@localhost', admin: true)
   end
@@ -39,40 +41,69 @@ class User < ApplicationRecord
   # OAuth コールバックを処理します。認証結果の auth に基づいてユーザーを返します。
   # 存在しないユーザの場合は作成して返します。
   def self.from_omniauth(auth)
-    find_or_initialize_by(provider: auth.provider, uid: auth.uid).tap do |user|
-      next unless user.new_record?
+    user = nil
 
-      begin
-        transaction do
-          if auth.info.email.present?
-            existing_user = find_by(email: auth.info.email)
-            existing_user.destroy if existing_user && !existing_user.confirmed?
+    begin
+      transaction do
+        authorization = Authorization.find_by(provider: auth.provider, uid: auth.uid)
+        return authorization.user if authorization
 
-            user.email = auth.info.email
-            user.skip_confirmation! if user.respond_to?(:skip_confirmation!)
+        if auth.info.email.present?
+          existing_user = find_by(email: auth.info.email)
+
+          if existing_user&.confirmed?
+            user = existing_user
+          elsif existing_user
+            existing_user.destroy
           end
+        end
 
-          user.username = generate_random_username!
-          user.password = generate_random_password
+        unless user
+          user = new(
+            email: auth.info.email,
+            username: generate_random_username!,
+            password: generate_random_password
+          )
+          user.skip_confirmation! if user.respond_to?(:skip_confirmation!)
 
           unless user.save
             Rails.logger.error("User creation failed: #{user.errors.full_messages.join(', ')}")
             raise ActiveRecord::Rollback
           end
         end
-      rescue => e
-        Rails.logger.error("from_omniauth: #{e}")
+
+        auth_record = user.authorizations.build(provider: auth.provider, uid: auth.uid)
+
+        unless auth_record.save
+          Rails.logger.error("Authorization creation failed for user (#{user.id}): #{auth_record.errors.full_messages.join(', ')}")
+          raise ActiveRecord::Rollback
+        end
       end
+    rescue => e
+      Rails.logger.error("from_omniauth: #{e}")
     end
+
+    user
   end
 
+  # 指定したプロバイダとUIDで連携を追加します。
   def link_with(provider, uid)
-    update(provider: provider, uid: uid)
+    authorizations.find_or_create_by(provider: provider, uid: uid)
   end
 
-  # 指定した provider とアカウントを連携している場合は true を返します。
+  # 指定した provider に紐づく認証情報が存在すれば true を返します。
   def linked_with?(provider)
-    self.provider == provider.to_s && self.uid.present?
+    authorizations.exists?(provider: provider.to_s)
+  end
+
+  # 指定した provider のレコードを返します。
+  def authorization_by_provider(provider)
+    authorizations.find_by(provider: provider.to_s)
+  end
+
+  # 指定した provider の uid を返します。
+  def provider_uid(provider)
+    authorization_by_provider(provider)&.uid
   end
 
   private

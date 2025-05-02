@@ -6,14 +6,10 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     auth = request.env["omniauth.auth"]
 
     if user_signed_in?
-      # 既にサインインしているユーザの場合、GitHub 情報がすでに登録されているかチェック
-      if current_user.provider.present? && current_user.uid.present? &&
-         (current_user.uid != auth.uid || current_user.provider != auth.provider)
-        # 他の GitHub アカウントと既に連携済みの場合は、上書きせずにキャンセル
+      if current_user.linked_with?(auth.provider) && current_user.provider_uid(auth.provider) != auth.uid
         flash[:alert] = "既に別の GitHub アカウントと連携されています。変更はキャンセルされました。"
         redirect_to edit_user_registration_path and return
       else
-        # 未連携または同一の情報の場合は、連携を実施
         current_user.link_with(auth.provider, auth.uid)
         flash[:notice] = "GitHub との連携が成功しました。"
         redirect_to edit_user_registration_path
@@ -21,7 +17,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     else
       @user = User.from_omniauth(auth)
 
-      if @user.persisted?
+      if @user&.persisted?
         if @user.saved_change_to_id?
           session["user_return_to"] = edit_user_registration_path
         end

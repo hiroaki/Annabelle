@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_24_141412) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_02_105206) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -39,6 +39,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_24_141412) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "authorizations", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "provider", null: false
+    t.string "uid", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["provider", "uid"], name: "index_authorizations_on_provider_and_uid", unique: true
+    t.index ["user_id"], name: "index_authorizations_on_user_id"
+  end
+
   create_table "messages", force: :cascade do |t|
     t.text "content"
     t.datetime "created_at", null: false
@@ -61,8 +71,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_24_141412) do
     t.datetime "confirmation_sent_at"
     t.string "unconfirmed_email"
     t.string "username"
-    t.string "provider"
-    t.string "uid"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -70,5 +78,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_24_141412) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "authorizations", "users"
   add_foreign_key "messages", "users"
 end
