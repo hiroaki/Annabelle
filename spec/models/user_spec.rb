@@ -72,67 +72,83 @@ RSpec.describe User, type: :model do
     end
 
     context "対象ユーザーが存在しない場合" do
-      it "新たに確認済みユーザーが作成されること" do
+      it "新たに確認済みユーザーが作成され、Authorizationが生成されること" do
         expect {
           @user = described_class.from_omniauth(auth)
         }.to change { User.count }.by(1)
 
         expect(@user).to be_persisted
-        expect(@user.provider).to eq("github")
-        expect(@user.uid).to eq("12345")
         expect(@user.email).to eq("user@example.com")
         expect(@user.username).to match(/\Auser_[a-z0-9]{8}\z/)
         expect(@user.confirmed?).to be true
+        expect(@user.authorizations).to exist(provider: "github", uid: "12345")
       end
     end
 
-    context "provider と uid で既存かつ、全属性が設定済みの場合" do
-      let!(:existing_user) { create(:user, provider: "github", uid: "12345", email: "old@example.com", username: "oldname") }
+    context "provider と uid に紐づく Authorization が既にある場合" do
+      let!(:user_with_auth) { create(:user) }
+      let!(:authorization) { create(:authorization, user: user_with_auth, provider: "github", uid: "12345") }
 
-      it "既存の email と username が上書きされないこと" do
+      it "そのユーザーを返すこと" do
         user = described_class.from_omniauth(auth)
-        expect(user).to eq(existing_user)
-        expect(user.email).to eq("old@example.com")
-        expect(user.username).to eq("oldname")
-      end
-    end
-
-    context "provider と uid で既存の場合" do
-      let!(:existing_user) do
-        create(:user, provider: "github", uid: "12345", email: "old@example.com", username: "existingusername")
-      end
-
-      it "既存ユーザのレコードが更新されず、そのまま返却されること" do
-        user = described_class.from_omniauth(auth)
-        expect(user).to eq(existing_user)
-        expect(user.email).to eq("old@example.com")
-        expect(user.username).to eq("existingusername")
+        expect(user).to eq(user_with_auth)
       end
     end
 
     context "同じメールアドレスを持つ未確認ユーザーが存在する場合" do
       let!(:unconfirmed_user) { create(:user, email: "user@example.com", confirmed_at: nil) }
 
-      it "未確認ユーザーが削除され、新たにユーザーが作成されること" do
+      it "未確認ユーザーが削除され、新たなユーザーが作成される" do
         expect {
           described_class.from_omniauth(auth)
-        }.to change { User.count }.by(0)  # 未確認ユーザーの削除と新規作成で件数は変化しない
+        }.not_to change { User.count }
 
         user = User.find_by(email: "user@example.com")
-        expect(user.provider).to eq("github")
+        expect(user.authorizations).to exist(provider: "github", uid: "12345")
       end
     end
 
     context "同じメールアドレスを持つ確認済みユーザーが存在する場合" do
       let!(:confirmed_user) { create(:user, email: "user@example.com", confirmed_at: Time.current) }
 
-      it "既存の確認済みユーザーがそのまま使用されること" do
+      it "既存の確認済みユーザーを使って Authorization を作成する" do
         expect {
           described_class.from_omniauth(auth)
-        }.to change { User.count }.by(0)
+        }.to change { Authorization.count }.by(1)
 
         user = User.find_by(email: "user@example.com")
         expect(user).to eq(confirmed_user)
+        expect(user.authorizations).to exist(provider: "github", uid: "12345")
+      end
+    end
+
+    context "auth 情報に email が含まれない場合" do
+      let(:auth_without_email) do
+        OmniAuth::AuthHash.new(
+          provider: "github",
+          uid: "12345",
+          info: OpenStruct.new(nickname: "githubuser")
+        )
+      end
+
+      it "ユーザーは保存されないこと" do
+        expect {
+          user = described_class.from_omniauth(auth_without_email)
+          expect(user).not_to be_persisted
+        }.not_to change(User, :count)
+      end
+    end
+
+    context "Authorization の作成に失敗する場合" do
+      before do
+        allow_any_instance_of(Authorization).to receive(:save).and_return(false)
+      end
+
+      it "ユーザーは保存されないこと" do
+        expect {
+          user = described_class.from_omniauth(auth)
+          expect(user).not_to be_persisted
+        }.not_to change(User, :count)
       end
     end
   end
@@ -172,36 +188,66 @@ RSpec.describe User, type: :model do
         expect(admin.admin).to be true
       end
     end
-  
+
     context "admin ユーザーが存在しない場合" do
       it "nil を返すこと" do
         admin = User.admin_user
         admin.destroy
-  
+
         expect(User.admin_user).to be_nil
       end
     end
   end
-    
+
   describe "#link_with メソッド" do
     let!(:user) { create(:user) }
 
-    it "ユーザーの provider と uid を更新すること" do
+    it "Authorization を作成すること" do
       user.link_with('github', '12345')
-      expect(user.provider).to eq('github')
-      expect(user.uid).to eq('12345')
+      expect(user.authorizations).to exist(provider: 'github', uid: '12345')
     end
   end
 
   describe "#linked_with? メソッド" do
-    let!(:user) { create(:user, provider: 'github', uid: '12345') }
+    let!(:user) { create(:user) }
 
-    it "provider と uid が一致する場合 true を返すこと" do
+    before do
+      user.link_with('github', '12345')
+    end
+
+    it "provider に対応する Authorization がある場合 true を返す" do
       expect(user.linked_with?('github')).to be true
     end
 
-    it "provider または uid が一致しない場合 false を返すこと" do
+    it "provider に対応する Authorization がない場合 false を返す" do
       expect(user.linked_with?('google')).to be false
+    end
+  end
+
+  describe "#authorization_by_provider メソッド" do
+    let(:user) { create(:user) }
+    let!(:auth) { create(:authorization, user: user, provider: "github", uid: "12345") }
+
+    it "指定した provider に紐づく Authorization を返すこと" do
+      result = user.authorization_by_provider("github")
+      expect(result).to eq(auth)
+    end
+
+    it "存在しない provider を指定した場合は nil を返すこと" do
+      expect(user.authorization_by_provider("google")).to be_nil
+    end
+  end
+
+  describe "#provider_uid メソッド" do
+    let(:user) { create(:user) }
+    let!(:auth) { create(:authorization, user: user, provider: "github", uid: "abc123") }
+
+    it "指定した provider に紐づく uid を返すこと" do
+      expect(user.provider_uid("github")).to eq("abc123")
+    end
+
+    it "指定した provider に紐づく Authorization が存在しない場合 nil を返すこと" do
+      expect(user.provider_uid("google")).to be_nil
     end
   end
 end

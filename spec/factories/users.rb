@@ -9,9 +9,10 @@ FactoryBot.define do
       confirmed_at { nil }
     end
 
-    trait :github_oauth do
-      provider { "github" }
-      uid { SecureRandom.uuid }
+    trait :with_github_oauth do
+      after(:create) do |user|
+        create(:authorization, user: user, provider: "github", uid: SecureRandom.uuid)
+      end
     end
   end
 end

@@ -22,8 +22,10 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
 
         user = User.find_by(email: "newuser@example.com")
         expect(user).to be_present
-        expect(user.provider).to eq("github")
-        expect(user.uid).to eq("abc123")
+
+        # Authorizationを使ってproviderとuidを確認
+        authorization = user.authorizations.find_by(provider: "github", uid: "abc123")
+        expect(authorization).to be_present
       end
     end
 
@@ -38,7 +40,10 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
 
         expect(User.exists?(unconfirmed.id)).to be_falsey
         new_user = User.find_by(email: "ghost@example.com")
-        expect(new_user.uid).to eq("uid789")
+
+        # Authorizationを使ってuidを確認
+        authorization = new_user.authorizations.find_by(uid: "uid789")
+        expect(authorization).to be_present
       end
     end
 
@@ -55,7 +60,7 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
   end
 
   describe "ログイン中ユーザーのGitHub連携" do
-    let(:user) { create(:user, provider: nil, uid: nil) }
+    let(:user) { create(:user) }  # providerとuidは既にnilの状態で作成
 
     before do
       login_as(user, scope: :user)
@@ -70,8 +75,10 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
 
         expect(page).to have_content("GitHub との連携が成功しました。")
         user.reload
-        expect(user.provider).to eq("github")
-        expect(user.uid).to eq("new_uid")
+
+        # Authorizationを使ってproviderとuidを確認
+        authorization = user.authorizations.find_by(provider: "github", uid: "new_uid")
+        expect(authorization).to be_present
       end
     end
 
@@ -81,19 +88,24 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
 
         visit edit_user_registration_path
 
-        user.update!(provider: "github", uid: "old_uid")
+        # Authorizationを使って古い情報を更新
+        user.authorizations.create!(provider: "github", uid: "old_uid")
 
         find("#oauth-button-github").click
 
         expect(page).to have_content("既に別の GitHub アカウントと連携されています。変更はキャンセルされました。")
         user.reload
-        expect(user.uid).to eq("old_uid")
+
+        # 古いAuthorizationが保持されているか確認
+        authorization = user.authorizations.find_by(uid: "old_uid")
+        expect(authorization).to be_present
       end
     end
   end
 
   describe "GitHubアカウントの重複利用" do
-    let!(:existing_user) { create(:user, provider: "github", uid: "dupe_uid") }
+    let!(:existing_user) { create(:user) }
+    let!(:existing_authorization) { create(:authorization, user: existing_user, provider: "github", uid: "dupe_uid") }
 
     it "同じuidで認証すると既存ユーザーがログインされる" do
       mock_github_auth(uid: "dupe_uid", email: existing_user.email)
@@ -101,7 +113,10 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
       visit_signin_and_click_github
 
       expect(page).to have_content("Successfully authenticated from github account.")
-      expect(User.where(uid: "dupe_uid").count).to eq(1)
+
+      # Authorizationを使ってuidを確認
+      authorization = existing_user.authorizations.find_by(uid: "dupe_uid")
+      expect(authorization).to be_present
     end
   end
 
@@ -119,7 +134,7 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
       expect(page).to have_content("GitHub 認証に失敗しました。")
 
       expect(User.exists?(unconfirmed.id)).to be true
-      expect(User.find_by(uid: "fail_uid")).to be_nil
+      expect(Authorization.exists?(uid: "fail_uid")).to be false
     end
   end
 end
