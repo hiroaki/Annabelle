@@ -5,6 +5,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :confirmable, :omniauthable, omniauth_providers: %i[github]
 
+  has_many :authorizations, dependent: :destroy
   has_many :messages
 
   # ユーザの削除時は、そのユーザのメッセージは残し、所有者を管理者にします。
