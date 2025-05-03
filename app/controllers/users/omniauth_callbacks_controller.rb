@@ -19,7 +19,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
       if @user&.persisted?
         if @user.saved_change_to_id?
-          session["user_return_to"] = edit_user_registration_path
+          session[:just_signed_up] = true
         end
 
         sign_in_and_redirect @user, event: :authentication # this will throw if @user is not activated

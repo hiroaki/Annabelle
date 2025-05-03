@@ -2,6 +2,20 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :conditional_auto_login
 
+  # サインイン後のリダイレクト先を制御しています。
+  # これは通常、デフォルトの root_path にリダイレクトしますが、
+  # session[:just_signed_up] に値がセットされている場合は、プロフィール編集画面（edit）へ遷移させます。
+  #
+  # そのフローはセッションが新規登録ユーザーのものであることを想定しており、
+  # ランダム生成された初期値のユーザー名などを編集してもらうための導線を意図しています。
+  def after_sign_in_path_for(resource)
+    if session.delete(:just_signed_up)
+      edit_user_registration_path
+    else
+      super
+    end
+  end
+
   protected
 
   def configure_permitted_parameters
@@ -24,5 +38,13 @@ class ApplicationController < ActionController::Base
 
     # ログイン不可な user をセットしてしまうと無限ループに陥るので注意。
     sign_in(:user, user)
+  end
+
+  private
+
+  def devise_edit_registration_path_for(resource)
+    mapping = Devise.mappings[resource_name]
+    path_helper = "edit_#{mapping.as}_registration_path"
+    respond_to?(path_helper) ? send(path_helper) : nil
   end
 end

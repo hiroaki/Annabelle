@@ -29,6 +29,20 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
       end
     end
 
+    context "登録済みの既存ユーザーがGitHubで認証する場合" do
+      it "既存ユーザーがログインされ、トップページ (root_path) に遷移すること" do
+        existing_user = create(:user, email: "existing@example.com")
+        mock_github_auth(uid: "existing_uid", email: existing_user.email)
+
+        visit_signin_and_click_github
+
+        # 既存ユーザーの場合、User.from_omniauthでのsaved_change_to_id?が falseとなるため、
+        # sign_in_and_redirectでDeviseのデフォルトリダイレクト先（通常は root_path）へ遷移する
+        expect(page).to have_current_path(root_path)
+        expect(page).to have_content("Successfully authenticated from github account.")
+      end
+    end
+
     context "未確認の既存ユーザーのメールと一致する場合" do
       it "既存ユーザーを削除し、新規ユーザーが作成される" do
         unconfirmed = create(:user, email: "ghost@example.com", confirmed_at: nil)
