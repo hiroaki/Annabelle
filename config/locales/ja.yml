@@ -44,3 +44,7 @@ ja:
           other: "全 <b>%{count}</b> 件の %{entry_name} を表示中"
       more_pages:
         display_entries: "全 <b>%{total}</b> 件中、<b>%{first}–%{last}</b> を表示中"
+  messages:
+    errors:
+      not_owned: "他のユーザのメッセージは削除できません。"
+      generic: "エラーが発生しました: %{error_message}"

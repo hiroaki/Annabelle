@@ -30,6 +30,10 @@ ja:
     omniauth_callbacks:
       failure: "%{kind} アカウントによる認証に失敗しました。理由：（%{reason}）"
       success: "%{kind} アカウントによる認証に成功しました。"
+      github:
+        already_linked: "既に別の GitHub アカウントと連携されています。変更はキャンセルされました。"
+        success: "GitHub との連携が成功しました。"
+        failure: "GitHub 認証に失敗しました。"
     passwords:
       no_token: "このページにはアクセスできません。パスワード再設定メールのリンクからアクセスされた場合には、URL をご確認ください。"
       send_instructions: 'パスワードの再設定について数分以内にメールでご連絡いたします。'
@@ -45,6 +49,10 @@ ja:
       update_needs_confirmation: 'アカウント情報を変更しました。変更されたメールアドレスの本人確認のため、本人確認用メールより確認処理をおこなってください。'
       updated: 'アカウント情報を変更しました。'
       updated_but_not_signed_in: 'アカウント情報は更新されましたが、パスワードを変更したため、再度ログインが必要です。'
+      unlink_oauth:
+        success: "%{provider_name} 認証を解除しました。"
+        failure: "%{provider_name} 認証の解除に失敗しました。"
+        not_found: "指定された連携が見つかりません。"
     sessions:
       signed_in: 'ログインしました。'
       signed_out: 'ログアウトしました。'

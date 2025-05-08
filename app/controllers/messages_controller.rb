@@ -10,15 +10,15 @@ class MessagesController < ApplicationController
   def create
     create_message!(message_params.merge(user: current_user_or_admin))
   rescue => ex
-    flash.now.alert = "#{ex.message}"
+    flash.now.alert = I18n.t("messages.errors.generic", error_message: ex.message)
   end
 
   def destroy
     destroy_message_if_owner!(params[:id], current_user)
   rescue MessageNotOwnedError
-    flash.now.alert = "You cannot delete this message because it does not belong to you."
+    flash.now.alert = I18n.t("messages.errors.not_owned")
   rescue => ex
-    flash.now.alert = "#{ex.message}"
+    flash.now.alert = I18n.t("messages.errors.generic", error_message: ex.message)
   end
 
   private
