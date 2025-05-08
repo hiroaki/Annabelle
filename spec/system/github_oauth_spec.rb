@@ -39,7 +39,7 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
         # 既存ユーザーの場合、User.from_omniauthでのsaved_change_to_id?が falseとなるため、
         # sign_in_and_redirectでDeviseのデフォルトリダイレクト先（通常は root_path）へ遷移する
         expect(page).to have_current_path(root_path)
-        expect(page).to have_content("Successfully authenticated from github account.")
+        expect(page).to have_content(I18n.t("devise.omniauth_callbacks.success", kind: "GitHub"))
       end
     end
 
