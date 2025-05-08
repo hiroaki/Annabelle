@@ -48,6 +48,7 @@ ja:
     errors:
       not_owned: "他のユーザのメッセージは削除できません。"
       generic: "エラーが発生しました: %{error_message}"
+    email_confirmation_required: "メールアドレスを確認するまで投稿はできません。"
   activerecord:
     models:
       user: "ユーザー"

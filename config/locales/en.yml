@@ -48,6 +48,7 @@ en:
     errors:
       not_owned: "You cannot delete another user's message."
       generic: "An error occurred: %{error_message}"
+    email_confirmation_required: "You cannot post until you confirm your email address."
   activerecord:
     models:
       user: "User"
