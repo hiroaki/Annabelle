@@ -48,3 +48,28 @@ en:
     errors:
       not_owned: "You cannot delete another user's message."
       generic: "An error occurred: %{error_message}"
+  activerecord:
+    models:
+      user: "User"
+      message: "Message"
+    attributes:
+      user:
+        username: "Username"
+        email: "Email"
+      message:
+        content: "Content"
+    errors:
+      models:
+        user:
+          attributes:
+            username:
+              blank: "can't be blank"
+              taken: "has already been taken"
+              invalid_format: "can only contain letters, numbers, and underscores."
+            email:
+              blank: "can't be blank"
+              invalid: "is not a valid email address"
+        message:
+          attributes:
+            content:
+              blank: "can't be blank"

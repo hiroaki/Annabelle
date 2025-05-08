@@ -16,7 +16,7 @@ class User < ApplicationRecord
   validates :username,
     presence: true,
     uniqueness: { case_sensitive: false },
-    format: { with: /\A[a-zA-Z0-9_]+\z/, message: 'can only contain letters, numbers, and underscores' }
+    format: { with: /\A[a-zA-Z0-9_]+\z/, message: :invalid_format }
 
   # 管理者ユーザを返します。（これは db:seed で追加されている特別なレコードです）
   # TODO: 変更不可にする

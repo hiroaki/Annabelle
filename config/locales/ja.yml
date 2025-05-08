@@ -48,3 +48,28 @@ ja:
     errors:
       not_owned: "他のユーザのメッセージは削除できません。"
       generic: "エラーが発生しました: %{error_message}"
+  activerecord:
+    models:
+      user: "ユーザー"
+      message: "メッセージ"
+    attributes:
+      user:
+        username: "ユーザー名"
+        email: "メールアドレス"
+      message:
+        content: "内容"
+    errors:
+      models:
+        user:
+          attributes:
+            username:
+              blank: "を入力してください"
+              taken: "は既に使用されています"
+              invalid_format: "英数字とアンダースコアのみ使用できます。"
+            email:
+              blank: "を入力してください"
+              invalid: "は有効なメールアドレスではありません"
+        message:
+          attributes:
+            content:
+              blank: "を入力してください"
