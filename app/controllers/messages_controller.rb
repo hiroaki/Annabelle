@@ -2,6 +2,7 @@ class MessagesController < ApplicationController
   include Factory
 
   before_action :authenticate_user!
+  before_action :require_confirmed_user_for_non_safe_requests  
 
   def index
     @messages = Message.order(created_at: :desc).page(params[:page])
@@ -33,6 +34,13 @@ class MessagesController < ApplicationController
 
     def admin_user
       User.admin_user
+    end
+
+    def require_confirmed_user_for_non_safe_requests
+      return if request.get? || request.head?
+      return if current_user.confirmed?
+    
+      render plain: "Email confirmation required", status: :forbidden
     end
 
   public

@@ -105,4 +105,7 @@ RSpec.configure do |config|
 
   # if you use Docker don't forget to pass no-sandbox option:
   #Capybara::Cuprite::Driver.new(app, browser_options: { 'no-sandbox': nil })
+
+  # Deviseのテストヘルパーを使用可能にする
+  config.include Devise::Test::IntegrationHelpers, type: :request
 end

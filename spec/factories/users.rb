@@ -5,6 +5,10 @@ FactoryBot.define do
     password { "password123" }
     confirmed_at { Time.current }
 
+    trait :confirmed do
+      confirmed_at { Time.current }
+    end
+
     trait :unconfirmed do
       confirmed_at { nil }
     end
