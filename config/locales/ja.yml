@@ -52,24 +52,52 @@ ja:
     models:
       user: "ユーザー"
       message: "メッセージ"
+      authorization: "認証情報"
     attributes:
       user:
-        username: "ユーザー名"
         email: "メールアドレス"
+        encrypted_password: "暗号化されたパスワード"
+        reset_password_token: "パスワードリセットトークン"
+        reset_password_sent_at: "パスワードリセット送信日時"
+        remember_created_at: "ログイン情報記憶日時"
+        created_at: "作成日時"
+        updated_at: "更新日時"
+        admin: "管理者"
+        confirmation_token: "確認トークン"
+        confirmed_at: "確認日時"
+        confirmation_sent_at: "確認送信日時"
+        unconfirmed_email: "未確認メールアドレス"
+        username: "ユーザー名"
       message:
-        content: "内容"
+        content: "本文"
+        created_at: "作成日時"
+        updated_at: "更新日時"
+        user_id: "ユーザー"
+      authorization:
+        user_id: "ユーザー"
+        provider: "プロバイダー"
+        uid: "UID"
+        created_at: "作成日時"
+        updated_at: "更新日時"
     errors:
       models:
         user:
           attributes:
             username:
               blank: "を入力してください"
-              taken: "は既に使用されています"
-              invalid_format: "英数字とアンダースコアのみ使用できます。"
+              taken: "はすでに使用されています"
+              invalid_format: "は英数字とアンダースコアのみ使用できます"
             email:
               blank: "を入力してください"
-              invalid: "は有効なメールアドレスではありません"
+              invalid: "の形式が正しくありません"
         message:
           attributes:
             content:
               blank: "を入力してください"
+        authorization:
+          attributes:
+            provider:
+              blank: "を入力してください"
+            uid:
+              blank: "を入力してください"
+              taken: "はこのプロバイダーですでに使用されています"
