@@ -1,0 +1,103 @@
+# Files in the config/locales directory are used for internationalization and
+# are automatically loaded by Rails. If you want to use locales other than
+# English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t "hello"
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t("hello") %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# To learn more about the API, please read the Rails Internationalization guide
+# at https://guides.rubyonrails.org/i18n.html.
+#
+# Be aware that YAML interprets the following case-insensitive strings as
+# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
+# must be quoted to be interpreted as strings. For example:
+#
+#     en:
+#       "yes": yup
+#       enabled: "ON"
+
+ja:
+  views:
+    pagination:
+      first: "&laquo;"
+      last: "&raquo;"
+      previous: "&lsaquo;"
+      next: "&rsaquo;"
+      truncate: "&hellip;"
+  helpers:
+    page_entries_info:
+      one_page:
+        display_entries:
+          zero: "%{entry_name}が見つかりません"
+          one: "表示中 <b>1</b> 件の %{entry_name}"
+          other: "全 <b>%{count}</b> 件の %{entry_name} を表示中"
+      more_pages:
+        display_entries: "全 <b>%{total}</b> 件中、<b>%{first}–%{last}</b> を表示中"
+  messages:
+    errors:
+      not_owned: "他のユーザのメッセージは削除できません。"
+      generic: "エラーが発生しました: %{error_message}"
+  activerecord:
+    models:
+      user: "ユーザー"
+      message: "メッセージ"
+      authorization: "認証情報"
+    attributes:
+      user:
+        email: "メールアドレス"
+        encrypted_password: "暗号化されたパスワード"
+        reset_password_token: "パスワードリセットトークン"
+        reset_password_sent_at: "パスワードリセット送信日時"
+        remember_created_at: "ログイン情報記憶日時"
+        created_at: "作成日時"
+        updated_at: "更新日時"
+        admin: "管理者"
+        confirmation_token: "確認トークン"
+        confirmed_at: "確認日時"
+        confirmation_sent_at: "確認送信日時"
+        unconfirmed_email: "未確認メールアドレス"
+        username: "ユーザー名"
+      message:
+        content: "本文"
+        created_at: "作成日時"
+        updated_at: "更新日時"
+        user_id: "ユーザー"
+      authorization:
+        user_id: "ユーザー"
+        provider: "プロバイダー"
+        uid: "UID"
+        created_at: "作成日時"
+        updated_at: "更新日時"
+    errors:
+      models:
+        user:
+          attributes:
+            username:
+              blank: "を入力してください"
+              taken: "はすでに使用されています"
+              invalid_format: "は英数字とアンダースコアのみ使用できます"
+            email:
+              blank: "を入力してください"
+              invalid: "の形式が正しくありません"
+        message:
+          attributes:
+            content:
+              blank: "を入力してください"
+        authorization:
+          attributes:
+            provider:
+              blank: "を入力してください"
+            uid:
+              blank: "を入力してください"
+              taken: "はこのプロバイダーですでに使用されています"

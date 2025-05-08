@@ -9,12 +9,12 @@ class Users::RegistrationsController < Devise::RegistrationsController
     if auth
       provider_name = OmniAuth::Utils.camelize(provider)
       if auth.destroy
-        redirect_to edit_user_registration_path, notice: "#{provider_name} 認証を解除しました。"
+        redirect_to edit_user_registration_path, notice: I18n.t("devise.registrations.unlink_oauth.success", provider_name: provider_name)
       else
-        redirect_to edit_user_registration_path, alert: "#{provider_name} 認証の解除に失敗しました。"
+        redirect_to edit_user_registration_path, alert: I18n.t("devise.registrations.unlink_oauth.failure", provider_name: provider_name)
       end
     else
-      redirect_to edit_user_registration_path, alert: "指定された連携が見つかりません。"
+      redirect_to edit_user_registration_path, alert: I18n.t("devise.registrations.unlink_oauth.not_found")
     end
   end
 end
