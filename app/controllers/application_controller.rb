@@ -40,12 +40,4 @@ class ApplicationController < ActionController::Base
     # ログイン不可な user をセットしてしまうと無限ループに陥るので注意。
     sign_in(:user, user)
   end
-
-  private
-
-  def devise_edit_registration_path_for(resource)
-    mapping = Devise.mappings[resource_name]
-    path_helper = "edit_#{mapping.as}_registration_path"
-    respond_to?(path_helper) ? send(path_helper) : nil
-  end
 end
