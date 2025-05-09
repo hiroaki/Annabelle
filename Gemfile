@@ -84,7 +84,7 @@ gem "kaminari", "~> 1.2"
 gem "stringio", "~> 3.1.5"
 
 gem "devise", "~> 4.9"
+gem "devise-two-factor"
 gem "omniauth"
 gem "omniauth-rails_csrf_protection"
 gem "omniauth-github"
-

@@ -108,6 +108,11 @@ GEM
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
+    devise-two-factor (6.1.0)
+      activesupport (>= 7.0, < 8.1)
+      devise (~> 4.0)
+      railties (>= 7.0, < 8.1)
+      rotp (~> 6.0)
     diff-lcs (1.6.1)
     dotenv (3.1.8)
     dotenv-rails (3.1.8)
@@ -310,6 +315,7 @@ GEM
       actionpack (>= 5.2)
       railties (>= 5.2)
     rexml (3.4.1)
+    rotp (6.3.0)
     rspec-core (3.13.3)
       rspec-support (~> 3.13.0)
     rspec-expectations (3.13.3)
@@ -407,6 +413,7 @@ DEPENDENCIES
   cuprite
   debug
   devise (~> 4.9)
+  devise-two-factor
   dotenv-rails
   factory_bot_rails
   image_processing (~> 1.2)
