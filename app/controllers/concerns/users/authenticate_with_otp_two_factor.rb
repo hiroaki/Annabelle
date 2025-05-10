@@ -15,7 +15,7 @@ module Users::AuthenticateWithOtpTwoFactor
 
   def valid_otp_attempt?(user)
     user.validate_and_consume_otp!(user_params[:otp_attempt]) ||
-        user.invalidate_otp_backup_code!(user_params[:otp_attempt])
+        (user.respond_to?(:invalidate_otp_backup_code!) && user.invalidate_otp_backup_code!(user_params[:otp_attempt]))
   end
 
   def prompt_for_otp_two_factor(user)
