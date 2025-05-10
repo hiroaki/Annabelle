@@ -2,15 +2,11 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
     registrations: 'users/registrations',
-    sessions: 'users/sessions',
+    sessions: 'users/sessions'
   }
 
   devise_scope :user do
     delete '/users/oauth', to: 'users/registrations#unlink_oauth', as: :unlink_oauth
-
-    # OTP 入力画面用ルート
-    get  '/users/otp_verification', to: 'users/sessions#otp_verification'
-    post '/users/otp_verify',       to: 'users/sessions#otp_verify'
   end
 
   resources :messages, only: [:index, :create, :destroy]
