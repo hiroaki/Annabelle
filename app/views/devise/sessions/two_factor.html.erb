@@ -7,12 +7,13 @@
 
   <h2 class="text-2xl font-bold mb-4">2段階認証</h2>
 
-  <%= form_with url: users_otp_verify_path, method: :post, html: { class: "space-y-6" } do %>
+  <%= form_with scope: :user, url: session_path(:user), method: :post, html: { class: "space-y-6" } do |f| %>
     <div class="mb-6">
-      <label for="otp_attempt" class="block mb-2 text-sm font-medium text-gray-900">
+      <label for="user_otp_attempt" class="block mb-2 text-sm font-medium text-gray-900">
         認証コードを入力してください
       </label>
-      <%= text_field_tag :otp_attempt, nil,
+      <%= f.text_field :otp_attempt,
+          id: "user_otp_attempt",
           autofocus: true,
           autocomplete: 'one-time-code',
           maxlength: 6,
@@ -21,7 +22,7 @@
     </div>
 
     <div class="flex items-center justify-between">
-      <%= submit_tag "認証", class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
+      <%= f.submit "認証", class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
     </div>
   <% end %>
 </div>
