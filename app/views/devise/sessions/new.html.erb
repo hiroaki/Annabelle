@@ -30,6 +30,8 @@
       </div>
     <% end %>
 
+    <%= f.hidden_field :otp_attempt, value: '' %>
+
     <div class="flex items-center justify-between">
       <%= f.submit "Log in", class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
     </div>
