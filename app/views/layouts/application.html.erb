@@ -8,9 +8,7 @@
     <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
 
-    <% if current_user %>
-      <meta name="current-user-id" content="<%= current_user.id %>">
-    <% end %>
+    <%= @current_user_presenter.meta_tag %>
   </head>
 
   <body>
@@ -21,13 +19,7 @@
             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
               <path fill="white" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 5h9M5 9h5m8-8H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h4l3.5 4 3.5-4h5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"/>
             </svg>
-            <% if current_user %>
-              <span class="sr-only">Notifications</span>
-              <div data-messages-channel="notification" class="absolute inline-flex items-center justify-center w-4 h-4 text-xs text-white bg-red-500 border-white rounded-full -top-1 -end-1 hidden">
-                <%# see also app/javascript/channels/messages_channel.js #%>
-                &nbsp;
-              </div>
-            <% end %>
+            <%= @current_user_presenter.notification_badge %>
           <% end %>
         </div>
         <div class="text-xl font-extrabold ml-2">
@@ -35,10 +27,7 @@
         </div>
       </div>
       <div class="flex ml-auto items-center space-x-4">
-        <% if current_user %>
-          <%= link_to current_user.username, edit_user_registration_path, class: 'text-gray-800 dark:text-white' %>
-          <%= link_to 'Sign out', destroy_user_session_path, data: { turbo_method: :delete }, class: 'text-gray-800 dark:text-white' %>
-        <% end %>
+        <%= @current_user_presenter.links %>
       </div>
     </header>
 
