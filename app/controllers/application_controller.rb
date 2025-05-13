@@ -1,8 +1,6 @@
 class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :conditional_auto_login
-  before_action :create_current_user_presenter
-
 
   # サインイン後のリダイレクト先を制御しています。
   # これは通常、デフォルトの root_path にリダイレクトしますが、
@@ -42,11 +40,4 @@ class ApplicationController < ActionController::Base
     # ログイン不可な user をセットしてしまうと無限ループに陥るので注意。
     sign_in(:user, user)
   end
-
-  # ログインしている（いない）ユーザの情報を View で扱うためのプレゼンター。
-  # アプリにグローバルな layout で使うため、ここでインスタンス化しています。
-  def create_current_user_presenter
-    @current_user_presenter = CurrentUserPresenter.new(current_user)
-  end
-
 end

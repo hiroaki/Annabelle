@@ -1,25 +1,36 @@
-class CurrentUserPresenter
-  def initialize(user)
-    @user = user
+class CurrentUserPresenter < ModelPresenterBase
+  def initialize(view_context, model)
+    model = User.new if model.nil?
+
+    if !model.kind_of?(User)
+      raise ArgumentError, "Expected User, got #{model.class.name}"
+    end
+
+    super
+  end
+
+  def user
+    model
   end
 
   def meta_tag
-    return unless @user
-    ActionController::Base.helpers.tag.meta(name: 'current-user-id', content: @user.id)
+    return '' unless view_context.user_signed_in?
+
+    view_context.tag.meta(name: 'current-user-id', content: user.id)
   end
 
   def links
-    return '' unless @user
+    return '' unless view_context.user_signed_in?
 
-    ApplicationController.helpers.safe_join([
-      ApplicationController.helpers.link_to(
-        @user.username,
-        Rails.application.routes.url_helpers.edit_user_registration_path,
+    view_context.safe_join([
+      view_context.link_to(
+        user.username,
+        view_context.edit_user_registration_path,
         class: 'text-gray-800 dark:text-white',
       ),
-      ApplicationController.helpers.link_to(
+      view_context.link_to(
         'Sign out',
-        Rails.application.routes.url_helpers.destroy_user_session_path,
+        view_context.destroy_user_session_path,
         method: :delete,
         class: 'text-gray-800 dark:text-white',
         data: { turbo_method: :delete },
@@ -28,19 +39,14 @@ class CurrentUserPresenter
   end
 
   def notification_badge
-    return '' unless @user
+    return '' unless view_context.user_signed_in?
 
     # data-messages-channel は Stimulus ではなく、チャンネルに関するものです。
     # app/javascript/channels/messages_channel.js
-    <<~HTML.html_safe
-      <span class="sr-only">Notifications</span>
-      <div data-messages-channel="notification" class="absolute inline-flex items-center justify-center w-4 h-4 text-xs text-white bg-red-500 border-white rounded-full -top-1 -end-1 hidden">
-        &nbsp;
-      </div>
-    HTML
-  end
-
-  def logged_in?
-    @user.present?
+    view_context.content_tag(:span, 'Notifications', class: 'sr-only') +
+    view_context.content_tag(:div, '&nbsp;'.html_safe,
+      data: { messages_channel: 'notification' },
+      class: 'absolute inline-flex items-center justify-center w-4 h-4 text-xs text-white bg-red-500 border-white rounded-full -top-1 -end-1 hidden'
+    )
   end
 end
