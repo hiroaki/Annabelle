@@ -1,17 +1,27 @@
 <turbo-frame id="devise">
-  <h2>Two Factor Authentication</h2>
+  <div class="container p-4">
 
-  <%= form_for(@user, html: { method: :put, class: "space-y-6" }) do |f| %>
+    <h2 class="text-2xl font-bold mb-4">Two Factor Authentication</h2>
 
-    <div class="mb-6">
-      <%= f.label :otp_required_for_login, '2FAを有効にする' %><br>
-      <%= f.check_box :otp_required_for_login %>
-    </div>
+    <%= form_for(@user, html: { method: :put, class: "space-y-6" }) do |f| %>
 
-    <div class="flex items-center justify-between">
-      <%= f.submit "Update", class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
-    </div>
+      <div class="mb-6">
+        <div class="flex items-center ps-4 border border-gray-200 rounded-sm dark:border-gray-700">
+          <%= f.check_box(:otp_required_for_login,
+              class: 'w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600',
+            )
+          %>
+          <%= f.label(:otp_required_for_login, '2FAを有効にする',
+            class: 'w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300',
+            )
+          %>
+        </div>
+      </div>
 
-  <% end %>
+      <div class="flex items-center justify-between">
+        <%= f.submit "Update", class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
+      </div>
 
+    <% end %>
+  </div>
 </turbo-frame>

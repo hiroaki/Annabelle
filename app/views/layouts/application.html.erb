@@ -19,8 +19,8 @@
     <%= current_user_presenter.meta_tag %>
   </head>
 
-  <body>
-    <header class="container flex p-2 lg:px-6 text-xs text-center text-slate-400 items-center bg-gray-100">
+  <body class="min-h-screen flex flex-col">
+    <header class="flex p-2 lg:px-6 text-xs text-center text-slate-400 items-center bg-gray-100">
       <div class="flex items-center">
         <div class="relative inline-flex items-center p-1 text-sm font-medium text-center">
           <%= link_to messages_path do %>
@@ -40,21 +40,21 @@
     </header>
 
     <% if configuration_layout? %>
-      <div class="container flex">
-        <nav class="container">
+      <div class="flex">
+        <nav class="px-2">
           <%= render 'layouts/configuration_menu' %>
         </nav>
-        <main class="container">
+        <main class="px-2">
           <%= yield %>
         </main>
       </div>
     <% else %>
-      <main class="container">
+      <main class="">
         <%= yield %>
       </main>
     <% end %>
 
-    <footer class="container p-1 text-xs text-center text-slate-400 bg-green-500 text-white">
+    <footer class=" mt-auto p-1 text-xs text-center text-slate-400 bg-green-500 text-white">
       <span>Annabelle - Message Board</span>
     </footer>
   </body>

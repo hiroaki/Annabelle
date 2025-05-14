@@ -1,5 +1,7 @@
 <div class="container p-4">
   <h2>設定</h2>
+
+  <hr class="my-8">
   
   <ul class="space-y-4" role="navigation">
     <li>
@@ -14,8 +16,10 @@
     <li>
       <%= link_to "Two Factor Authentication", two_factor_authentication_user_path(current_user), data: { turbo_frame: 'devise' }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
     </li>
-    <li>
-      <%= link_to "Logout", destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
-    </li>
   </ul>
+
+  <hr class="my-8">
+
+  <%= link_to "Logout", destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
+
 </div>
