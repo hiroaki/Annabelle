@@ -25,7 +25,7 @@ class CurrentUserPresenter < ModelPresenterBase
     view_context.safe_join([
       view_context.link_to(
         user.username,
-        view_context.edit_user_registration_path,
+        view_context.user_path(current_user),
         class: 'text-gray-800 dark:text-white',
       ),
       view_context.link_to(

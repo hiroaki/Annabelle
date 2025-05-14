@@ -1,6 +1,10 @@
 <%
   # ログインしている（いない）ユーザの情報を View で扱うためのプレゼンター。
   current_user_presenter = CurrentUserPresenter.new(self, current_user)
+
+  def configuration_layout?
+    (controller_name == 'registrations' || controller_name == 'users') && user_signed_in?
+  end
 %>
 <!DOCTYPE html>
 <html>
@@ -35,9 +39,20 @@
       </div>
     </header>
 
-    <main class="container">
-      <%= yield %>
-    </main>
+    <% if configuration_layout? %>
+      <div class="container flex">
+        <nav class="container">
+          <%= render 'layouts/configuration_menu' %>
+        </nav>
+        <main class="container">
+          <%= yield %>
+        </main>
+      </div>
+    <% else %>
+      <main class="container">
+        <%= yield %>
+      </main>
+    <% end %>
 
     <footer class="container p-1 text-xs text-center text-slate-400 bg-green-500 text-white">
       <span>Annabelle - Message Board</span>
