@@ -8,12 +8,12 @@
 
     <div class="mb-6">
       <%= f.label :email, class: "block mb-2 text-sm font-medium text-gray-900" %>
-      <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
     </div>
 
     <div class="mb-6">
       <%= f.label :username, class: "block mb-2 text-sm font-medium text-gray-900" %>
-      <%= f.text_field :username, autofocus: true, autocomplete: "username", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.text_field :username, autofocus: true, autocomplete: "username", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
     </div>
 
     <div class="mb-6">
@@ -23,12 +23,12 @@
           <em class="mr-2 text-sm text-gray-500">(<%= @minimum_password_length %> characters minimum)</em>
         <% end %>
       </div>
-      <%= f.password_field :password, autocomplete: "new-password", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.password_field :password, autocomplete: "new-password", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
     </div>
 
     <div class="mb-6">
       <%= f.label :password_confirmation, class: "block mb-2 text-sm font-medium text-gray-900" %>
-      <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
     </div>
 
     <div class="flex items-center justify-between">

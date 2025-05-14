@@ -10,7 +10,7 @@
     <div class="mb-6">
       <div>
         <%= f.label :email, class: "block mb-2 text-sm font-medium text-gray-900" %>
-        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
       </div>
 
       <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
@@ -24,7 +24,7 @@
 
     <div class="mb-6">
       <%= f.label :password, class: "block mb-2 text-sm font-medium text-gray-900" %>
-      <%= f.password_field :password, autocomplete: "new-password", placeholder: "Your new password", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.password_field :password, autocomplete: "new-password", placeholder: "Your new password", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
       <% if @minimum_password_length %>
         <p class="mt-2 text-sm text-gray-500">
           <%= @minimum_password_length %> characters minimum
@@ -34,12 +34,12 @@
 
     <div class="mb-6">
       <%= f.label :password_confirmation, class: "block mb-2 text-sm font-medium text-gray-900" %>
-      <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: "Confirm new password", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: "Confirm new password", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
     </div>
 
     <div class="mb-6">
       <%= f.label :current_password, class: "block mb-2 text-sm font-medium text-gray-900" %>
-      <%= f.password_field :current_password, autocomplete: "current-password", placeholder: "Current password", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.password_field :current_password, autocomplete: "current-password", placeholder: "Current password", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
       <p class="mt-2 text-sm text-gray-500">
         We need your current password to confirm your changes.
       </p>
