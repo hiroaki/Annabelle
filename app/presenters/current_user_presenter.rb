@@ -1,4 +1,8 @@
 class CurrentUserPresenter < ModelPresenterBase
+  def self.username_display_dom_id
+    'user-name-display'
+  end
+
   def initialize(view_context, model)
     model = User.new if model.nil?
 
@@ -27,6 +31,7 @@ class CurrentUserPresenter < ModelPresenterBase
         user.username,
         view_context.user_path(current_user),
         class: 'text-gray-800 dark:text-white',
+        id: self.class.username_display_dom_id,
       ),
       view_context.link_to(
         'Sign out',
