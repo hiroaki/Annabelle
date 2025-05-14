@@ -71,7 +71,10 @@
                 turbo: false,
                 confirm: '本当に#{provider_name}認証を無効化しますか？',
               },
-              id: "unlink-button-#{provider}"
+              id: "unlink-button-#{provider}",
+              params: {
+                provider: provider
+              },
             )
           %>
         <% else %>
