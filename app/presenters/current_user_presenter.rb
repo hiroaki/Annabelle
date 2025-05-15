@@ -30,14 +30,14 @@ class CurrentUserPresenter < ModelPresenterBase
       view_context.link_to(
         user.username,
         view_context.user_path(current_user),
-        class: 'text-gray-800 dark:text-white',
+        class: 'text-gray-400',
         id: self.class.username_display_dom_id,
       ),
       view_context.link_to(
         'Sign out',
         view_context.destroy_user_session_path,
         method: :delete,
-        class: 'text-gray-800 dark:text-white',
+        class: 'text-gray-400',
         data: { turbo_method: :delete },
       )
     ])
