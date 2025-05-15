@@ -1,9 +1,12 @@
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  devise :two_factor_authenticatable, :registerable,
+  devise :two_factor_authenticatable, :two_factor_backupable, :registerable,
          :recoverable, :rememberable, :validatable,
          :confirmable, :omniauthable, omniauth_providers: %i[github]
+
+  # for two_factor_backupable
+  serialize :otp_backup_codes, Array
 
   has_many :authorizations, dependent: :destroy
   has_many :messages
