@@ -6,7 +6,7 @@ class User < ApplicationRecord
          :confirmable, :omniauthable, omniauth_providers: %i[github]
 
   # for two_factor_backupable
-  serialize :otp_backup_codes, Array
+  attribute :otp_backup_codes, JsonStringArrayType.new, default: []
 
   has_many :authorizations, dependent: :destroy
   has_many :messages
