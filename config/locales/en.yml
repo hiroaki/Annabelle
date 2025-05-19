@@ -150,3 +150,13 @@ en:
       two_factor_authentication: "Two-Factor Authentication"
       enter_otp_code: "Please enter your authentication code"
       authenticate: "Authenticate"
+    unlocks:
+      resend_unlock_instructions: "Resend unlock instructions"
+      email: "Email"
+    shared:
+      sign_in_with: "Sign in with %{provider}"
+      log_in: "Log in"
+      sign_up: "Sign up"
+      forgot_your_password: "Forgot your password?"
+      didnt_receive_confirmation: "Didn't receive confirmation instructions?"
+      didnt_receive_unlock: "Didn't receive unlock instructions?"

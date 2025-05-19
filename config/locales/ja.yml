@@ -150,3 +150,13 @@ ja:
       two_factor_authentication: "2段階認証"
       enter_otp_code: "認証コードを入力してください"
       authenticate: "認証"
+    shared:
+      sign_in_with: "%{provider}でサインイン"
+      log_in: "ログイン"
+      sign_up: "新規登録"
+      forgot_your_password: "パスワードをお忘れですか？"
+      didnt_receive_confirmation: "確認メールが届いていませんか？"
+      didnt_receive_unlock: "アンロック用メールが届いていませんか？"
+    unlocks:
+      resend_unlock_instructions: "アンロック用メールを再送信"
+      email: "メールアドレス"
