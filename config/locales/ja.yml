@@ -142,3 +142,11 @@ ja:
       password: "パスワード"
       password_confirmation: "パスワード（確認）"
       minimum_characters: "最低%{count}文字"
+    sessions:
+      log_in: "ログイン"
+      email: "メールアドレス"
+      password: "パスワード"
+      remember_me: "ログイン状態を保持する"
+      two_factor_authentication: "2段階認証"
+      enter_otp_code: "認証コードを入力してください"
+      authenticate: "認証"

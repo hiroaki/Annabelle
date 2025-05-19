@@ -142,3 +142,11 @@ en:
       password: "Password"
       password_confirmation: "Password confirmation"
       minimum_characters: "%{count} characters minimum"
+    sessions:
+      log_in: "Log in"
+      email: "Email"
+      password: "Password"
+      remember_me: "Remember me"
+      two_factor_authentication: "Two-Factor Authentication"
+      enter_otp_code: "Please enter your authentication code"
+      authenticate: "Authenticate"
