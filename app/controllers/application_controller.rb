@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  before_action :set_locale
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :conditional_auto_login
 
@@ -18,8 +19,19 @@ class ApplicationController < ActionController::Base
 
   protected
 
+  # 開発中における一時的な実装です。
+  def set_locale
+    session[:set_lang] = params[:set_lang].presence || session[:set_lang]
+    I18n.locale = if I18n.available_locales.map(&:to_s).include?(session[:set_lang])
+        session[:set_lang]
+      else
+        I18n.default_locale
+      end
+  end
+
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_up, keys: [:username])
+    devise_parameter_sanitizer.permit(:sign_in, keys: [:otp_attempt])
     devise_parameter_sanitizer.permit(:account_update, keys: [:username])
   end
 
@@ -38,13 +50,5 @@ class ApplicationController < ActionController::Base
 
     # ログイン不可な user をセットしてしまうと無限ループに陥るので注意。
     sign_in(:user, user)
-  end
-
-  private
-
-  def devise_edit_registration_path_for(resource)
-    mapping = Devise.mappings[resource_name]
-    path_helper = "edit_#{mapping.as}_registration_path"
-    respond_to?(path_helper) ? send(path_helper) : nil
   end
 end

@@ -10,28 +10,30 @@
     </div>
   <% end %>
 
-  <h2 class="text-2xl font-bold mb-4">Log in</h2>
+  <h2 class="text-2xl font-bold mb-4"><%= t('devise.sessions.log_in') %></h2>
 
   <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-6" }) do |f| %>
     <div class="mb-6">
-      <%= f.label :email, class: "block mb-2 text-sm font-medium text-gray-900" %>
-      <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.label :email, t('devise.sessions.email'), class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
     </div>
 
     <div class="mb-6">
-      <%= f.label :password, class: "block mb-2 text-sm font-medium text-gray-900" %>
-      <%= f.password_field :password, autocomplete: "current-password", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.label :password, t('devise.sessions.password'), class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= f.password_field :password, autocomplete: "current-password", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
     </div>
 
     <% if devise_mapping.rememberable? %>
       <div class="flex items-center mb-6">
         <%= f.check_box :remember_me, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
-        <%= f.label :remember_me, class: "ml-2 block text-sm font-medium text-gray-900" %>
+        <%= f.label :remember_me, t('devise.sessions.remember_me'), class: "ml-2 block text-sm font-medium text-gray-900" %>
       </div>
     <% end %>
 
+    <%= f.hidden_field :otp_attempt, value: '' %>
+
     <div class="flex items-center justify-between">
-      <%= f.submit "Log in", class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
+      <%= f.submit t('devise.sessions.log_in'), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
     </div>
   <% end %>
 

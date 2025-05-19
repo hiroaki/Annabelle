@@ -274,4 +274,107 @@ RSpec.describe User, type: :model do
       end
     end
   end
+
+  describe "#generate_two_factor_secret_if_missing!" do
+    let(:user) { create(:user, otp_secret: otp_secret) }
+
+    context "otp_secret が nil の場合" do
+      let(:otp_secret) { nil }
+
+      it "新しい otp_secret を生成して保存すること" do
+        expect(user.otp_secret).to be_nil
+        expect(User).to receive(:generate_otp_secret).and_call_original
+        expect { user.generate_two_factor_secret_if_missing! }
+          .to change { user.reload.otp_secret }.from(nil)
+        expect(user.otp_secret).to be_present
+      end
+    end
+
+    context "otp_secret が既に存在する場合" do
+      let(:otp_secret) { "existingsecret" }
+
+      it "otp_secret を変更しないこと" do
+        expect { user.generate_two_factor_secret_if_missing! }
+          .not_to change { user.reload.otp_secret }
+      end
+    end
+  end
+
+  describe "#enable_two_factor!" do
+    let(:user) { create(:user, otp_required_for_login: false) }
+
+    it "otp_required_for_login が true になること" do
+      expect {
+        user.enable_two_factor!
+      }.to change { user.reload.otp_required_for_login }.from(false).to(true)
+    end
+  end
+
+  describe "#disable_two_factor!" do
+    let(:user) do
+      create(:user,
+        otp_required_for_login: true,
+        otp_secret: "somesecret",
+        otp_backup_codes: ["code1", "code2"]
+      )
+    end
+
+    it "otp_required_for_login が false になること" do
+      expect {
+        user.disable_two_factor!
+      }.to change { user.reload.otp_required_for_login }.from(true).to(false)
+    end
+
+    it "otp_secret が nil になること" do
+      expect {
+        user.disable_two_factor!
+      }.to change { user.reload.otp_secret }.from("somesecret").to(nil)
+    end
+
+    it "otp_backup_codes が空配列になること" do
+      expect {
+        user.disable_two_factor!
+      }.to change { user.reload.otp_backup_codes }.from(["code1", "code2"]).to([])
+    end
+  end
+
+  describe "#two_factor_backup_codes_generated?" do
+    let(:user) { create(:user, otp_backup_codes: backup_codes) }
+
+    context "otp_backup_codes が存在する場合" do
+      let(:backup_codes) { ["code1", "code2"] }
+
+      it "true を返すこと" do
+        expect(user.two_factor_backup_codes_generated?).to be true
+      end
+    end
+
+    context "otp_backup_codes が nil の場合" do
+      let(:backup_codes) { nil }
+
+      it "false を返すこと" do
+        expect(user.two_factor_backup_codes_generated?).to be false
+      end
+    end
+
+    context "otp_backup_codes が空配列の場合" do
+      let(:backup_codes) { [] }
+
+      it "false を返すこと" do
+        expect(user.two_factor_backup_codes_generated?).to be false
+      end
+    end
+  end
+
+  describe "#two_factor_qr_code_uri" do
+    let(:user) { create(:user, email: "test@example.com", otp_secret: "SECRET") }
+
+    it "issuer とメールアドレスを含む provisioning URI を返すこと" do
+      uri = user.two_factor_qr_code_uri
+      expect(uri).to be_a(String)
+      expect(uri).to include("Annabelle")
+      expect(uri).to include("test%40example.com")
+      expect(uri).to include("otpauth://totp/")
+    end
+  end
 end

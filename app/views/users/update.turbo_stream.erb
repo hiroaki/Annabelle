@@ -1,0 +1,6 @@
+<%# id="devise" は <turbo-frame> です、 edit からの turbo frame による置き換えと等しくなるように処理します %>
+<%= turbo_stream.replace 'devise', partial: 'users/edit', locals: { user: @user } %>
+
+<%= turbo_stream.update CurrentUserPresenter.username_display_dom_id do %>
+  <%= @user.username %>
+<% end %>

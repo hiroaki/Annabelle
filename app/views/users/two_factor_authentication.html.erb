@@ -1,0 +1,42 @@
+<turbo-frame id="devise">
+<div class="container p-4">
+  <h2 class="text-2xl font-bold mb-4"><%= t('users.two_factor_authentication.title') %></h2>
+
+  <%= render 'shared/flash' %>
+
+  <% if current_user.otp_required_for_login %>
+    <div class="mb-4">
+      <p class="text-sm text-gray-700 mb-2">
+        <%= t('users.two_factor_authentication.enabled_html') %>
+      </p>
+      <div class="my-4">
+        <%= link_to(
+              t('users.two_factor_authentication.disable'),
+              two_factor_settings_path,
+              class: 'text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center',
+              method: :delete,
+              data: {
+                turbo_method: :delete,
+                turbo_confirm: t('users.two_factor_authentication.disable_confirm'),
+              }
+            )
+        %>
+      </div>
+    </div>
+  <% else %>
+    <div class="mb-4">
+      <p class="text-sm text-gray-700 mb-2">
+        <%= t('users.two_factor_authentication.not_enabled_html') %>
+      </p>
+      <div class="my-4">
+        <%= link_to(
+              t('users.two_factor_authentication.enable'),
+              new_two_factor_settings_path,
+              class: 'text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center',
+            )
+        %>
+      </div>
+    </div>
+  <% end %>
+</div>
+</turbo-frame>

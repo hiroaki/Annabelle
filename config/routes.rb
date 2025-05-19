@@ -1,13 +1,21 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
-    registrations: 'users/registrations'
+    registrations: 'users/registrations',
+    sessions: 'users/sessions'
   }
 
   devise_scope :user do
     delete '/users/oauth', to: 'users/registrations#unlink_oauth', as: :unlink_oauth
   end
 
+  resource :two_factor_settings, except: [:show, :update]
+
+  resources :users, only: [:show, :edit, :update] do
+    member do
+      get "two_factor_authentication"
+    end
+  end
 
   resources :messages, only: [:index, :create, :destroy]
 
