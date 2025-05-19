@@ -115,6 +115,7 @@ GEM
       railties (>= 7.0, < 8.1)
       rotp (~> 6.0)
     diff-lcs (1.6.2)
+    docile (1.4.1)
     dotenv (3.1.8)
     dotenv-rails (3.1.8)
       dotenv (= 3.1.8)
@@ -353,6 +354,12 @@ GEM
       websocket (~> 1.0)
     shoulda-matchers (6.5.0)
       activesupport (>= 5.2.0)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.13.1)
+    simplecov_json_formatter (0.1.4)
     snaky_hash (2.0.1)
       hashie
       version_gem (~> 1.1, >= 1.1.1)
@@ -438,6 +445,7 @@ DEPENDENCIES
   rspec-rails (~> 7.1, >= 7.1.1)
   selenium-webdriver
   shoulda-matchers (~> 6.0)
+  simplecov
   solid_cable (~> 3.0)
   sqlite3 (>= 2.1)
   stimulus-rails

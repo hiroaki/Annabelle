@@ -1,4 +1,11 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
+
+# Load and launch SimpleCov at the very top of your test/test_helper.rb
+# (or spec_helper.rb, rails_helper, cucumber env.rb,
+# or whatever your preferred test framework uses):
+require 'simplecov'
+SimpleCov.start 'rails'
+
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
