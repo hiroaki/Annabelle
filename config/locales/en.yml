@@ -139,6 +139,9 @@ en:
       enable: "Enable Two Factor Authentication"
       not_enabled_html: "Two factor authentication is <span class=\"font-semibold text-red-600\">not enabled</span>."
       title: "Two Factor Authentication"
+    update:
+      failure: "Failed to update your profile. Please try again later."
+      success: "Your profile has been updated successfully."
   views:
     pagination:
       first: "&laquo;"
