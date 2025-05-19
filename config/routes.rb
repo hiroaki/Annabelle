@@ -9,6 +9,14 @@ Rails.application.routes.draw do
     delete '/users/oauth', to: 'users/registrations#unlink_oauth', as: :unlink_oauth
   end
 
+  resource :two_factor_settings, except: [:show, :update]
+
+  resources :users, only: [:show, :edit, :update] do
+    member do
+      get "two_factor_authentication"
+    end
+  end
+
   resources :messages, only: [:index, :create, :destroy]
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

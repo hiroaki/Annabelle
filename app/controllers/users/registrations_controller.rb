@@ -27,22 +27,6 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   # (override)
-  def update_resource(resource, params)
-    if params[:otp_required_for_login] == '1'
-      unless resource.otp_required_for_login
-        # 新たに ON にする場合は secret を新しくします。
-        resource.otp_secret = User.generate_otp_secret
-      end
-      params[:otp_required_for_login] = true
-    else
-      resource.otp_secret = nil
-      params[:otp_required_for_login] = false
-    end
-
-    super(resource, params)
-  end
-
-  # (override)
   def after_update_path_for(resource)
     devise_edit_registration_path_for(resource)
   end

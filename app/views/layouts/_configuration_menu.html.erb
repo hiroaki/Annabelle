@@ -1,0 +1,47 @@
+<%# 画面レイアウトについて
+  ## PCサイズの場合
+  - モバイルファーストが理想ですがPCサイズをデザインのベースにしています。
+  - ハンバーガーメニュー・アイコンは出さず、メニュー項目の要素(drawer) も出したままです(position: relative)
+  ## モバイルサイズの場合
+  - drawer を position: absolute にすることによりその領域を解放し、右隣の要素(main) のコンテンツ幅が広がるようにします。
+  - ハンバーガーメニュー・アイコンを出し、クリックすることで drawer を出し入れできるようにします。右隣の要素の上に被さって出ます。
+  - drawer 要素にはボーダーをつけて視認性を良くします（現在すべてが白地なので）
+%>
+<div data-controller="drawer" class="relative">
+  <div class="container p-4">
+    <%# FIXME: text-nowrap なしの場合、選択したメニュー（右側コンテンツ）によっては折り返しが発生してしまっています %>
+    <div class="sm:pr-2 pt-1 text-nowrap text-gray-400"><%= t('layouts.configuration_menu.settings') %></div>
+    <button
+      data-drawer-target="reaction"
+      data-action="click->drawer#toggle"
+      class="sm:hidden w-8 h-8 flex items-center justify-center text-2xl rounded-md transition-all active:bg-blue-100 active:scale-95">
+      &#9776; <!-- ハンバーガーメニュー・アイコン -->
+    </button>
+  </div>
+
+  <div
+    data-drawer-target="drawer"
+    class="border border-gray-300 shadow-sm sm:border-0 sm:shadow-none
+     absolute sm:relative transform -translate-x-full sm:translate-x-0 sm:block transition-transform duration-300 ease-in-out p-4 bg-white w-64"
+    data-action="click->drawer#closeOnClick"
+  >
+    <ul class="space-y-4" role="navigation">
+      <li>
+        <%= link_to t('layouts.configuration_menu.dashboard'), user_path(current_user), data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
+      </li>
+      <li>
+        <%= link_to t('layouts.configuration_menu.profile'), edit_user_path(current_user), data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
+      </li>
+      <li>
+        <%= link_to t('layouts.configuration_menu.account_settings'), edit_user_registration_path, data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
+      </li>
+      <li>
+        <%= link_to t('layouts.configuration_menu.two_factor_authentication'), two_factor_authentication_user_path(current_user), data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
+      </li>
+    </ul>
+
+    <hr class="my-8">
+
+    <%= link_to t('layouts.configuration_menu.sign_out'), destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
+  </div>
+</div>

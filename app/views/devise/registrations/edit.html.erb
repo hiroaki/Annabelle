@@ -1,7 +1,8 @@
+<turbo-frame id="devise">
 <div class="container p-4">
-  <h2 class="text-2xl font-bold mb-4">Edit <%= resource_name.to_s.humanize %></h2>
+  <h2 class="text-2xl font-bold mb-4"><%= t('devise.registrations.account_settings') %></h2>
 
-  <%= render "messages/flash" %>
+  <%= render "shared/flash" %>
 
   <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "space-y-6" }) do |f| %>
     <%= render "devise/shared/error_messages", resource: resource %>
@@ -9,53 +10,43 @@
     <div class="mb-6">
       <div>
         <%= f.label :email, class: "block mb-2 text-sm font-medium text-gray-900" %>
-        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
       </div>
 
       <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
         <div class="flex items-center">
           <p class="text-sm text-gray-500">
-            Currently waiting confirmation for: <%= resource.unconfirmed_email %>
+            <%= t('devise.registrations.currently_waiting_confirmation', email: resource.unconfirmed_email) %>
           </p>
         </div>
       <% end %>
     </div>
 
     <div class="mb-6">
-      <%= f.label :username, class: "block mb-2 text-sm font-medium text-gray-900" %>
-      <%= f.text_field :username, autofocus: true, autocomplete: "username", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
-    </div>
-
-    <div class="mb-6">
       <%= f.label :password, class: "block mb-2 text-sm font-medium text-gray-900" %>
-      <%= f.password_field :password, autocomplete: "new-password", placeholder: "Your new password", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.password_field :password, autocomplete: "new-password", placeholder: t('devise.registrations.your_new_password'), class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
       <% if @minimum_password_length %>
         <p class="mt-2 text-sm text-gray-500">
-          <%= @minimum_password_length %> characters minimum
+          <%= t('devise.registrations.minimum_characters', count: @minimum_password_length) %>
         </p>
       <% end %>
     </div>
 
     <div class="mb-6">
       <%= f.label :password_confirmation, class: "block mb-2 text-sm font-medium text-gray-900" %>
-      <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: "Confirm new password", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: t('devise.registrations.confirm_new_password'), class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
     </div>
 
     <div class="mb-6">
       <%= f.label :current_password, class: "block mb-2 text-sm font-medium text-gray-900" %>
-      <%= f.password_field :current_password, autocomplete: "current-password", placeholder: "Current password", class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.password_field :current_password, autocomplete: "current-password", placeholder: t('devise.registrations.current_password'), class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
       <p class="mt-2 text-sm text-gray-500">
-        We need your current password to confirm your changes.
+        <%= t('devise.registrations.need_current_password') %>
       </p>
     </div>
 
-    <div class="mb-6">
-      <%= f.label :otp_required_for_login, '2FAを有効にする' %><br>
-      <%= f.check_box :otp_required_for_login %>
-    </div>
-
     <div class="flex items-center justify-between">
-      <%= f.submit "Update", class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
+      <%= f.submit t('devise.registrations.update'), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
     </div>
   <% end %>
 
@@ -64,28 +55,28 @@
   <div class="mb-4">
     <%- if devise_mapping.omniauthable? %>
       <%- resource_class.omniauth_providers.each do |provider| %>
-
         <% provider_name = OmniAuth::Utils.camelize(provider) %>
-
         <% if resource.linked_with?(provider) %>
-          <%=
-            button_to("#{provider_name}アカウントの連携を解除", unlink_oauth_path,
-              method: :delete,
-              class: "text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2",
-              data: {
-                turbo: false,
-                confirm: '本当に#{provider_name}認証を無効化しますか？',
-              },
-              id: "unlink-button-#{provider}"
-            )
+          <%= button_to(
+                t('devise.registrations.unlink_oauth', provider: provider_name),
+                unlink_oauth_path,
+                method: :delete,
+                class: "text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2",
+                data: {
+                  turbo: false,
+                  confirm: t('devise.registrations.unlink_confirm', provider: provider_name),
+                },
+                id: "unlink-button-#{provider}"
+              )
           %>
         <% else %>
-          <%=
-            button_to("#{provider_name}アカウントと連携", omniauth_authorize_path(resource_name, provider),
-              class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2",
-              data: { turbo: false },
-              id: "oauth-button-#{provider}"
-            )
+          <%= button_to(
+                t('devise.registrations.link_oauth', provider: provider_name),
+                omniauth_authorize_path(resource_name, provider),
+                class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2",
+                data: { turbo: false },
+                id: "oauth-button-#{provider}"
+              )
           %>
         <% end %>
       <% end %>
@@ -94,13 +85,10 @@
 
   <hr class="my-4">
 
-  <h3 class="text-xl font-bold mt-8 mb-4">Cancel my account</h3>
+  <h3 class="text-xl font-bold mt-8 mb-4"><%= t('devise.registrations.cancel_my_account') %></h3>
 
   <div class="mb-4">
-    <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete, class: "text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
+    <%= button_to t('devise.registrations.cancel_my_account'), registration_path(resource_name), data: { confirm: t('devise.registrations.cancel_confirm') }, method: :delete, class: "text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
   </div>
-
-  <hr class="my-4">
-
-  <%= link_to "Back", messages_path, class: "text-blue-600 hover:underline" %>
 </div>
+</turbo-frame>

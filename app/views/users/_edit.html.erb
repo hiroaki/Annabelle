@@ -1,0 +1,19 @@
+<turbo-frame id="devise">
+  <div class="container p-4">
+    <h2 class="text-2xl font-bold mb-4"><%= t('users.edit.profile') %></h2>
+
+    <%= render 'shared/flash' %>
+
+    <%= form_for(user, html: { method: :put, class: "space-y-6" }) do |f| %>
+      <div class="mb-6">
+        <%= f.label :username, t('users.edit.username'), class: "block mb-2 text-sm font-medium text-gray-900" %>
+        <%= f.text_field :username, autofocus: true, autocomplete: "username", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <%= f.submit t('users.edit.update'), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
+      </div>
+
+    <% end %>
+  </div>
+</turbo-frame>
