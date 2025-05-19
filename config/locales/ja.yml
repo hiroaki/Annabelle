@@ -160,3 +160,18 @@ ja:
     unlocks:
       resend_unlock_instructions: "アンロック用メールを再送信"
       email: "メールアドレス"
+  users:
+    edit:
+      profile: "プロフィール"
+      username: "ユーザー名"
+      update: "更新"
+    show:
+      dashboard: "ダッシュボード"
+      welcome: "%{username}さん、ようこそ！"
+    two_factor_authentication:
+      title: "二要素認証"
+      enabled_html: "二要素認証は<span class=\"font-semibold text-green-600\">有効</span>です。"
+      not_enabled_html: "二要素認証は<span class=\"font-semibold text-red-600\">無効</span>です。"
+      enable: "二要素認証を有効にする"
+      disable: "二要素認証を無効にする"
+      disable_confirm: "本当に二要素認証を無効にしますか？"

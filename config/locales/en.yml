@@ -160,3 +160,18 @@ en:
       forgot_your_password: "Forgot your password?"
       didnt_receive_confirmation: "Didn't receive confirmation instructions?"
       didnt_receive_unlock: "Didn't receive unlock instructions?"
+  users:
+    edit:
+      profile: "Profile"
+      username: "Username"
+      update: "Update"
+    show:
+      dashboard: "Dashboard"
+      welcome: "Welcome %{username}!"
+    two_factor_authentication:
+      title: "Two Factor Authentication"
+      enabled_html: "Two factor authentication is <span class=\"font-semibold text-green-600\">enabled</span>."
+      not_enabled_html: "Two factor authentication is <span class=\"font-semibold text-red-600\">not enabled</span>."
+      enable: "Enable Two Factor Authentication"
+      disable: "Disable Two Factor Authentication"
+      disable_confirm: "Are you sure you want to disable two factor authentication?"
