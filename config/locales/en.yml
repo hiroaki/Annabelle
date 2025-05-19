@@ -69,6 +69,9 @@ en:
         confirmation_sent_at: "Confirmation sent at"
         unconfirmed_email: "Unconfirmed email"
         username: "Username"
+        password: "Password"
+        password_confirmation: "Password confirmation"
+        current_password: "Current password"
       message:
         content: "Content"
         created_at: "Created at"
@@ -175,3 +178,11 @@ en:
       enable: "Enable Two Factor Authentication"
       disable: "Disable Two Factor Authentication"
       disable_confirm: "Are you sure you want to disable two factor authentication?"
+  layouts:
+    configuration_menu:
+      settings: "Settings"
+      dashboard: "Dashboard"
+      profile: "Profile"
+      account_settings: "Account settings"
+      two_factor_authentication: "Two Factor Authentication"
+      sign_out: "Sign out"

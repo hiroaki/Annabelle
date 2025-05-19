@@ -10,7 +10,7 @@
 <div data-controller="drawer" class="relative">
   <div class="container p-4">
     <%# FIXME: text-nowrap なしの場合、選択したメニュー（右側コンテンツ）によっては折り返しが発生してしまっています %>
-    <div class="sm:pr-2 pt-1 text-nowrap text-gray-400">設定</div>
+    <div class="sm:pr-2 pt-1 text-nowrap text-gray-400"><%= t('layouts.configuration_menu.settings') %></div>
     <button
       data-drawer-target="reaction"
       data-action="click->drawer#toggle"
@@ -27,21 +27,21 @@
   >
     <ul class="space-y-4" role="navigation">
       <li>
-        <%= link_to "Dashboard", user_path(current_user), data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
+        <%= link_to t('layouts.configuration_menu.dashboard'), user_path(current_user), data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
       </li>
       <li>
-        <%= link_to "Profile", edit_user_path(current_user), data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
+        <%= link_to t('layouts.configuration_menu.profile'), edit_user_path(current_user), data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
       </li>
       <li>
-        <%= link_to "Account settings", edit_user_registration_path, data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
+        <%= link_to t('layouts.configuration_menu.account_settings'), edit_user_registration_path, data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
       </li>
       <li>
-        <%= link_to "Two Factor Authentication", two_factor_authentication_user_path(current_user), data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
+        <%= link_to t('layouts.configuration_menu.two_factor_authentication'), two_factor_authentication_user_path(current_user), data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
       </li>
     </ul>
 
     <hr class="my-8">
 
-    <%= link_to "Sign out", destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
+    <%= link_to t('layouts.configuration_menu.sign_out'), destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
   </div>
 </div>

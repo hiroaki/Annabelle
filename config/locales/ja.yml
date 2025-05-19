@@ -69,6 +69,9 @@ ja:
         confirmation_sent_at: "確認送信日時"
         unconfirmed_email: "未確認メールアドレス"
         username: "ユーザー名"
+        password: "パスワード"
+        password_confirmation: "パスワード（確認）"
+        current_password: "現在のパスワード"
       message:
         content: "本文"
         created_at: "作成日時"
@@ -175,3 +178,11 @@ ja:
       enable: "二要素認証を有効にする"
       disable: "二要素認証を無効にする"
       disable_confirm: "本当に二要素認証を無効にしますか？"
+  layouts:
+    configuration_menu:
+      settings: "設定"
+      dashboard: "ダッシュボード"
+      profile: "プロフィール"
+      account_settings: "アカウント設定"
+      two_factor_authentication: "二要素認証"
+      sign_out: "ログアウト"
