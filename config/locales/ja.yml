@@ -28,163 +28,162 @@
 #       enabled: "ON"
 
 ja:
-  views:
-    pagination:
-      first: "&laquo;"
-      last: "&raquo;"
-      previous: "&lsaquo;"
-      next: "&rsaquo;"
-      truncate: "&hellip;"
-  helpers:
-    page_entries_info:
-      one_page:
-        display_entries:
-          zero: "%{entry_name}が見つかりません"
-          one: "表示中 <b>1</b> 件の %{entry_name}"
-          other: "全 <b>%{count}</b> 件の %{entry_name} を表示中"
-      more_pages:
-        display_entries: "全 <b>%{total}</b> 件中、<b>%{first}–%{last}</b> を表示中"
-  messages:
-    errors:
-      not_owned: "他のユーザのメッセージは削除できません。"
-      generic: "エラーが発生しました: %{error_message}"
-    form:
-      comment_label: "コメント"
-      post: "投稿"
-    email_confirmation_required: "投稿するにはメールアドレスの確認が必要です。"
   activerecord:
-    models:
-      user: "ユーザー"
-      message: "メッセージ"
-      authorization: "認証情報"
     attributes:
+      authorization:
+        created_at: "作成日時"
+        provider: "プロバイダ"
+        uid: "UID"
+        updated_at: "更新日時"
+      message:
+        content: "内容"
+        created_at: "作成日時"
+        updated_at: "更新日時"
+        user_id: "ユーザー"
       user:
+        admin: "管理者"
+        confirmation_sent_at: "確認メール送信日時"
+        confirmation_token: "確認トークン"
+        confirmed_at: "確認済み日時"
+        created_at: "作成日時"
+        current_password: "現在のパスワード"
         email: "メールアドレス"
         encrypted_password: "暗号化されたパスワード"
-        reset_password_token: "パスワードリセットトークン"
-        reset_password_sent_at: "パスワードリセット送信日時"
-        remember_created_at: "ログイン情報記憶日時"
-        created_at: "作成日時"
-        updated_at: "更新日時"
-        admin: "管理者"
-        confirmation_token: "確認トークン"
-        confirmed_at: "確認日時"
-        confirmation_sent_at: "確認送信日時"
-        unconfirmed_email: "未確認メールアドレス"
-        username: "ユーザー名"
         password: "パスワード"
         password_confirmation: "パスワード（確認）"
-        current_password: "現在のパスワード"
-      message:
-        content: "本文"
-        created_at: "作成日時"
+        remember_created_at: "ログイン状態保持開始日時"
+        reset_password_sent_at: "パスワード再設定メール送信日時"
+        reset_password_token: "パスワード再設定トークン"
+        unconfirmed_email: "未確認メールアドレス"
         updated_at: "更新日時"
-        user_id: "ユーザー"
-      authorization:
-        user_id: "ユーザー"
-        provider: "プロバイダー"
-        uid: "UID"
-        created_at: "作成日時"
-        updated_at: "更新日時"
+        username: "ユーザー名"
     errors:
       models:
-        user:
-          attributes:
-            username:
-              blank: "を入力してください"
-              taken: "はすでに使用されています"
-              invalid_format: "は英数字とアンダースコアのみ使用できます"
-            email:
-              blank: "を入力してください"
-              invalid: "の形式が正しくありません"
-        message:
-          attributes:
-            content:
-              blank: "を入力してください"
         authorization:
           attributes:
             provider:
               blank: "を入力してください"
             uid:
               blank: "を入力してください"
-              taken: "はこのプロバイダーですでに使用されています"
-  two_factor_settings:
-    already_enabled: "二要素認証は既に有効になっています。"
-    incorrect_password: "パスワードが正しくありません"
-    enabled: "二要素認証を有効化しました。バックアップコードを必ず控えてください。"
-    incorrect_code: "認証コードが正しくありません"
-    enable_first: "まず二要素認証を有効にしてください。"
-    backup_codes_already_seen: "バックアップコードは既に表示済みです。"
-    disabled: "二要素認証を無効化しました。"
-    could_not_disable: "二要素認証を無効化できませんでした。"
+              taken: "は既に登録済みです"
+        message:
+          attributes:
+            content:
+              blank: "を入力してください"
+        user:
+          attributes:
+            email:
+              blank: "を入力してください"
+              invalid: "は有効なメールアドレスではありません"
+            username:
+              blank: "を入力してください"
+              invalid_format: "は英数字とアンダースコアのみ使用できます"
+              taken: "は既に使用されています"
+    models:
+      authorization: "認証情報"
+      message: "メッセージ"
+      user: "ユーザー"
   devise:
     confirmations:
       resend_confirmation_instructions: "確認メールを再送信"
     passwords:
-      change_your_password: "パスワードの変更"
-      new_password: "新しいパスワード"
-      confirm_new_password: "新しいパスワード（確認）"
       change_my_password: "パスワードを変更する"
-      minimum_characters: "（最低%{count}文字）"
+      change_your_password: "パスワードの変更"
+      confirm_new_password: "新しいパスワード（確認）"
       forgot_your_password: "パスワードをお忘れですか？"
+      minimum_characters: "最低%{count}文字"
+      new_password: "新しいパスワード"
       send_reset_password_instructions: "パスワード再設定用メールを送信"
     registrations:
       account_settings: "アカウント設定"
-      currently_waiting_confirmation: "確認待ちのメールアドレス: %{email}"
-      your_new_password: "新しいパスワード"
-      confirm_new_password: "新しいパスワード（確認）"
-      minimum_characters: "最低%{count}文字"
-      current_password: "現在のパスワード"
-      need_current_password: "変更を確定するために現在のパスワードが必要です。"
-      update: "更新"
-      unlink_oauth: "%{provider}アカウントの連携を解除"
-      link_oauth: "%{provider}アカウントと連携"
-      unlink_confirm: "本当に%{provider}認証を無効化しますか？"
-      cancel_my_account: "アカウントを削除"
       cancel_confirm: "本当に削除しますか？"
+      cancel_my_account: "アカウントを削除"
+      confirm_new_password: "新しいパスワード（確認）"
+      current_password: "現在のパスワード"
+      email: "メールアドレス"
+      link_oauth: "%{provider}アカウントと連携"
+      need_current_password: "変更を確定するために現在のパスワードが必要です。"
       sign_up: "新規登録"
-      email: "メールアドレス"
+      update: "更新"
+      unlink_confirm: "本当に%{provider}認証を無効化しますか？"
+      unlink_oauth: "%{provider}アカウントの連携を解除"
       username: "ユーザー名"
-      password: "パスワード"
-      password_confirmation: "パスワード（確認）"
+      your_new_password: "新しいパスワード"
     sessions:
-      log_in: "ログイン"
+      authenticate: "認証"
       email: "メールアドレス"
+      log_in: "ログイン"
       password: "パスワード"
       remember_me: "ログイン状態を保持する"
-      two_factor_authentication: "2段階認証"
+      two_factor_authentication: "二段階認証"
       enter_otp_code: "認証コードを入力してください"
-      authenticate: "認証"
     shared:
-      sign_in_with: "%{provider}でサインイン"
-      log_in: "ログイン"
-      sign_up: "新規登録"
-      forgot_your_password: "パスワードをお忘れですか？"
       didnt_receive_confirmation: "確認メールが届いていませんか？"
       didnt_receive_unlock: "アンロック用メールが届いていませんか？"
+      forgot_your_password: "パスワードをお忘れですか？"
+      log_in: "ログイン"
+      sign_in_with: "%{provider}でサインイン"
+      sign_up: "新規登録"
     unlocks:
-      resend_unlock_instructions: "アンロック用メールを再送信"
       email: "メールアドレス"
+      resend_unlock_instructions: "アンロック用メールを再送信"
+  helpers:
+    page_entries_info:
+      more_pages:
+        display_entries: "全 <b>%{total}</b> 件中、<b>%{first}–%{last}</b> を表示中"
+      one_page:
+        display_entries:
+          one: "表示中 <b>1</b> 件の %{entry_name}"
+          other: "全 <b>%{count}</b> 件の %{entry_name} を表示中"
+          zero: "%{entry_name}が見つかりません"
+  layouts:
+    configuration_menu:
+      account_settings: "アカウント設定"
+      dashboard: "ダッシュボード"
+      profile: "プロフィール"
+      settings: "設定"
+      sign_out: "ログアウト"
+      two_factor_authentication: "二要素認証"
+  messages:
+    email_confirmation_required: "投稿するにはメールアドレスの確認が必要です。"
+    errors:
+      generic: "エラーが発生しました: %{error_message}"
+      not_owned: "他のユーザのメッセージは削除できません。"
+    form:
+      comment_label: "コメント"
+      post: "投稿"
+  two_factor_settings:
+    backup_codes_already_seen: "バックアップコードは既に表示済みです。"
+    disable: "二要素認証を無効にする"
+    disable_confirm: "本当に二要素認証を無効化しますか？"
+    enable: "二要素認証を有効にする"
+    enable_first: "まず二要素認証を有効にしてください。"
+    enabled: "二要素認証を有効化しました。バックアップコードを必ず控えてください。"
+    incorrect_code: "認証コードが正しくありません"
+    incorrect_password: "パスワードが正しくありません"
+    could_not_disable: "二要素認証を無効化できませんでした。"
+    not_enabled_html: "二要素認証は<span class=\"font-semibold text-red-600\">無効</span>です。"
+    enabled_html: "二要素認証は<span class=\"font-semibold text-green-600\">有効</span>です。"
+    title: "二要素認証"
   users:
     edit:
       profile: "プロフィール"
-      username: "ユーザー名"
       update: "更新"
+      username: "ユーザー名"
     show:
       dashboard: "ダッシュボード"
       welcome: "%{username}さん、ようこそ！"
     two_factor_authentication:
-      title: "二要素認証"
-      enabled_html: "二要素認証は<span class=\"font-semibold text-green-600\">有効</span>です。"
-      not_enabled_html: "二要素認証は<span class=\"font-semibold text-red-600\">無効</span>です。"
-      enable: "二要素認証を有効にする"
       disable: "二要素認証を無効にする"
-      disable_confirm: "本当に二要素認証を無効にしますか？"
-  layouts:
-    configuration_menu:
-      settings: "設定"
-      dashboard: "ダッシュボード"
-      profile: "プロフィール"
-      account_settings: "アカウント設定"
-      two_factor_authentication: "二要素認証"
-      sign_out: "ログアウト"
+      disable_confirm: "本当に二要素認証を無効化しますか？"
+      enabled_html: "二要素認証は<span class=\"font-semibold text-green-600\">有効</span>です。"
+      enable: "二要素認証を有効にする"
+      not_enabled_html: "二要素認証は<span class=\"font-semibold text-red-600\">無効</span>です。"
+      title: "二要素認証"
+  views:
+    pagination:
+      first: "&laquo;"
+      last: "&raquo;"
+      next: "&rsaquo;"
+      previous: "&lsaquo;"
+      truncate: "&hellip;"
