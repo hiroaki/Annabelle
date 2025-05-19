@@ -102,3 +102,12 @@ en:
             uid:
               blank: "can't be blank"
               taken: "has already been taken for this provider"
+  two_factor_settings:
+    already_enabled: "Two Factor Authentication is already enabled."
+    incorrect_password: "Incorrect password"
+    enabled: "Successfully enabled two factor authentication, please make note of your backup codes."
+    incorrect_code: "Incorrect Code"
+    enable_first: "Please enable two factor authentication first."
+    backup_codes_already_seen: "You have already seen your backup codes."
+    disabled: "Successfully disabled two factor authentication."
+    could_not_disable: "Could not disable two factor authentication."

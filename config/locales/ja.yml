@@ -102,3 +102,12 @@ ja:
             uid:
               blank: "を入力してください"
               taken: "はこのプロバイダーですでに使用されています"
+  two_factor_settings:
+    already_enabled: "二要素認証は既に有効になっています。"
+    incorrect_password: "パスワードが正しくありません"
+    enabled: "二要素認証を有効化しました。バックアップコードを必ず控えてください。"
+    incorrect_code: "認証コードが正しくありません"
+    enable_first: "まず二要素認証を有効にしてください。"
+    backup_codes_already_seen: "バックアップコードは既に表示済みです。"
+    disabled: "二要素認証を無効化しました。"
+    could_not_disable: "二要素認証を無効化できませんでした。"
