@@ -57,32 +57,35 @@ ja:
         unconfirmed_email: "未確認メールアドレス"
         updated_at: "更新日時"
         username: "ユーザー名"
+    # エラーメッセージを個別にカスタマイズしたい場合はこのような階層で定義できます。
     errors:
       models:
-        authorization:
-          attributes:
-            provider:
-              blank: "を入力してください"
-            uid:
-              blank: "を入力してください"
-              taken: "は既に登録済みです"
-        message:
-          attributes:
-            content:
-              blank: "を入力してください"
         user:
           attributes:
-            email:
-              blank: "を入力してください"
-              invalid: "は有効なメールアドレスではありません"
             username:
-              blank: "を入力してください"
               invalid_format: "は英数字とアンダースコアのみ使用できます"
-              taken: "は既に使用されています"
     models:
       authorization: "認証情報"
       message: "メッセージ"
       user: "ユーザー"
+  errors:
+    messages:
+      blank: "を入力してください"
+      invalid: "は不正な値です"
+      invalid_format: "は正しい形式で入力してください"
+      taken: "は既に使用されています"
+      too_short: "は%{count}文字以上で入力してください"
+      too_long: "は%{count}文字以内で入力してください"
+      not_a_number: "は数値で入力してください"
+      confirmation: "と%{attribute}の入力が一致しません"
+      accepted: "を受諾してください"
+      present: "は空欄でなければいけません"
+      inclusion: "は一覧にありません"
+      exclusion: "は予約されています"
+      greater_than: "%{count}より大きい値にしてください"
+      less_than: "%{count}より小さい値にしてください"
+      even: "は偶数にしてください"
+      odd: "は奇数にしてください"
   helpers:
     page_entries_info:
       more_pages:
