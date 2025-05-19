@@ -83,50 +83,6 @@ ja:
       authorization: "認証情報"
       message: "メッセージ"
       user: "ユーザー"
-  devise:
-    confirmations:
-      resend_confirmation_instructions: "確認メールを再送信"
-    passwords:
-      change_my_password: "パスワードを変更する"
-      change_your_password: "パスワードの変更"
-      confirm_new_password: "新しいパスワード（確認）"
-      forgot_your_password: "パスワードをお忘れですか？"
-      minimum_characters: "最低%{count}文字"
-      new_password: "新しいパスワード"
-      send_reset_password_instructions: "パスワード再設定用メールを送信"
-    registrations:
-      account_settings: "アカウント設定"
-      cancel_confirm: "本当に削除しますか？"
-      cancel_my_account: "アカウントを削除"
-      confirm_new_password: "新しいパスワード（確認）"
-      current_password: "現在のパスワード"
-      email: "メールアドレス"
-      link_oauth: "%{provider}アカウントと連携"
-      need_current_password: "変更を確定するために現在のパスワードが必要です。"
-      sign_up: "新規登録"
-      update: "更新"
-      unlink_confirm: "本当に%{provider}認証を無効化しますか？"
-      unlink_oauth: "%{provider}アカウントの連携を解除"
-      username: "ユーザー名"
-      your_new_password: "新しいパスワード"
-    sessions:
-      authenticate: "認証"
-      email: "メールアドレス"
-      log_in: "ログイン"
-      password: "パスワード"
-      remember_me: "ログイン状態を保持する"
-      two_factor_authentication: "二段階認証"
-      enter_otp_code: "認証コードを入力してください"
-    shared:
-      didnt_receive_confirmation: "確認メールが届いていませんか？"
-      didnt_receive_unlock: "アンロック用メールが届いていませんか？"
-      forgot_your_password: "パスワードをお忘れですか？"
-      log_in: "ログイン"
-      sign_in_with: "%{provider}でサインイン"
-      sign_up: "新規登録"
-    unlocks:
-      email: "メールアドレス"
-      resend_unlock_instructions: "アンロック用メールを再送信"
   helpers:
     page_entries_info:
       more_pages:

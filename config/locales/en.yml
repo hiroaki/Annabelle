@@ -83,50 +83,6 @@ en:
       authorization: "Authorization"
       message: "Message"
       user: "User"
-  devise:
-    confirmations:
-      resend_confirmation_instructions: "Resend confirmation instructions"
-    passwords:
-      change_my_password: "Change my password"
-      change_your_password: "Change your password"
-      confirm_new_password: "Confirm new password"
-      forgot_your_password: "Forgot your password?"
-      minimum_characters: "(%{count} characters minimum)"
-      new_password: "New password"
-      send_reset_password_instructions: "Send me reset password instructions"
-    registrations:
-      account_settings: "Account settings"
-      cancel_confirm: "Are you sure?"
-      cancel_my_account: "Cancel my account"
-      confirm_new_password: "Confirm new password"
-      current_password: "Current password"
-      email: "Email"
-      link_oauth: "Link with %{provider} account"
-      need_current_password: "We need your current password to confirm your changes."
-      sign_up: "Sign up"
-      update: "Update"
-      unlink_confirm: "Are you sure you want to unlink %{provider} authentication?"
-      unlink_oauth: "Unlink %{provider} account"
-      username: "Username"
-      your_new_password: "Your new password"
-    sessions:
-      authenticate: "Authenticate"
-      email: "Email"
-      log_in: "Log in"
-      password: "Password"
-      remember_me: "Remember me"
-      two_factor_authentication: "Two-Factor Authentication"
-      enter_otp_code: "Please enter your authentication code"
-    shared:
-      didnt_receive_confirmation: "Didn't receive confirmation instructions?"
-      didnt_receive_unlock: "Didn't receive unlock instructions?"
-      forgot_your_password: "Forgot your password?"
-      log_in: "Log in"
-      sign_in_with: "Sign in with %{provider}"
-      sign_up: "Sign up"
-    unlocks:
-      email: "Email"
-      resend_unlock_instructions: "Resend unlock instructions"
   helpers:
     page_entries_info:
       more_pages:
