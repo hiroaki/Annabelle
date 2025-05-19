@@ -14,13 +14,17 @@ class UsersController < ApplicationController
   # PUT /users/:id(.:format)
   def update
     if @user.update(user_params_for_profile)
-      flash.now[:notice] = "success"
+      flash[:notice] = I18n.t("users.update.success")
       respond_to do |format|
         format.turbo_stream
+        format.html { redirect_to @user }
       end
     else
-      flash.now[:alert] = "failure"
-      render :edit
+      flash.now[:alert] = I18n.t("users.update.failure")
+      respond_to do |format|
+        format.turbo_stream
+        format.html { render :edit }
+      end
     end
   end
 
@@ -31,7 +35,7 @@ class UsersController < ApplicationController
   private
 
   def set_user
-    @user = User.find(params[:id])
+    @user = current_user
   end
 
   def user_params_for_profile
