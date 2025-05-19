@@ -1,11 +1,5 @@
-<turbo-frame id="devise">
-  <div class="container p-4">
-    <h2 class="text-2xl font-bold mb-4"><%= t('users.show.dashboard') %></h2>
-
-    <%= render 'shared/flash' %>
-
-    <p>
-      <%= t('users.show.welcome', username: @user.username) %>
-    </p>
-  </div>
-</turbo-frame>
+<%= users_frame('users.show.dashboard') do %>
+  <p>
+    <%= t('users.show.welcome', username: @user.username) %>
+  </p>
+<% end %>
