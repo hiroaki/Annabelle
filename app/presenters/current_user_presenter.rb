@@ -34,7 +34,7 @@ class CurrentUserPresenter < ModelPresenterBase
         id: self.class.username_display_dom_id,
       ),
       view_context.link_to(
-        'Sign out',
+        I18n.t('layouts.configuration_menu.sign_out'),
         view_context.destroy_user_session_path,
         method: :delete,
         class: 'text-gray-400',

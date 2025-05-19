@@ -6,6 +6,7 @@ ja:
       confirmed: 'アカウントを登録しました。'
       send_instructions: 'アカウントの有効化について数分以内にメールでご連絡します。'
       send_paranoid_instructions: "あなたのメールアドレスが登録済みの場合、本人確認用のメールが数分以内に送信されます。"
+      resend_confirmation_instructions: "確認メールを再送信"
     failure:
       already_authenticated: 'すでにログインしています。'
       inactive: 'アカウントが有効化されていません。メールに記載された手順にしたがって、アカウントを有効化してください。'
@@ -40,6 +41,13 @@ ja:
       send_paranoid_instructions: "あなたのメールアドレスが登録済みの場合、パスワード再設定用のメールが数分以内に送信されます。"
       updated: 'パスワードが正しく変更されました。'
       updated_not_active: 'パスワードが正しく変更されました。'
+      change_my_password: "パスワードを変更する"
+      change_your_password: "パスワードの変更"
+      confirm_new_password: "新しいパスワード（確認）"
+      forgot_your_password: "パスワードをお忘れですか？"
+      minimum_characters: "最低%{count}文字"
+      new_password: "新しいパスワード"
+      send_reset_password_instructions: "パスワード再設定用メールを送信"
     registrations:
       destroyed: 'アカウントを削除しました。またのご利用をお待ちしております。'
       signed_up: 'アカウント登録が完了しました。'
@@ -53,10 +61,40 @@ ja:
         success: "%{provider_name} 認証を解除しました。"
         failure: "%{provider_name} 認証の解除に失敗しました。"
         not_found: "指定された連携が見つかりません。"
+      account_settings: "アカウント設定"
+      cancel_confirm: "本当に削除しますか？"
+      cancel_my_account: "アカウントを削除"
+      confirm_new_password: "新しいパスワード（確認）"
+      current_password: "現在のパスワード"
+      email: "メールアドレス"
+      link_oauth: "%{provider}アカウントと連携"
+      need_current_password: "変更を確定するために現在のパスワードが必要です。"
+      sign_up: "新規登録"
+      update: "更新"
+      unlink_confirm: "本当に%{provider}認証を無効化しますか？"
+      unlink_oauth: "%{provider}アカウントの連携を解除"
+      username: "ユーザー名"
+      your_new_password: "新しいパスワード"
+      minimum_characters: "(最低 %{count} 文字)"
+      currently_waiting_confirmation: "確認待ちのメールアドレス: %{email}"
     sessions:
       signed_in: 'ログインしました。'
       signed_out: 'ログアウトしました。'
       already_signed_out: '既にログアウト済みです。'
+      authenticate: "認証"
+      email: "メールアドレス"
+      log_in: "ログイン"
+      password: "パスワード"
+      remember_me: "ログイン状態を保持する"
+      two_factor_authentication: "二段階認証"
+      enter_otp_code: "認証コードを入力してください"
+    shared:
+      didnt_receive_confirmation: "確認メールが届いていませんか？"
+      didnt_receive_unlock: "アンロック用メールが届いていませんか？"
+      forgot_your_password: "パスワードをお忘れですか？"
+      log_in: "ログイン"
+      sign_in_with: "%{provider}でサインイン"
+      sign_up: "新規登録"
     unlocks:
       send_instructions: 'アカウントの凍結解除方法を数分以内にメールでご連絡します。'
       send_paranoid_instructions: 'アカウントが見つかった場合、アカウントの凍結解除方法を数分以内にメールでご連絡します。'

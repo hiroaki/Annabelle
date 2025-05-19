@@ -4,7 +4,7 @@ class TwoFactorSettingsController < ApplicationController
   # new_two_factor_settings GET /two_factor_settings/new(.:format)
   def new
     if current_user.otp_required_for_login
-      flash[:alert] = 'Two Factor Authentication is already enabled.'
+      flash[:alert] = I18n.t('two_factor_settings.already_enabled')
       return redirect_to user_path(current_user)
     end
 
@@ -14,17 +14,17 @@ class TwoFactorSettingsController < ApplicationController
   # two_factor_settings POST /two_factor_settings(.:format)
   def create
     unless current_user.valid_password?(params_enabling_2fa[:password])
-      flash.now[:alert] = 'Incorrect password'
+      flash.now[:alert] = I18n.t('two_factor_settings.incorrect_password')
       return render :new
     end
 
     if current_user.validate_and_consume_otp!(params_enabling_2fa[:code])
       current_user.enable_two_factor!
 
-      flash[:notice] = 'Successfully enabled two factor authentication, please make note of your backup codes.'
+      flash[:notice] = I18n.t('two_factor_settings.enabled')
       redirect_to edit_two_factor_settings_path
     else
-      flash.now[:alert] = 'Incorrect Code'
+      flash.now[:alert] = I18n.t('two_factor_settings.incorrect_code')
       render :new
     end
   end
@@ -32,12 +32,12 @@ class TwoFactorSettingsController < ApplicationController
   # edit_two_factor_settings GET /two_factor_settings/edit(.:format)
   def edit
     unless current_user.otp_required_for_login
-      flash[:alert] = 'Please enable two factor authentication first.'
+      flash[:alert] = I18n.t('two_factor_settings.enable_first')
       return redirect_to new_two_factor_settings_path
     end
 
     if current_user.two_factor_backup_codes_generated?
-      flash[:alert] = 'You have already seen your backup codes.'
+      flash[:alert] = I18n.t('two_factor_settings.backup_codes_already_seen')
       return redirect_to edit_user_registration_path
     end
 
@@ -48,10 +48,10 @@ class TwoFactorSettingsController < ApplicationController
   # two_factor_settings DELETE /two_factor_settings(.:format)
   def destroy
     if current_user.disable_two_factor!
-      flash[:notice] = 'Successfully disabled two factor authentication.'
+      flash[:notice] = I18n.t('two_factor_settings.disabled')
       redirect_to edit_user_registration_path
     else
-      flash[:alert] = 'Could not disable two factor authentication.'
+      flash[:alert] = I18n.t('two_factor_settings.could_not_disable')
       redirect_back fallback_location: root_path
     end
   end
