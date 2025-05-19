@@ -40,3 +40,5 @@
 #
 /Procfile.dev
 
+# simplecov (gem) generates this
+coverage
