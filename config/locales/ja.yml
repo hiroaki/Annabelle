@@ -111,3 +111,14 @@ ja:
     backup_codes_already_seen: "バックアップコードは既に表示済みです。"
     disabled: "二要素認証を無効化しました。"
     could_not_disable: "二要素認証を無効化できませんでした。"
+  devise:
+    confirmations:
+      resend_confirmation_instructions: "確認メールを再送信"
+    passwords:
+      change_your_password: "パスワードの変更"
+      new_password: "新しいパスワード"
+      confirm_new_password: "新しいパスワード（確認）"
+      change_my_password: "パスワードを変更する"
+      minimum_characters: "（最低%{count}文字）"
+      forgot_your_password: "パスワードをお忘れですか？"
+      send_reset_password_instructions: "パスワード再設定用メールを送信"

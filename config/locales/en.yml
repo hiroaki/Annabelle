@@ -111,3 +111,14 @@ en:
     backup_codes_already_seen: "You have already seen your backup codes."
     disabled: "Successfully disabled two factor authentication."
     could_not_disable: "Could not disable two factor authentication."
+  devise:
+    confirmations:
+      resend_confirmation_instructions: "Resend confirmation instructions"
+    passwords:
+      change_your_password: "Change your password"
+      new_password: "New password"
+      confirm_new_password: "Confirm new password"
+      change_my_password: "Change my password"
+      minimum_characters: "(%{count} characters minimum)"
+      forgot_your_password: "Forgot your password?"
+      send_reset_password_instructions: "Send me reset password instructions"
