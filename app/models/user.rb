@@ -1,9 +1,12 @@
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  devise :two_factor_authenticatable, :registerable,
+  devise :two_factor_authenticatable, :two_factor_backupable, :registerable,
          :recoverable, :rememberable, :validatable,
          :confirmable, :omniauthable, omniauth_providers: %i[github]
+
+  # for two_factor_backupable
+  attribute :otp_backup_codes, JsonStringArrayType.new, default: []
 
   has_many :authorizations, dependent: :destroy
   has_many :messages
@@ -104,6 +107,38 @@ class User < ApplicationRecord
   # 指定した provider の uid を返します。
   def provider_uid(provider)
     authorization_by_provider(provider)&.uid
+  end
+
+  # Generate an OTP secret it it does not already exist
+  def generate_two_factor_secret_if_missing!
+    return unless otp_secret.nil?
+    update!(otp_secret: User.generate_otp_secret)
+  end
+
+  # Ensure that the user is prompted for their OTP when they login
+  def enable_two_factor!
+    update!(otp_required_for_login: true)
+  end
+
+  # Disable the use of OTP-based two-factor.
+  def disable_two_factor!
+    update!(
+      otp_required_for_login: false,
+      otp_secret: nil,
+      otp_backup_codes: nil,
+    )
+  end
+
+  # Determine if backup codes have been generated
+  def two_factor_backup_codes_generated?
+    otp_backup_codes.present?
+  end
+
+  def two_factor_qr_code_uri
+    issuer = 'Annabelle' # TODO --> ENV['OTP_2FA_ISSUER_NAME']
+    label = [issuer, email].join(':')
+
+    otp_provisioning_uri(label, issuer: issuer)
   end
 
   private

@@ -27,16 +27,16 @@
   >
     <ul class="space-y-4" role="navigation">
       <li>
-        <%= link_to "Dashboard", user_path(current_user), data: { turbo_frame: 'devise' }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
+        <%= link_to "Dashboard", user_path(current_user), data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
       </li>
       <li>
-        <%= link_to "Profile", edit_user_path(current_user), data: { turbo_frame: 'devise' }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
+        <%= link_to "Profile", edit_user_path(current_user), data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
       </li>
       <li>
-        <%= link_to "Account settings", edit_user_registration_path, data: { turbo_frame: 'devise' }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
+        <%= link_to "Account settings", edit_user_registration_path, data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
       </li>
       <li>
-        <%= link_to "Two Factor Authentication", two_factor_authentication_user_path(current_user), data: { turbo_frame: 'devise' }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
+        <%= link_to "Two Factor Authentication", two_factor_authentication_user_path(current_user), data: { turbo_frame: 'devise', turbo_action: :advance }, class: "block text-lg text-gray-700 hover:text-blue-500" %>
       </li>
     </ul>
 

@@ -9,6 +9,8 @@ Rails.application.routes.draw do
     delete '/users/oauth', to: 'users/registrations#unlink_oauth', as: :unlink_oauth
   end
 
+  resource :two_factor_settings, except: [:show, :update]
+
   resources :users, only: [:show, :edit, :update] do
     member do
       get "two_factor_authentication"
