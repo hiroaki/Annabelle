@@ -2,7 +2,11 @@ class JsonStringArrayType < ActiveRecord::Type::Value
   def cast(value)
     case value
     when String
-      JSON.parse(value).map(&:to_s)
+      parsed = JSON.parse(value)
+      unless parsed.is_a?(Array)
+        raise TypeError, "Expected JSON array, got #{parsed.class}"
+      end
+      parsed.map(&:to_s)
     when Array
       value.map(&:to_s)
     else
