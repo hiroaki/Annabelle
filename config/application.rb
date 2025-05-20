@@ -28,6 +28,9 @@ module Annabelle
     config.active_record.encryption.primary_key = ENV["ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY"]
     config.active_record.encryption.deterministic_key = ENV["ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY"]
     config.active_record.encryption.key_derivation_salt = ENV["ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT"]
+
+    # activerecord-session_store
+    ActiveRecord::SessionStore::Session.serializer = :json
   end
 
   # Set default_url_options For Entire Application

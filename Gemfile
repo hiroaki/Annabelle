@@ -89,3 +89,5 @@ gem "omniauth"
 gem "omniauth-rails_csrf_protection"
 gem "omniauth-github"
 gem "rqrcode"
+gem "activerecord-session_store"
+
