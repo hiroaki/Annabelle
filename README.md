@@ -1,8 +1,8 @@
 # Annabelle アナベル
 
-Annabelle is a simple message board developed as part of my personal Ruby on Rails training. Its purpose is to facilitate file and message exchange between PCs and smartphones on a local area network (LAN). It is not intended to be used as a publicly accessible site.
+Annabelle is a simple message board developed as part of my personal Ruby on Rails training. It is intended to facilitate file and message exchange between PCs and smartphones on a local area network (LAN). Since it also includes experimental implementations, it is not recommended for use as a publicly accessible site.
 
-Annabelle は、私個人の Ruby on Rails トレーニングの一環として開発された簡易な掲示板です。PC やスマートフォン間でファイルやメッセージをやり取りすることを目的としており、公開サイトとしての利用は想定していません。
+Annabelle は、私個人の Ruby on Rails トレーニングの一環として開発された簡易な掲示板です。 LAN 内の PC やスマートフォン間でファイルやメッセージをやり取りすることを目的としており、また実験的な実装も盛り込むため、公開サイトとしての利用は推奨しません。
 
 ## Features 機能
 
@@ -12,23 +12,29 @@ Messages posted or deleted by other users (browser sessions) are instantly refle
 
 他のユーザ（ブラウザセッション）によるメッセージの投稿や削除が、Action Cable を通じて即座に画面に反映されます。チャットのように利用することも可能です。
 
-### File Upload / ファイルアップロード
-
-Multiple files can be selected and uploaded at once. (Currently, uploaded files are stored locally only.)
-
-複数のファイルを同時に選択してアップロードできます。（現時点では、アップロードされたファイルはローカルディスクに保存されます。）
-
 ### Layout / 画面レイアウト
 
 The screen layout is optimized to allow quick preview of uploaded media such as images or videos. On PC screens, the right half is dedicated to previews, while on mobile devices, a modal window is used.
 
 アップロードされたメディア（画像や動画）をすばやく確認できるように、画面レイアウトが工夫されています。PC では画面の右半分がプレビュー領域となり、モバイルではモーダルウィンドウが使用されます。
 
+### File Upload / ファイルアップロード
+
+Multiple files can be selected and uploaded at once. (Currently, uploaded files are stored locally only.)
+
+複数のファイルを同時に選択してアップロードできます。（現時点では、アップロードされたファイルはローカルディスクに保存されます。）
+
 ### User Authentication / ユーザ認証
 
-Users can sign in using either their email address or via GitHub OAuth (currently, only GitHub is supported). OAuth is optional; even if a user registers via OAuth, the account will be created using the email address obtained during authentication.
+Users can sign in using either their email address or via OAuth (currently, only GitHub is supported). OAuth is optional. Even when registering via OAuth, the user account will be created based on the email address retrieved during authentication.
 
-ユーザはメールアドレスまたは GitHub OAuth（現時点では GitHub のみ対応）を利用してサインインできます。OAuth はオプションで、OAuth を使って初回登録した場合でも、認証時に取得されるメールアドレスをもとにユーザが登録されます。
+ユーザはメールアドレスまたは OAuth（現時点では GitHub のみ対応）を利用してサインインできます。OAuth はオプションで、OAuth を使って初回登録した場合でも、認証時に取得されるメールアドレスをもとにユーザが登録されます。
+
+### Two Factor Authentication / 二要素認証
+
+An additional option for user authentication is available: two-factor authentication (2FA) using time-based one-time passwords (TOTP).
+
+ユーザ認証に追加のオプションで、タイムベースのワンタイムパスワード (TOTP) による二要素認証 (2FA) が利用できます。
 
 ## Requirements 要件
 
@@ -36,7 +42,7 @@ Users can sign in using either their email address or via GitHub OAuth (currentl
 
 This project requires [libvips](https://github.com/libvips/libvips) to be installed on the system for Active Storage.
 
-このプロジェクトでは、Active Storage のために libvips がシステムにインストールされている必要があります。
+このプロジェクトでは、Active Storage のために [libvips](https://github.com/libvips/libvips) がシステムにインストールされている必要があります。
 
 ### SMTP Server / SMTP サーバ
 
@@ -64,15 +70,15 @@ GitHub OAuth 認証を利用する場合は、プロジェクト用の GitHub OA
 
 ## Usage 使い方
 
-### 1. DB
+### 1. Preparing DB / データベースのセットアップ
 
 First, run the database migrations and seed the database:
 
-最初に、`rails db:migrate` と `rails db:seed` を実行してください。
+最初に、`bin/rails db:migrate` と `bin/rails db:seed` を実行してください。
 
 ```
-$ rails db:migrate
-$ rails db:seed
+$ bin/rails db:migrate
+$ bin/rails db:seed
 ```
 
 This process will create an administrator user in the `users` table. Please change the administrator's password as follows:
@@ -80,11 +86,15 @@ This process will create an administrator user in the `users` table. Please chan
 この処理で `users` テーブルに管理者ユーザが作成されます。管理者ユーザのパスワードは以下の手順で変更してください。
 
 ```
-$ rails c
+$ bin/rails c
 > user = User.admin_user
 > user.password = 'foo bar baz'
 > user.save!
 ```
+
+Note: Please do not change any values other than the password in the current version.
+
+注意：現時点ではパスワード以外の値は変更しないでください。
 
 ### 2. Environment Variables / 環境変数
 
@@ -92,7 +102,7 @@ Set the necessary environment variables to run the application.
 
 アプリケーションを動作させるために、必要な環境変数を設定してください。
 
-If you are using dotenv, you can rename the sample file `dot.env.skel` to `.env` as a starting point. (Note: this app does not require a `.env` file, but using dotenv is convenient for managing environment variables.)
+If you are using dotenv, you can rename the sample file `dot.env.skel` to `.env` as a starting point. (Note: while this app does not require a .env file, using dotenv is a convenient way to manage environment variables.)
 
 dotenv を利用する場合は、サンプルファイル `dot.env.skel` を `.env` にリネームして利用してください。（本アプリでは `.env` ファイルは必須ではありませんが、環境変数の管理には dotenv を利用すると便利です。）
 
@@ -134,7 +144,7 @@ Once everything is configured, start the web server by running:
 全ての設定が完了したら、Web サーバを以下のコマンドで起動してください。
 
 ```
-$ rails s
+$ bin/rails s
 ```
 
 Then, access the homepage via your browser.
@@ -148,6 +158,16 @@ Please note that the production environment is not supported at this time. Run t
 During development, it is useful to run the Tailwind CSS watcher concurrently. Alternatively, you can use `bin/dev` to run multiple processes at once. A sample configuration is provided in `Procfile.dev.skel`, which you can customize as needed.
 
 開発中は、Tailwind 用に `bin/rails tailwindcss:watch` を同時に実行すると便利です。また、複数のプロセスを同時に起動するために `bin/dev` も利用可能です。雛形として `Procfile.dev.skel` が用意されているので、必要に応じてカスタマイズしてください。
+
+### 4. Operation / 運用について
+
+Session information is stored in the database using [activerecord-session_store](https://github.com/rails/activerecord-session_store). Since old session records will remain unless cleaned up, please make sure to delete them periodically. A rake task is provided for this purpose, which deletes sessions older than 30 days by default. To specify a different threshold, set the number of days via the SESSION_DAYS_TRIM_THRESHOLD environment variable before running the task.
+
+セッション情報は [activerecord-session_store](https://github.com/rails/activerecord-session_store) を用いてデータベースに保存しています。古いセッションのレコードが残るため、定期的に削除してください。削除のための rake タスクがあり、実行すると、デフォルトでは 30日を経過したものが削除されます。この日数を指定したい場合は環境変数 `SESSION_DAYS_TRIM_THRESHOLD` に日数を指定して実行してください。
+
+```
+$ SESSION_DAYS_TRIM_THRESHOLD=30 bin/rails db:sessions:trim
+```
 
 ## License ライセンス
 
