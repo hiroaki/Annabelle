@@ -1,3 +1,12 @@
+<%#
+  turbo-frame のリンク先がログインが要求されるページであるとき、セッションが切れたままそのリンクをを辿ろうとすると、
+  リクエスト先がログイン画面へのリダイレクトになり、その結果ターゲットのフレームが "Content missing" となっていまいます。
+  このログイン画面は常にウィンドウの "top" で表示されればよいため、それを指示するための meta タグを挿入して対応します。
+  ちなみに turbo-frame に於けるレイアウトのテンプレートはこのファイルになります：
+    turbo-rails-2.0.13/app/views/layouts/turbo_rails/frame.html.erb
+%>
+<%= turbo_page_requires_reload %>
+
 <div class="container p-4 max-w-xl mx-auto">
   <% if flash[:alert] %>
     <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
