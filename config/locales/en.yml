@@ -118,6 +118,7 @@ en:
     enable: "Enable Two Factor Authentication"
     enable_first: "Please enable two factor authentication first."
     enabled: "Successfully enabled two factor authentication, please make note of your backup codes."
+    disabled: "Successfully disabled two factor authentication."
     incorrect_code: "Incorrect Code"
     incorrect_password: "Incorrect password"
     could_not_disable: "Could not disable two factor authentication."

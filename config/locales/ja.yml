@@ -118,6 +118,7 @@ ja:
     enable: "二要素認証を有効にする"
     enable_first: "まず二要素認証を有効にしてください。"
     enabled: "二要素認証を有効化しました。バックアップコードを必ず控えてください。"
+    disabled: "二要素認証を無効化しました。"
     incorrect_code: "認証コードが正しくありません"
     incorrect_password: "パスワードが正しくありません"
     could_not_disable: "二要素認証を無効化できませんでした。"
