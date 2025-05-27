@@ -19,9 +19,7 @@
         <div class="p-4 text-gray-700">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
             <% @backup_codes.each do |code| %>
-              <div class="font-mono font-bold text-gray-900">
-                <%= code %>
-              </div>
+              <%= content_tag :div, code, class: 'font-mono font-bold text-gray-900', **data_with_testid('backup-code') %>
             <% end %>
           </div>
         </div>
