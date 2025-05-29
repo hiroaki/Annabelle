@@ -36,7 +36,7 @@ RSpec.describe UsersController, type: :request do
       it "renders edit template" do
         patch user_path(user), params: { user: { username: "" } }
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include("Failed to update your profile")
+        expect(response.body).to include("Username can&#39;t be blank")
       end
     end
   end
