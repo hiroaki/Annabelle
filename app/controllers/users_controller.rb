@@ -20,7 +20,6 @@ class UsersController < ApplicationController
         format.html { redirect_to @user }
       end
     else
-      flash.now[:alert] = I18n.t("users.update.failure")
       respond_to do |format|
         format.turbo_stream
         format.html { render :edit }
