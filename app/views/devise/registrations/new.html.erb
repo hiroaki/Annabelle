@@ -1,5 +1,5 @@
 <div class="container p-4 max-w-xl mx-auto">
-  <h2 class="text-2xl font-bold mb-4"><%= t('devise.registrations.sign_up') %></h2>
+  <%= content_tag :h2, t('devise.registrations.sign_up'), class: 'text-2xl font-bold mb-4', **data_with_testid('signup-title') %>
 
   <%= render "shared/flash" %>
 
@@ -7,32 +7,32 @@
     <%= render "devise/shared/error_messages", resource: resource %>
 
     <div class="mb-6">
-      <%= f.label :email, class: "block mb-2 text-sm font-medium text-gray-900" %>
-      <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.label :email, class: "block mb-2 text-sm font-medium text-gray-900", **data_with_testid('signup-email-label') %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5", **data_with_testid('signup-email') %>
     </div>
 
     <div class="mb-6">
-      <%= f.label :username, class: "block mb-2 text-sm font-medium text-gray-900" %>
-      <%= f.text_field :username, autofocus: true, autocomplete: "username", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.label :username, class: "block mb-2 text-sm font-medium text-gray-900", **data_with_testid('signup-username-label') %>
+      <%= f.text_field :username, autofocus: true, autocomplete: "username", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5", **data_with_testid('signup-username') %>
     </div>
 
     <div class="mb-6">
-      <%= f.label :password, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= f.label :password, class: "block mb-2 text-sm font-medium text-gray-900", **data_with_testid('signup-password-label') %>
       <div class="flex items-center mb-2">
         <% if @minimum_password_length %>
           <em class="mr-2 text-sm text-gray-500"><%= t('devise.registrations.minimum_characters', count: @minimum_password_length) %></em>
         <% end %>
       </div>
-      <%= f.password_field :password, autocomplete: "new-password", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.password_field :password, autocomplete: "new-password", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5", **data_with_testid('signup-password') %>
     </div>
 
     <div class="mb-6">
-      <%= f.label :password_confirmation, class: "block mb-2 text-sm font-medium text-gray-900" %>
-      <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      <%= f.label :password_confirmation, class: "block mb-2 text-sm font-medium text-gray-900", **data_with_testid('signup-password-confirm-label') %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5", **data_with_testid('signup-password-confirm') %>
     </div>
 
     <div class="flex items-center justify-between">
-      <%= f.submit t('devise.registrations.sign_up'), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
+      <%= f.submit t('devise.registrations.sign_up'), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center", **data_with_testid('signup-submit') %>
     </div>
   <% end %>
 

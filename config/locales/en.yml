@@ -58,12 +58,15 @@ en:
         updated_at: "Updated at"
         username: "Username"
     # エラーメッセージを個別にカスタマイズしたい場合はこのような階層で定義できます。
-    errors:
-      models:
-        user:
-          attributes:
-            username:
-              invalid_format: "can only contain letters, numbers, and underscores."
+    # errors:
+    #   models:
+    #     user:
+    #       attributes:
+    #         username:
+    #           blank: "Username can't be blank"
+    #           invalid: "Username has invalid format"
+    #         email:
+    #           blank: "Email can't be blank"
     models:
       authorization: "Authorization"
       message: "Message"
