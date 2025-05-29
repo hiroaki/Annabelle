@@ -1,7 +1,7 @@
 <turbo-frame id="devise">
   <div class="container p-4">
 
-    <h2 class="text-2xl font-bold mb-4">Two Factor Authentication</h2>
+    <%= content_tag :h2, 'Two Factor Authentication', class: 'text-2xl font-bold mb-4', **data_with_testid('two-factor-enabled-message') %>
 
     <p class="text-sm text-gray-500 mb-4">
       <%= t('two_factor_settings.enabled') %>
@@ -11,7 +11,7 @@
       <!-- Backup Codes Card -->
       <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
         <div class="px-4 py-2 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">Backup Codes</h3>
+          <%= content_tag :h3, 'Backup Codes', class: 'text-lg font-semibold text-gray-900', **data_with_testid('backup-codes-title') %>
           <p class="text-sm text-gray-500">
             Keep these backup codes safe in case you lose access to your authenticator app:
           </p>
