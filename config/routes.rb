@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
   devise_scope :user do
     delete '/users/oauth', to: 'users/registrations#unlink_oauth', as: :unlink_oauth
+    get '/users/auth/failure', to: 'users/omniauth_callbacks#failure', as: :user_omniauth_failure
   end
 
   resource :two_factor_settings, except: [:show, :update]
