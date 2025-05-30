@@ -55,8 +55,8 @@ RSpec.describe JsonStringArrayType do
     context 'when value is an unsupported type (e.g. Hash)' do
       let(:value) { { foo: 'bar' } }
 
-      it 'returns an empty array' do
-        expect(type.cast(value)).to eq([])
+      it 'raises TypeError' do
+        expect { type.cast(value) }.to raise_error(TypeError, /Unsupported type/)
       end
     end
 
@@ -65,6 +65,14 @@ RSpec.describe JsonStringArrayType do
 
       it 'rescues JSON::ParserError and returns []' do
         expect(type.cast(value)).to eq([])
+      end
+    end
+
+    context 'when value is an unsupported type (e.g. Integer)' do
+      let(:value) { 123 }
+
+      it 'raises TypeError' do
+        expect { type.cast(value) }.to raise_error(TypeError, /Unsupported type/)
       end
     end
   end

@@ -9,8 +9,10 @@ class JsonStringArrayType < ActiveRecord::Type::Value
       parsed.map(&:to_s)
     when Array
       value.map(&:to_s)
-    else
+    when nil
       []
+    else
+      raise TypeError, "Unsupported type for JsonStringArrayType: #{value.class}"
     end
   rescue JSON::ParserError
     []
