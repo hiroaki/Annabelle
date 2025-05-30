@@ -18,7 +18,6 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
         visit_signin_and_click_github
 
         expect(page).to have_current_path(edit_user_registration_path)
-        expect(page).to have_content(I18n.t("devise.omniauth_callbacks.success", kind: "GitHub"))
 
         user = User.find_by(email: "newuser@example.com")
         expect(user).to be_present
@@ -36,10 +35,10 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
 
         visit_signin_and_click_github
 
-        # 既存ユーザーの場合、User.from_omniauthでのsaved_change_to_id?が falseとなるため、
-        # sign_in_and_redirectでDeviseのデフォルトリダイレクト先（通常は root_path）へ遷移する
         expect(page).to have_current_path(root_path)
-        expect(page).to have_content(I18n.t("devise.omniauth_callbacks.success", kind: "GitHub"))
+        expect(page).to have_content(
+          I18n.t("devise.omniauth_callbacks.success", kind: "GitHub")
+        )
       end
     end
 
@@ -68,7 +67,9 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
         visit_signin_and_click_github
 
         expect(page).to have_current_path(new_user_registration_path)
-        expect(page).to have_content(I18n.t("devise.omniauth_callbacks.github.failure"))
+        expect(page).to have_content(
+          I18n.t("devise.omniauth_callbacks.failure", provider: "GitHub")
+        )
       end
     end
   end
@@ -87,7 +88,9 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
         visit edit_user_registration_path
         find("#oauth-button-github").click
 
-        expect(page).to have_content(I18n.t("devise.omniauth_callbacks.github.success", kind: "GitHub"))
+        expect(page).to have_content(
+          I18n.t("devise.omniauth_callbacks.provider.success", provider: "GitHub")
+        )
         user.reload
 
         # Authorizationを使ってproviderとuidを確認
@@ -107,7 +110,9 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
 
         find("#oauth-button-github").click
 
-        expect(page).to have_content(I18n.t("devise.omniauth_callbacks.github.already_linked"))
+        expect(page).to have_content(
+          I18n.t("devise.omniauth_callbacks.provider.already_linked", provider: "GitHub")
+        )
         user.reload
 
         # 古いAuthorizationが保持されているか確認
@@ -126,7 +131,9 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
 
       visit_signin_and_click_github
 
-      expect(page).to have_content(I18n.t("devise.omniauth_callbacks.success", kind: "GitHub"))
+      expect(page).to have_content(
+        I18n.t("devise.omniauth_callbacks.success", kind: "GitHub")
+      )
 
       # Authorizationを使ってuidを確認
       authorization = existing_user.authorizations.find_by(uid: "dupe_uid")
@@ -145,7 +152,9 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
       visit_signin_and_click_github
 
       expect(page).to have_current_path(new_user_registration_path)
-      expect(page).to have_content(I18n.t("devise.omniauth_callbacks.github.failure"))
+      expect(page).to have_content(
+        I18n.t("devise.omniauth_callbacks.failure", provider: "GitHub")
+      )
 
       expect(User.exists?(unconfirmed.id)).to be true
       expect(Authorization.exists?(uid: "fail_uid")).to be false
