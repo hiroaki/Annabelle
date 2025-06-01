@@ -16,7 +16,7 @@ RSpec.describe '2FA有効化フロー', type: :system do
     visit new_user_session_path
     fill_in 'Email', with: user.email
     fill_in 'Password', with: password
-    find('[data-testid="login-button"]').click
+    find('[data-testid="login-submit"]').click
 
     # 右上のユーザ名クリック
     find('[data-testid="current-user-display"]').click
