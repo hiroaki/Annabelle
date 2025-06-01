@@ -1,14 +1,22 @@
 class CreateSuperUser < ActiveRecord::Migration[8.0]
   def up
-    User.create!(
-      email: 'admin@localhost',
-      password: 'YOU MUST CHANGE THIS',
-      password_confirmation: 'YOU MUST CHANGE THIS',
-      admin: true,
-    )
+    now = Time.current.utc.strftime('%Y-%m-%d %H:%M:%S')
+    encrypted_password = User.new.send(:password_digest, 'YOU MUST CHANGE THIS')
+    execute <<~SQL
+      INSERT INTO users (email, encrypted_password, admin, created_at, updated_at)
+      VALUES (
+        'admin@localhost',
+        '#{encrypted_password}',
+        1,
+        '#{now}',
+        '#{now}'
+      )
+    SQL
   end
 
   def down
-    User.find_by(email: 'admin@localhost', admin: true)&.destroy
+    execute <<~SQL
+      DELETE FROM users WHERE email = 'admin@localhost' AND admin = 1
+    SQL
   end
 end
