@@ -3,31 +3,31 @@
 ja:
   devise:
     confirmations:
-      confirmed: 'アカウントを登録しました。'
-      send_instructions: 'アカウントの有効化について数分以内にメールでご連絡します。'
+      confirmed: "アカウントを登録しました。"
+      send_instructions: "アカウントの有効化について数分以内にメールでご連絡します。"
       send_paranoid_instructions: "あなたのメールアドレスが登録済みの場合、本人確認用のメールが数分以内に送信されます。"
       resend_confirmation_instructions: "確認メールを再送信"
     failure:
-      already_authenticated: 'すでにログインしています。'
-      inactive: 'アカウントが有効化されていません。メールに記載された手順にしたがって、アカウントを有効化してください。'
+      already_authenticated: "すでにログインしています。"
+      inactive: "アカウントが有効化されていません。メールに記載された手順にしたがって、アカウントを有効化してください。"
       invalid: "%{authentication_keys} もしくはパスワードが不正です。"
-      locked: 'あなたのアカウントは凍結されています。'
-      last_attempt: 'あなたのアカウントが凍結される前に、複数回の操作がおこなわれています。'
+      locked: "あなたのアカウントは凍結されています。"
+      last_attempt: "あなたのアカウントが凍結される前に、複数回の操作がおこなわれています。"
       not_found_in_database: "%{authentication_keys} もしくはパスワードが不正です。"
-      timeout: 'セッションがタイムアウトしました。もう一度ログインしてください。'
-      unauthenticated: 'アカウント登録もしくはログインしてください。'
-      unconfirmed: 'メールアドレスの本人確認が必要です。'
+      timeout: "セッションがタイムアウトしました。もう一度ログインしてください。"
+      unauthenticated: "アカウント登録もしくはログインしてください。"
+      unconfirmed: "メールアドレスの本人確認が必要です。"
     mailer:
       confirmation_instructions:
-        subject: 'アカウントの有効化について'
+        subject: "アカウントの有効化について"
       reset_password_instructions:
-        subject: 'パスワードの再設定について'
+        subject: "パスワードの再設定について"
       unlock_instructions:
-        subject: 'アカウントの凍結解除について'
+        subject: "アカウントの凍結解除について"
       email_changed:
-        subject: 'メールアドレスが変更されました'
+        subject: "メールアドレスが変更されました"
       password_change:
-        subject: 'パスワードが変更されました'
+        subject: "パスワードが変更されました"
     omniauth_callbacks:
       failure: "%{provider}での認証に失敗しました。もう一度お試しください。"
       success: "%{provider}アカウントによる認証に成功しました。"
@@ -38,10 +38,10 @@ ja:
       unknown_provider: "外部サービス"
     passwords:
       no_token: "このページにはアクセスできません。パスワード再設定メールのリンクからアクセスされた場合には、URL をご確認ください。"
-      send_instructions: 'パスワードの再設定について数分以内にメールでご連絡いたします。'
+      send_instructions: "パスワードの再設定について数分以内にメールでご連絡いたします。"
       send_paranoid_instructions: "あなたのメールアドレスが登録済みの場合、パスワード再設定用のメールが数分以内に送信されます。"
-      updated: 'パスワードが正しく変更されました。'
-      updated_not_active: 'パスワードが正しく変更されました。'
+      updated: "パスワードが正しく変更されました。"
+      updated_not_active: "パスワードが正しく変更されました。"
       change_my_password: "パスワードを変更する"
       change_your_password: "パスワードの変更"
       confirm_new_password: "新しいパスワード（確認）"
@@ -50,14 +50,14 @@ ja:
       new_password: "新しいパスワード"
       send_reset_password_instructions: "パスワード再設定用メールを送信"
     registrations:
-      destroyed: 'アカウントを削除しました。またのご利用をお待ちしております。'
-      signed_up: 'アカウント登録が完了しました。'
-      signed_up_but_inactive: 'ログインするためには、アカウントを有効化してください。'
-      signed_up_but_locked: 'アカウントが凍結されているためログインできません。'
-      signed_up_but_unconfirmed: '本人確認用のメールを送信しました。メール内のリンクからアカウントを有効化させてください。'
-      update_needs_confirmation: 'アカウント情報を変更しました。変更されたメールアドレスの本人確認のため、本人確認用メールより確認処理をおこなってください。'
-      updated: 'アカウント情報を変更しました。'
-      updated_but_not_signed_in: 'アカウント情報は更新されましたが、パスワードを変更したため、再度ログインが必要です。'
+      destroyed: "アカウントを削除しました。またのご利用をお待ちしております。"
+      signed_up: "アカウント登録が完了しました。"
+      signed_up_but_inactive: "ログインするためには、アカウントを有効化してください。"
+      signed_up_but_locked: "アカウントが凍結されているためログインできません。"
+      signed_up_but_unconfirmed: "本人確認用のメールを送信しました。メール内のリンクからアカウントを有効化させてください。"
+      update_needs_confirmation: "アカウント情報を変更しました。変更されたメールアドレスの本人確認のため、本人確認用メールより確認処理をおこなってください。"
+      updated: "アカウント情報を変更しました。"
+      updated_but_not_signed_in: "アカウント情報は更新されましたが、パスワードを変更したため、再度ログインが必要です。"
       unlink_oauth:
         success: "%{provider_name} 認証を解除しました。"
         failure: "%{provider_name} 認証の解除に失敗しました。"
@@ -79,9 +79,9 @@ ja:
       minimum_characters: "(最低 %{count} 文字)"
       currently_waiting_confirmation: "確認待ちのメールアドレス: %{email}"
     sessions:
-      signed_in: 'ログインしました。'
-      signed_out: 'ログアウトしました。'
-      already_signed_out: '既にログアウト済みです。'
+      signed_in: "ログインしました。"
+      signed_out: "ログアウトしました。"
+      already_signed_out: "既にログアウト済みです。"
       authenticate: "認証"
       email: "メールアドレス"
       log_in: "ログイン"
@@ -97,16 +97,18 @@ ja:
       sign_in_with: "%{provider}でサインイン"
       sign_up: "新規登録"
     unlocks:
-      send_instructions: 'アカウントの凍結解除方法を数分以内にメールでご連絡します。'
-      send_paranoid_instructions: 'アカウントが見つかった場合、アカウントの凍結解除方法を数分以内にメールでご連絡します。'
-      unlocked: 'アカウントを凍結解除しました。'
+      send_instructions: "アカウントの凍結解除方法を数分以内にメールでご連絡します。"
+      send_paranoid_instructions: "アカウントが見つかった場合、アカウントの凍結解除方法を数分以内にメールでご連絡します。"
+      unlocked: "アカウントを凍結解除しました。"
+      email: "メールアドレス"
+      resend_unlock_instructions: "アンロック用メールを再送信"
   errors:
     messages:
-      already_confirmed: 'は既に登録済みです。ログインしてください。'
+      already_confirmed: "は既に登録済みです。ログインしてください。"
       confirmation_period_expired: "の期限が切れました。%{period} までに確認する必要があります。 新しくリクエストしてください。"
-      expired: 'の有効期限が切れました。新しくリクエストしてください。'
-      not_found: 'は見つかりませんでした。'
-      not_locked: 'は凍結されていません。'
+      expired: "の有効期限が切れました。新しくリクエストしてください。"
+      not_found: "は見つかりませんでした。"
+      not_locked: "は凍結されていません。"
       not_saved:
         one: "エラーが発生したため %{resource} は保存されませんでした:"
         other: "%{count} 件のエラーが発生したため %{resource} は保存されませんでした:"
