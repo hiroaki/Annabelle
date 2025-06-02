@@ -5,21 +5,37 @@ class MessagesController < ApplicationController
   before_action :require_confirmed_user_for_non_safe_requests  
 
   def index
-    @messages = Message.order(created_at: :desc).page(params[:page])
+    set_messages
   end
 
   def create
     create_message!(message_params.merge(user: current_user_or_admin))
   rescue => ex
     flash.now.alert = I18n.t("messages.errors.generic", error_message: ex.message)
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.replace('flash-message-container', partial: 'shared/flash') }
+      format.html { render :index, status: :unprocessable_entity }
+    end
   end
 
   def destroy
     destroy_message_if_owner!(params[:id], current_user)
   rescue MessageNotOwnedError
     flash.now.alert = I18n.t("messages.errors.not_owned")
+    set_messages
+    respond_to do |format|
+      format.turbo_stream {
+        render turbo_stream: turbo_stream.replace('flash-message-container', partial: 'shared/flash')
+      }
+      format.html { render :index, status: :unprocessable_entity }
+    end
   rescue => ex
     flash.now.alert = I18n.t("messages.errors.generic", error_message: ex.message)
+    set_messages
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.replace('flash-message-container', partial: 'shared/flash') }
+      format.html { render :index, status: :unprocessable_entity }
+    end
   end
 
   private
@@ -41,6 +57,10 @@ class MessagesController < ApplicationController
       return if current_user.confirmed?
     
       render plain: "Email confirmation required", status: :forbidden
+    end
+
+    def set_messages
+      @messages = Message.order(created_at: :desc).page(params[:page])
     end
 
   public
