@@ -139,4 +139,13 @@ RSpec.configure do |config|
 
   # I18n に関するメッセージを組み立てるための自作ヘルパー
   config.include ExpectErrorMessageHelper
+
+  # system spec ではジョブを動かします。
+  config.before(:each, type: :system) do
+    ActiveJob::Base.queue_adapter = :inline
+  end
+
+  # config.before(:each, type: :job) do
+  #   ActiveJob::Base.queue_adapter = :test
+  # end
 end

@@ -56,9 +56,8 @@ RSpec.describe 'Messages Form', type: :system do
     end
 
     it 'allows form submission' do
-      pending 'ActionCable 経由でのメッセージ追加をサポートする設定が必要'
       fill_in 'comment', with: 'This is a test message'
-      click_button 'Post'
+      click_button I18n.t('messages.form.post')
       expect(page).to have_content('This is a test message')
     end
   end
