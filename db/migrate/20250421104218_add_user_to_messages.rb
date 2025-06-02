@@ -1,16 +1,24 @@
 class AddUserToMessages < ActiveRecord::Migration[8.0]
   def up
-    # user_id カラムを追加（既存のレコードのために、最初は null 許可）
     add_reference :messages, :user, foreign_key: true, null: true
 
-    # admin ユーザの ID を取得して既存レコードにセット
-    admin = User.find_by(admin: true)
-    raise "Admin user not found" unless admin
+    # ダミーadminユーザーをSQLで直接作成
+    now = Time.current.utc.strftime('%Y-%m-%d %H:%M:%S')
+    encrypted_password = User.new.send(:password_digest, SecureRandom.hex(16))
+    execute <<~SQL
+      INSERT INTO users (email, encrypted_password, admin, created_at, updated_at)
+      SELECT 'migration_admin_' || strftime('%s','now') || '@localhost',
+             '#{encrypted_password}',
+             1,
+             '#{now}',
+             '#{now}'
+      WHERE NOT EXISTS (SELECT 1 FROM users WHERE admin = 1)
+    SQL
 
+    admin_id = select_value("SELECT id FROM users WHERE admin = 1 ORDER BY id ASC LIMIT 1")
     Message.reset_column_information
-    Message.where(user_id: nil).update_all(user_id: admin.id)
+    Message.where(user_id: nil).update_all(user_id: admin_id)
 
-    # すべてのメッセージに user_id が設定されたあとに null 制約を加える
     change_column_null :messages, :user_id, false
   end
 
