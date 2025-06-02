@@ -20,7 +20,7 @@ consumer.subscriptions.create("MessagesChannel", {
     const page = document.querySelector('[data-current-page-number]')?.dataset?.currentPageNumber; // or undefined
 
     if (data['created']) {
-      if (page && page == '1') {
+      if (!page || page == '1') {
         messages.insertAdjacentHTML('afterbegin', data['rendered_message']);
       } else {
         notificationTargets.forEach((nt) => nt.classList.remove('hidden'));
