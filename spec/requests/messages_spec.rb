@@ -1,9 +1,11 @@
 require 'rails_helper'
+require 'cgi'
 
 RSpec.describe "Messages", type: :request do
   let(:confirmed_user) { create(:user, confirmed_at: Time.current) }
   let(:unconfirmed_user) { create(:user, confirmed_at: nil) }
   let!(:message) { create(:message, user: confirmed_user) }
+  let(:other_user) { create(:user, :confirmed) }
 
   describe "POST /messages" do
     context "when user is confirmed" do
@@ -99,6 +101,27 @@ RSpec.describe "Messages", type: :request do
           expect(response).to have_http_status(:found)
           expect(response.location).to eq 'http://www.example.com/users/sign_in'
         end
+      end
+    end
+
+    context "when trying to delete another user's message" do
+      before { sign_in other_user }
+
+      it "does not allow deleting another user's message (HTML)" do
+        delete message_path(message)
+        expect(response.body).to include(CGI.escapeHTML(I18n.t('messages.errors.not_owned')))
+        expect(Message.exists?(message.id)).to be true
+      end
+    end
+
+    context "when trying to delete another user's message via Turbo Stream" do
+      before { sign_in other_user }
+
+      it "does not allow deleting another user's message and returns flash via turbo_stream" do
+        delete message_path(message), as: :turbo_stream
+        expect(response.media_type).to eq 'text/vnd.turbo-stream.html'
+        expect(response.body).to include(CGI.escapeHTML(I18n.t('messages.errors.not_owned')))
+        expect(Message.exists?(message.id)).to be true
       end
     end
   end

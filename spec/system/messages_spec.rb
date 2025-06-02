@@ -60,5 +60,58 @@ RSpec.describe 'Messages Form', type: :system do
       click_button I18n.t('messages.form.post')
       expect(page).to have_content('This is a test message')
     end
+
+    it 'shows a generic error message when message creation fails' do
+      allow_any_instance_of(MessagesController).to receive(:create_message!).and_raise(StandardError, 'Simulated failure!')
+      visit messages_path
+      fill_in 'comment', with: 'fail'
+      click_button I18n.t('messages.form.post')
+      expect(page).to have_selector('[data-testid="flash-message"]', text: I18n.t('messages.errors.generic', error_message: 'Simulated failure!'))
+    end
+
+    it "shows a not owned error when trying to delete another user's message" do
+      other_user = create(:user, :confirmed)
+      message = create(:message, user: other_user, content: "other message")
+      visit messages_path
+
+      accept_confirm do
+        # hiddenな削除ボタンを取得してJSで強制クリック
+        delete_link = find_link("delete-message-#{message.id}", visible: :all)
+        page.execute_script("arguments[0].click();", delete_link)
+      end
+
+      expect(page).to have_selector('[data-testid="flash-message"]', text: I18n.t('messages.errors.not_owned'), wait: 2)
+      expect(page).to have_content('other message')
+    end
+
+    it 'shows a generic error message when an unexpected error occurs during message deletion' do
+      # 例外を発生させるためにdestroy_message_if_owner!をモック
+      allow_any_instance_of(MessagesController).to receive(:destroy_message_if_owner!).and_raise(StandardError, 'Simulated destroy failure!')
+      other_user = create(:user, :confirmed)
+      message = create(:message, user: other_user, content: "other message")
+      visit messages_path
+
+      accept_confirm do
+        delete_link = find_link("delete-message-#{message.id}", visible: :all)
+        page.execute_script("arguments[0].click();", delete_link)
+      end
+
+      expect(page).to have_selector('[data-testid="flash-message"]', text: I18n.t('messages.errors.generic', error_message: 'Simulated destroy failure!'), wait: 2)
+      expect(page).to have_content('other message')
+    end
+
+    it 'allows the user to delete their own message' do
+      # confirmed_userで自分のメッセージを作成
+      message = create(:message, user: confirmed_user, content: 'my message')
+      visit messages_path
+
+      accept_confirm do
+        delete_link = find_link("delete-message-#{message.id}", visible: :all)
+        page.execute_script("arguments[0].click();", delete_link)
+      end
+
+      expect(page).not_to have_content('my message')
+      expect(page).not_to have_selector("[data-testid='delete-message-#{message.id}']")
+    end
   end
 end
