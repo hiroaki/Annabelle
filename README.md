@@ -151,13 +151,21 @@ Then, access the homepage via your browser.
 
 その後、ブラウザでトップページにアクセスします。
 
-Please note that the production environment is not supported at this time. Run the server in development mode:
+Please note that the production environment is not supported at this time. Run the server in development mode.
 
 なお、本プロジェクトは現時点では本番環境に対応していないため、`RAILS_ENV=development` で実行してください。
 
 During development, it is useful to run the Tailwind CSS watcher concurrently. Alternatively, you can use `bin/dev` to run multiple processes at once. A sample configuration is provided in `Procfile.dev.skel`, which you can customize as needed.
 
 開発中は、Tailwind 用に `bin/rails tailwindcss:watch` を同時に実行すると便利です。また、複数のプロセスを同時に起動するために `bin/dev` も利用可能です。雛形として `Procfile.dev.skel` が用意されているので、必要に応じてカスタマイズしてください。
+
+If you only want to use this application (not develop it), please run the following command once at the beginning:
+
+（開発するのではなく）単にこのアプリを利用する場合は、最初一回だけ、次のコマンドを実行してください：
+
+```
+$ bin/rails assets:precompile
+```
 
 ### 4. Operation / 運用について
 
