@@ -30,7 +30,7 @@ en:
         subject: "Password Changed"
     omniauth_callbacks:
       failure: "Could not authenticate you from %{provider} because of an error. Please try again."
-      success: "Successfully authenticated from %{kind} account."
+      success: "Successfully authenticated from %{provider} account."
       provider:
         already_linked: "This %{provider} account is already linked to another account. Changes have been canceled."
         success: "Successfully linked with %{provider}."

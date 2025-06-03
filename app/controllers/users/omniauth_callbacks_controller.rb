@@ -22,10 +22,10 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
         end
 
         sign_in_and_redirect @user, event: :authentication
-        set_flash_message(:notice, :success, kind: "GitHub") if is_navigational_format?
+        set_flash_message(:notice, :success, provider: OmniAuth::Utils.camelize(auth.provider)) if is_navigational_format?
       else
         session["devise.github_data"] = auth.except(:extra)
-        redirect_to new_user_registration_path, alert: I18n.t("devise.omniauth_callbacks.failure", provider: "GitHub")
+        redirect_to new_user_registration_path, alert: I18n.t("devise.omniauth_callbacks.failure", provider: OmniAuth::Utils.camelize(auth.provider))
       end
     end
   end
