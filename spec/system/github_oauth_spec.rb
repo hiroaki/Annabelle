@@ -37,7 +37,7 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
 
         expect(page).to have_current_path(root_path)
         expect(page).to have_content(
-          I18n.t("devise.omniauth_callbacks.success", kind: "GitHub")
+          I18n.t("devise.omniauth_callbacks.provider.success", provider: "GitHub")
         )
       end
     end
@@ -132,7 +132,7 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
       visit_signin_and_click_github
 
       expect(page).to have_content(
-        I18n.t("devise.omniauth_callbacks.success", kind: "GitHub")
+        I18n.t("devise.omniauth_callbacks.provider.success", provider: "GitHub")
       )
 
       # Authorizationを使ってuidを確認
