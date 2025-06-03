@@ -15,6 +15,7 @@
           autofocus: true,
           autocomplete: "new-password",
           class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500",
+          **data_with_testid('password-edit-new-password')
         )
       %>
     </div>
@@ -25,12 +26,18 @@
         f.password_field(:password_confirmation,
           autocomplete: "new-password",
           class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500",
+          **data_with_testid('password-edit-confirm-password')
         )
       %>
     </div>
 
     <div class="flex items-center justify-between">
-      <%= f.submit t('devise.passwords.change_my_password'), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
+      <%=
+        f.submit(t('devise.passwords.change_my_password'),
+          class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center",
+          **data_with_testid('password-edit-submit')
+        )
+      %>
     </div>
   <% end %>
 
