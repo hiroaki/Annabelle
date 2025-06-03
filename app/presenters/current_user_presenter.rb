@@ -29,7 +29,7 @@ class CurrentUserPresenter < ModelPresenterBase
     view_context.safe_join([
       view_context.link_to(
         user.username,
-        view_context.user_path(current_user),
+        view_context.user_path(user),
         class: 'text-gray-400',
         id: self.class.username_display_dom_id,
       ),
