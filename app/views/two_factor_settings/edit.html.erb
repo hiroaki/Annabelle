@@ -1,17 +1,17 @@
 <turbo-frame id="devise">
   <div class="container p-4">
 
-    <h2 class="text-2xl font-bold mb-4">Two Factor Authentication</h2>
+    <%= content_tag :h2, 'Two Factor Authentication', class: 'text-2xl font-bold mb-4', **data_with_testid('two-factor-enabled-message') %>
 
     <p class="text-sm text-gray-500 mb-4">
-      Two factor authentication has been successfully enabled.
+      <%= t('two_factor_settings.enabled') %>
     </p>
 
     <div class="space-y-6">
       <!-- Backup Codes Card -->
       <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
         <div class="px-4 py-2 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">Backup Codes</h3>
+          <%= content_tag :h3, 'Backup Codes', class: 'text-lg font-semibold text-gray-900', **data_with_testid('backup-codes-title') %>
           <p class="text-sm text-gray-500">
             Keep these backup codes safe in case you lose access to your authenticator app:
           </p>
@@ -19,9 +19,7 @@
         <div class="p-4 text-gray-700">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
             <% @backup_codes.each do |code| %>
-              <div class="font-mono font-bold text-gray-900">
-                <%= code %>
-              </div>
+              <%= content_tag :div, code, class: 'font-mono font-bold text-gray-900', **data_with_testid('backup-code') %>
             <% end %>
           </div>
         </div>

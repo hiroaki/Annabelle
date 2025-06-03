@@ -30,7 +30,7 @@ require 'rspec/rails'
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
-Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
+Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
@@ -41,6 +41,42 @@ rescue ActiveRecord::PendingMigrationError => e
 end
 
 Rails.application.load_seed if Rails.env.test?
+
+#--
+# Capybara の設定ここから
+#
+require 'capybara/rails'
+require 'capybara/cuprite'
+Capybara.javascript_driver = :cuprite_custom
+Capybara.register_driver(:cuprite_custom) do |app|
+  # see also https://github.com/rubycdp/ferrum?tab=readme-ov-file#customization
+  Capybara::Cuprite::Driver.new(app,
+    js_errors: true,
+    window_size: [1200, 800],
+    headless: %w[0 false].exclude?(ENV['HEADLESS']),
+    slowmo: ENV['SLOWMO']&.to_f,
+    inspector: true,
+    browser_options: ENV['DOCKER'] ? { 'no-sandbox' => nil } : {},
+  )
+end
+
+# if you use Docker don't forget to pass no-sandbox option:
+#Capybara::Cuprite::Driver.new(app, browser_options: { 'no-sandbox': nil })
+
+# 要素を特定するために、この属性を使います。
+# 要素に埋め込むためのヘルパー TestHelper の内容も参照してください。
+Capybara.configure do |config|
+  config.test_id = 'data-testid'
+end
+# TODO: 単に find したい場合はカスタムのセレクタを導入することができます。
+# #==> find(:test_id, "foo-bar")
+# Capybara.add_selector(:test_id) do
+#   css { |value| "[data-testid='#{value}']" }
+# end
+
+#
+# Capybara の設定ここまで
+#--
 
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
@@ -95,24 +131,21 @@ RSpec.configure do |config|
     end
   end
 
-  #
-  require 'capybara/cuprite'
-  Capybara.javascript_driver = :cuprite_custom
-  Capybara.register_driver(:cuprite_custom) do |app|
-    # see also https://github.com/rubycdp/ferrum?tab=readme-ov-file#customization
-    Capybara::Cuprite::Driver.new(app,
-      js_errors: true,
-      window_size: [1200, 800],
-      headless: %w[0 false].exclude?(ENV['HEADLESS']),
-      slowmo: ENV['SLOWMO']&.to_f,
-      inspector: true,
-      browser_options: ENV['DOCKER'] ? { 'no-sandbox' => nil } : {},
-    )
-  end
-
-  # if you use Docker don't forget to pass no-sandbox option:
-  #Capybara::Cuprite::Driver.new(app, browser_options: { 'no-sandbox': nil })
-
   # Deviseのテストヘルパーを使用可能にする
   config.include Devise::Test::IntegrationHelpers, type: :request
+
+  # Capybara 用の自作ヘルパー
+  config.include CapybaraHelpers, type: :system
+
+  # I18n に関するメッセージを組み立てるための自作ヘルパー
+  config.include ExpectErrorMessageHelper
+
+  # system spec ではジョブを動かします。
+  config.before(:each, type: :system) do
+    ActiveJob::Base.queue_adapter = :inline
+  end
+
+  # config.before(:each, type: :job) do
+  #   ActiveJob::Base.queue_adapter = :test
+  # end
 end

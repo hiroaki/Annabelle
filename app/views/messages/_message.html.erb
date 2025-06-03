@@ -21,9 +21,9 @@
     <span><%= message.user.username %></span>
   </div>
 
-  <div class="container text-nowrap">
-    <%= simple_format(message.content) %>
-  </div>
+  <%= content_tag :div, simple_format(message.content),
+    class: "container text-nowrap",
+    **data_with_testid("message-content-#{message.id}") %>
 
   <div class="container flex">
     <% if message.attachements.attached? %>

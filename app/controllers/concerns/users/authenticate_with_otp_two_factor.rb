@@ -37,7 +37,7 @@ module Users::AuthenticateWithOtpTwoFactor
       sign_in(user, event: :authentication)
       respond_with resource, location: after_sign_in_path_for(resource)
     else
-      flash.now[:alert] = 'Invalid two-factor code.'
+      flash.now[:alert] = I18n.t('devise.sessions.invalid_otp')
       prompt_for_otp_two_factor(user)
     end
   end

@@ -1,9 +1,9 @@
 <turbo-frame id="devise">
 <div class="container p-4">
-  <h2 class="text-2xl font-bold mb-6">Two Factor Authentication</h2>
+  <%= content_tag :h2, 'Two Factor Authentication', class: 'text-2xl font-bold mb-6', **data_with_testid('two-factor-enabled-message') %>
 
   <ol class="list-decimal pl-5 space-y-6">
-    <li>
+    <%= content_tag :li, **data_with_testid('configuration-menu-two-factor-authentication') do %>
       <div>
         <h3 class="text-xl font-semibold mb-2">Scan QR Code</h3>
         <div class="bg-gray-50 border border-gray-300 rounded-lg p-4 shadow-sm">
@@ -19,11 +19,11 @@
           </p>
         </div>
       </div>
-    </li>
+    <% end %>
 
     <li>
       <div>
-        <h3 class="text-xl font-semibold mb-2">Confirm OTP Code</h3>
+        <%= content_tag :h3, 'Confirm OTP Code', class: 'text-xl font-semibold mb-2', **data_with_testid('backup-codes-title') %>
         <div class="bg-gray-50 border border-gray-300 rounded-lg p-4 shadow-sm">
           <p class="mb-4 text-gray-700">
             Please confirm that your authentication application is working by entering a generated code below.
@@ -34,24 +34,24 @@
           <%= form_with scope: :two_fa, url: two_factor_settings_path, method: :post, local: true do |form| %>
             <div class="mb-4">
               <%= form.label :code, class: "block font-medium text-gray-700" %>
-              <%=
-                form.text_field(:code,
+              <%= form.text_field(:code,
                   autofocus: false,
                   autocomplete: 'one-time-code',
                   maxlength: 6,
                   inputmode: "numeric",
                   class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-40 p-2 text-center tracking-widest",
+                  **data_with_testid('otp-code-input')
                 )
               %>
             </div>
 
             <div class="mb-4">
               <%= form.label :password, 'Enter your current password', class: "block font-medium text-gray-700" %>
-              <%= form.password_field :password, class: "mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" %>
+              <%= form.password_field :password, class: "mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500", **data_with_testid('current-password-input') %>
             </div>
 
             <div>
-              <%= form.submit 'Confirm and Enable Two Factor', class: "w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+              <%= form.submit 'Confirm and Enable Two Factor', class: "w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500", **data_with_testid('confirm-and-enable-two-factor') %>
             </div>
           <% end %>
         </div>

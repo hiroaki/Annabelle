@@ -51,7 +51,7 @@ RSpec.describe User, type: :model do
       it "username が無効な形式だと無効になること" do
         user = build(:user, username: "invalid user!")
         expect(user).to be_invalid
-        expect(user.errors[:username]).to include(I18n.t("activerecord.errors.models.user.attributes.username.invalid_format"))
+        expect(user.errors[:username]).to include(I18n.t("errors.messages.invalid_format"))
       end
     end
   end

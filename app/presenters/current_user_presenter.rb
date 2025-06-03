@@ -32,13 +32,14 @@ class CurrentUserPresenter < ModelPresenterBase
         view_context.user_path(user),
         class: 'text-gray-400',
         id: self.class.username_display_dom_id,
+        **view_context.data_with_testid('current-user-display'),
       ),
       view_context.link_to(
         I18n.t('layouts.configuration_menu.sign_out'),
         view_context.destroy_user_session_path,
         method: :delete,
         class: 'text-gray-400',
-        data: { turbo_method: :delete },
+        **view_context.data_with_testid('current-user-signout', turbo_method: :delete),
       )
     ])
   end

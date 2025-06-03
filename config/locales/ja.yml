@@ -58,12 +58,15 @@ ja:
         updated_at: "更新日時"
         username: "ユーザー名"
     # エラーメッセージを個別にカスタマイズしたい場合はこのような階層で定義できます。
-    errors:
-      models:
-        user:
-          attributes:
-            username:
-              invalid_format: "は英数字とアンダースコアのみ使用できます"
+    # errors:
+    #   models:
+    #     user:
+    #       attributes:
+    #         username:
+    #           blank: "ユーザー名を入力してください"
+    #           invalid: "ユーザー名が不正です"
+    #         email:
+    #           blank: "メールアドレスを入力してください"
     models:
       authorization: "認証情報"
       message: "メッセージ"
@@ -118,6 +121,7 @@ ja:
     enable: "二要素認証を有効にする"
     enable_first: "まず二要素認証を有効にしてください。"
     enabled: "二要素認証を有効化しました。バックアップコードを必ず控えてください。"
+    disabled: "二要素認証を無効化しました。"
     incorrect_code: "認証コードが正しくありません"
     incorrect_password: "パスワードが正しくありません"
     could_not_disable: "二要素認証を無効化できませんでした。"

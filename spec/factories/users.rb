@@ -18,5 +18,10 @@ FactoryBot.define do
         create(:authorization, user: user, provider: "github", uid: SecureRandom.uuid)
       end
     end
+
+    trait :with_otp do
+      otp_secret { User.generate_otp_secret } # assumes you use rotp or similar
+      otp_required_for_login { true }
+    end
   end
 end
