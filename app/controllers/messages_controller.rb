@@ -9,7 +9,7 @@ class MessagesController < ApplicationController
   end
 
   def create
-    create_message!(message_params.merge(user: current_user_or_admin))
+    create_message!(message_params.merge(user: current_user))
   rescue => ex
     flash.now.alert = I18n.t("messages.errors.generic", error_message: ex.message)
     respond_to do |format|
@@ -42,14 +42,6 @@ class MessagesController < ApplicationController
 
     def message_params
       params.permit(:content, attachements: [])
-    end
-
-    def current_user_or_admin
-      current_user || admin_user
-    end
-
-    def admin_user
-      User.admin_user
     end
 
     def require_confirmed_user_for_non_safe_requests
