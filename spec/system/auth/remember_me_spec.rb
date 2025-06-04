@@ -5,10 +5,6 @@ require 'rails_helper'
 RSpec.describe 'Remember me機能', type: :system do
   let(:user) { create(:user, :confirmed) }
 
-  before do
-    driven_by(:cuprite_custom)
-  end
-
   it 'Remember meにチェックを入れてログインすると、ブラウザを閉じても自動的にログインされること' do
     # 1回目のログイン - Remember meにチェックを入れる
     visit new_user_session_path

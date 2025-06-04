@@ -1,15 +1,11 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
-require 'rotp'
 
 RSpec.describe '2FA有効化フロー', type: :system do
   let(:username) { 'staff' }
   let(:password) { 'password123' }
-  let(:user) { create(:user, username: username, password: password, password_confirmation: password, confirmed_at: Time.current) }
-
-  before do
-    driven_by(:cuprite)
-    user # ユーザ作成
-  end
+  let!(:user) { create(:user, username: username, password: password, password_confirmation: password, confirmed_at: Time.current) }
 
   it '2FAを有効化できる' do
     # ログイン

@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'One-person mode (auto login)', type: :system do
   before do
-    driven_by(:cuprite_custom)
     @original_enabled = Rails.configuration.x.auto_login.enabled
     @original_email = Rails.configuration.x.auto_login.email
     Rails.configuration.x.auto_login.enabled = true

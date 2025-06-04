@@ -8,10 +8,6 @@ RSpec.describe '認証メールフロー', type: :system do
   let(:user) { create(:user, confirmed_at: nil) }
   let(:confirmation_token) { user.confirmation_token }
 
-  before do
-    driven_by(:cuprite_custom)
-  end
-
   it 'メール確認後に初回ログインができること' do
     # メール確認のリンクにアクセス
     visit user_confirmation_path(confirmation_token: confirmation_token)

@@ -8,10 +8,6 @@ RSpec.describe 'パスワードリセット', type: :system do
   let(:user) { create(:user, :confirmed) }
   let(:new_password) { 'new_password123' }
 
-  before do
-    driven_by(:cuprite_custom)
-  end
-
   it 'パスワードをリセットできること' do
     # パスワードリセットの申請
     visit new_user_session_path

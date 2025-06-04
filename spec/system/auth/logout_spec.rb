@@ -5,10 +5,6 @@ require 'rails_helper'
 RSpec.describe 'ログアウト', type: :system do
   let(:user) { create(:user, :confirmed) }
 
-  before do
-    driven_by(:cuprite_custom)
-  end
-
   it 'ログアウトできること' do
     # ログイン
     visit new_user_session_path
