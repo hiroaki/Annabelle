@@ -13,8 +13,15 @@ class UsersController < ApplicationController
   # PATCH /users/:id(.:format)
   # PUT /users/:id(.:format)
   def update
+    previous_locale = @user.preferred_language
     if @user.update(user_params_for_profile)
-      flash[:notice] = I18n.t("users.update.success")
+      if @user.preferred_language != previous_locale
+        session[:locale] = @user.preferred_language
+        I18n.locale = @user.preferred_language
+        @requires_full_page_reload_to = edit_user_path(@user)
+      end
+
+      flash[:notice] = I18n.t('users.update.success')
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to @user }
@@ -38,6 +45,6 @@ class UsersController < ApplicationController
   end
 
   def user_params_for_profile
-    params.require(:user).permit(:username)
+    params.require(:user).permit(:username, :preferred_language)
   end
 end
