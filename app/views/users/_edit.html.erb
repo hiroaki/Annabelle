@@ -7,7 +7,29 @@
       <%= f.text_field :username, autofocus: true, autocomplete: "username", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
     </div>
 
+    <div class="mb-6">
+      <%= f.label :preferred_language, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%=
+        f.select :preferred_language,
+          options_for_select([
+            ['日本語', 'ja'],
+            ['English', 'en']
+          ], f.object.preferred_language),
+          { include_blank: t('devise.registrations.use_browser_language') },
+          class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5",
+          **data_with_testid('account-preferred-language')
+      %>
+      <p class="mt-2 text-sm text-gray-500">
+        <%= t('devise.registrations.preferred_language_help') %>
+      </p>
+    </div>
+
     <div class="flex items-center justify-between">
+      <%# ロケールが変更された時はページ全体を書き換えたいですが、
+        このボタンに data-turbo-frame="_top" を置いてしまうと、
+        ロケールの変更がなくてもページ全体の書き換えになってしまいます。
+        UserController#update のビューで Turbo.visit することで対応しています。
+      %>
       <%= f.submit t('users.edit.update'), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
     </div>
 

@@ -19,20 +19,67 @@ class ApplicationController < ActionController::Base
 
   protected
 
-  # 開発中における一時的な実装です。
-  def set_locale
-    session[:set_lang] = params[:set_lang].presence || session[:set_lang]
-    I18n.locale = if I18n.available_locales.map(&:to_s).include?(session[:set_lang])
-        session[:set_lang]
-      else
-        I18n.default_locale
-      end
+  def set_locale_to_cookie(locale)
+    cookies.permanent[:locale] = locale
+  end
+
+  def set_locale(locale = nil)
+    I18n.locale = locale || extract_locale || I18n.default_locale
+  end
+
+  private
+
+  def extract_locale
+    locale = locale_from_params
+    Rails.logger.debug "locale_from_params: #{locale}"
+    return locale if locale
+
+    locale = locale_from_user
+    Rails.logger.debug "locale_from_user: #{locale}"
+    return locale if locale
+
+    locale = locale_from_cookie
+    Rails.logger.debug "locale_from_cookie: #{locale}"
+    return locale if locale
+
+    locale = locale_from_header
+    Rails.logger.debug "locale_from_header: #{locale}"
+    locale
+  end
+
+  def locale_from_params
+    if params[:locale].present? && valid_locale?(params[:locale])
+      params[:locale]
+    end
+  end
+
+  def locale_from_user
+    return unless user_signed_in?
+    current_user.preferred_language unless current_user.preferred_language.empty?
+  end
+
+  # def locale_from_session
+  #   session[:locale] if valid_locale?(session[:locale])
+  # end
+
+  def locale_from_cookie
+    cookies[:locale] if valid_locale?(cookies[:locale])
+  end
+
+  def locale_from_header
+    return unless request.env['HTTP_ACCEPT_LANGUAGE']
+    locale = request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first
+    locale if valid_locale?(locale)
+  end
+
+  def valid_locale?(locale)
+    I18n.available_locales.map(&:to_s).include?(locale.to_s)
   end
 
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_up, keys: [:username])
     devise_parameter_sanitizer.permit(:sign_in, keys: [:otp_attempt])
-    devise_parameter_sanitizer.permit(:account_update, keys: [:username])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:username, :preferred_language])
   end
 
   # My experimental feature

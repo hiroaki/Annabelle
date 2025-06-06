@@ -7,7 +7,6 @@ RSpec.describe 'アカウント設定', type: :system do
   let(:user) { create(:user, :confirmed, password: 'current_password') }
 
   before do
-    driven_by(:cuprite_custom)
     login_as(user)
     visit edit_user_registration_path
   end

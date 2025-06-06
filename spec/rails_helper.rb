@@ -47,21 +47,29 @@ Rails.application.load_seed if Rails.env.test?
 #
 require 'capybara/rails'
 require 'capybara/cuprite'
-Capybara.javascript_driver = :cuprite_custom
+
+# 表示言語を en にした Chrome で、環境変数で挙動を変えることができるようにカスタムしたものです。
+# 現在の rspec は、ブラウザの表示言語が en を前提にされています。
+# すべての system spec はこのドライバーを使います。
+# Docker 環境で利用する場合、 DOCKER 環境変数を true の値にしてください。
+# これはドキュメントにあります：
+# > if you use Docker don't forget to pass no-sandbox option:
+# > Capybara::Cuprite::Driver.new(app, browser_options: { 'no-sandbox': nil })
+#
+# MEMO: ferrum のオプション
+# https://github.com/rubycdp/ferrum?tab=readme-ov-file#customization
 Capybara.register_driver(:cuprite_custom) do |app|
-  # see also https://github.com/rubycdp/ferrum?tab=readme-ov-file#customization
+  lang = ENV['CAPYBARA_LANG'] || 'en'
+  opts = (ENV['DOCKER'] ? { 'no-sandbox' => nil } : {}).merge('accept-lang' => lang)
   Capybara::Cuprite::Driver.new(app,
     js_errors: true,
     window_size: [1200, 800],
     headless: %w[0 false].exclude?(ENV['HEADLESS']),
     slowmo: ENV['SLOWMO']&.to_f,
     inspector: true,
-    browser_options: ENV['DOCKER'] ? { 'no-sandbox' => nil } : {},
+    browser_options: opts,
   )
 end
-
-# if you use Docker don't forget to pass no-sandbox option:
-#Capybara::Cuprite::Driver.new(app, browser_options: { 'no-sandbox': nil })
 
 # 要素を特定するために、この属性を使います。
 # 要素に埋め込むためのヘルパー TestHelper の内容も参照してください。
@@ -140,8 +148,9 @@ RSpec.configure do |config|
   # I18n に関するメッセージを組み立てるための自作ヘルパー
   config.include ExpectErrorMessageHelper
 
-  # system spec ではジョブを動かします。
-  config.before(:each, type: :system) do
+  # system spec の設定
+  config.before(:each, type: :system) do |example|
+    driven_by(:cuprite_custom)
     ActiveJob::Base.queue_adapter = :inline
   end
 

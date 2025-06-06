@@ -5,10 +5,6 @@ require 'rails_helper'
 RSpec.describe 'Two-factor authentication login', type: :system do
   let(:user) { FactoryBot.create(:user, :with_otp) }
 
-  before do
-    driven_by(:cuprite_custom)
-  end
-
   it 'allows login with correct OTP' do
     visit new_user_session_path
     fill_in 'user_email', with: user.email

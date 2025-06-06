@@ -1,10 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Messages Form', type: :system do
-  before do
-    driven_by(:cuprite_custom)
-  end
-
   before do
     @original_value = Devise.allow_unconfirmed_access_for
     Devise.allow_unconfirmed_access_for = 7.days

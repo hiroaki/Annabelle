@@ -51,6 +51,7 @@ ja:
         encrypted_password: "暗号化されたパスワード"
         password: "パスワード"
         password_confirmation: "パスワード（確認）"
+        preferred_language: "表示言語"
         remember_created_at: "ログイン状態保持開始日時"
         reset_password_sent_at: "パスワード再設定メール送信日時"
         reset_password_token: "パスワード再設定トークン"
@@ -71,6 +72,10 @@ ja:
       authorization: "認証情報"
       message: "メッセージ"
       user: "ユーザー"
+  devise:
+    registrations:
+      use_browser_language: "ブラウザの言語設定を使用"
+      preferred_language_help: "このアプリケーションの表示言語を選択してください。未設定の場合はブラウザの設定に従います。"
   errors:
     messages:
       blank: "を入力してください"
