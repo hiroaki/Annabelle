@@ -16,10 +16,11 @@ class UsersController < ApplicationController
     previous_locale = @user.preferred_language
     if @user.update(user_params_for_profile)
       if @user.preferred_language != previous_locale
-        session[:locale] = @user.preferred_language
-        I18n.locale = @user.preferred_language
+        set_locale(@user.preferred_language)
         @requires_full_page_reload_to = edit_user_path(@user)
       end
+
+      set_locale_to_cookie(@user.preferred_language)
 
       flash[:notice] = I18n.t('users.update.success')
       respond_to do |format|

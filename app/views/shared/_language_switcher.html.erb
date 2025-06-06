@@ -1,5 +1,5 @@
 <%# Show current locale and provide links to change it %>
-<div class="language-switcher flex items-center space-x-2">
+<div class="language-switcher flex items-center space-x-2" data-turbo="false">
   <%= link_to_unless_current "日本語", locale_path(:ja), class: "hover:text-slate-600 #{I18n.locale == :ja ? 'font-bold' : ''}" %>
   <span>|</span>
   <%= link_to_unless_current "English", locale_path(:en), class: "hover:text-slate-600 #{I18n.locale == :en ? 'font-bold' : ''}" %>

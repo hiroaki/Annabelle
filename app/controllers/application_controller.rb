@@ -19,8 +19,12 @@ class ApplicationController < ActionController::Base
 
   protected
 
-  def set_locale
-    I18n.locale = extract_locale || I18n.default_locale
+  def set_locale_to_cookie(locale)
+    cookies.permanent[:locale] = locale
+  end
+
+  def set_locale(locale = nil)
+    I18n.locale = locale || extract_locale || I18n.default_locale
   end
 
   private
@@ -34,8 +38,8 @@ class ApplicationController < ActionController::Base
     Rails.logger.debug "locale_from_user: #{locale}"
     return locale if locale
 
-    locale = locale_from_session
-    Rails.logger.debug "locale_from_session: #{locale}"
+    locale = locale_from_cookie
+    Rails.logger.debug "locale_from_cookie: #{locale}"
     return locale if locale
 
     locale = locale_from_header
@@ -45,9 +49,7 @@ class ApplicationController < ActionController::Base
 
   def locale_from_params
     if params[:locale].present? && valid_locale?(params[:locale])
-      locale = params[:locale]
-      session[:locale] = locale if locale != I18n.locale.to_s
-      locale
+      params[:locale]
     end
   end
 
@@ -56,8 +58,12 @@ class ApplicationController < ActionController::Base
     current_user.preferred_language unless current_user.preferred_language.empty?
   end
 
-  def locale_from_session
-    session[:locale] if valid_locale?(session[:locale])
+  # def locale_from_session
+  #   session[:locale] if valid_locale?(session[:locale])
+  # end
+
+  def locale_from_cookie
+    cookies[:locale] if valid_locale?(cookies[:locale])
   end
 
   def locale_from_header
