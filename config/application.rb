@@ -31,6 +31,9 @@ module Annabelle
 
     # activerecord-session_store
     ActiveRecord::SessionStore::Session.serializer = :json
+
+    # rails-i18n (gem) settings
+    config.i18n.available_locales = [:en, :ja]
   end
 
   # Set default_url_options For Entire Application
