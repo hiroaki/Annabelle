@@ -90,4 +90,4 @@ gem "omniauth-rails_csrf_protection"
 gem "omniauth-github"
 gem "rqrcode"
 gem "activerecord-session_store"
-
+gem 'rails-i18n', '~> 8.0.0' # For Rails >= 8.0.0
