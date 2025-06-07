@@ -29,11 +29,14 @@ module Annabelle
     config.active_record.encryption.deterministic_key = ENV["ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY"]
     config.active_record.encryption.key_derivation_salt = ENV["ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT"]
 
-    # activerecord-session_store
+    # activerecord-session_store (gem) settings
     ActiveRecord::SessionStore::Session.serializer = :json
 
     # rails-i18n (gem) settings
     config.i18n.available_locales = [:en, :ja]
+
+    # My experimental feature
+    config.x.auto_login = config_for(Rails.root.join('config/x/auto_login.yml'))
   end
 
   # Set default_url_options For Entire Application
@@ -42,9 +45,4 @@ module Annabelle
     host: ENV['ANNABELLE_HOST'].presence || 'localhost',
     port: ENV['ANNABELLE_PORT'].presence,
   }
-
-  # My experimental feature
-  Rails.application.configure do
-    config.x.auto_login = config_for(Rails.root.join('config/x/auto_login.yml'))
-  end
 end
