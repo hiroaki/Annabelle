@@ -19,7 +19,8 @@ class User < ApplicationRecord
   validates :username,
     presence: true,
     uniqueness: { case_sensitive: false },
-    format: { with: /\A[a-zA-Z0-9_]+\z/, message: :invalid_format }
+    format: { with: /\A[a-zA-Z0-9_]+\z/, message: :invalid_format },
+    length: { minimum: 3, maximum: 255 }
 
   validates :preferred_language,
     inclusion: { in: I18n.available_locales.map(&:to_s) + [''] }

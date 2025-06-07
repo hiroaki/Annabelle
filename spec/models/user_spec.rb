@@ -53,6 +53,42 @@ RSpec.describe User, type: :model do
         expect(user).to be_invalid
         expect(user.errors[:username]).to include(I18n.t("errors.messages.invalid_format"))
       end
+
+      it "username が255文字まで有効であること" do
+        user = build(:user, username: 'a' * 255)
+        expect(user).to be_valid
+      end
+
+      it "username が256文字だと無効になること" do
+        user = build(:user, username: 'a' * 256)
+        expect(user).to be_invalid
+      end
+
+      it "username が3文字未満だと無効になること" do
+        user = build(:user, username: 'ab')
+        expect(user).to be_invalid
+        expect(user.errors[:username]).to include(I18n.t("errors.messages.too_short", count: 3))
+      end
+
+      it "username が3文字は有効であること" do
+        user = build(:user, username: 'abc')
+        expect(user).to be_valid
+      end
+
+      it "emailがnilの場合は無効になること" do
+        user = build(:user, email: nil)
+        expect(user).to be_invalid
+      end
+
+      it "emailが空文字の場合は無効になること" do
+        user = build(:user, email: '')
+        expect(user).to be_invalid
+      end
+
+      it "不正な形式のemailは無効になること" do
+        user = build(:user, email: 'invalid-email')
+        expect(user).to be_invalid
+      end
     end
   end
 
