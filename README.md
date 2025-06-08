@@ -38,11 +38,11 @@ An additional option for user authentication is available: two-factor authentica
 
 ## Requirements 要件
 
-### libvips
+### Image Processing Library / 画像処理ライブラリ
 
-This project requires [libvips](https://github.com/libvips/libvips) to be installed on the system for Active Storage.
+This project uses ImageMagick (via mini_magick gem) for Active Storage image and video processing by default, for better compatibility with older operating systems and environments. If you prefer to use libvips instead, set the environment variable `ANNABELLE_VARIANT_PROCESSOR` to `vips` before starting the application.
 
-このプロジェクトでは、Active Storage のために [libvips](https://github.com/libvips/libvips) がシステムにインストールされている必要があります。
+このプロジェクトでは、古い OS や環境との互換性向上のため、Active Storage の画像・動画処理にデフォルトで ImageMagick（mini_magick gem 経由）を使用しています。libvips を利用したい場合は、アプリケーション起動前に環境変数 `ANNABELLE_VARIANT_PROCESSOR` を `vips` に設定してください。
 
 ### SMTP Server / SMTP サーバ
 
