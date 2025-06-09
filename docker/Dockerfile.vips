@@ -10,6 +10,7 @@ RUN apt-get update && \
       imagemagick \
       tzdata \
       ffmpeg \
+      curl \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m -s /bin/bash rails

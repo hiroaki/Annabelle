@@ -60,15 +60,25 @@ require 'capybara/cuprite'
 # https://github.com/rubycdp/ferrum?tab=readme-ov-file#customization
 Capybara.register_driver(:cuprite_custom) do |app|
   lang = ENV['CAPYBARA_LANG'] || 'en'
-  opts = (ENV['DOCKER'] ? { 'no-sandbox' => nil } : {}).merge('accept-lang' => lang)
-  Capybara::Cuprite::Driver.new(app,
+  browser_options = (ENV['DOCKER'] ? { 'no-sandbox' => nil } : {}).merge('accept-lang' => lang)
+
+  options = {
     js_errors: true,
     window_size: [1200, 800],
     headless: %w[0 false].exclude?(ENV['HEADLESS']),
     slowmo: ENV['SLOWMO']&.to_f,
     inspector: true,
-    browser_options: opts,
-  )
+    browser_options: browser_options,
+  }
+
+  if ENV['CAPYBARA_APP_HOST'].present?
+    options[:url] = 'http://chrome:3333'
+    options[:base_url] = "http://web:3000"
+  end
+
+  puts "Capybara::Cuprite::Driver options: #{options}"
+
+  Capybara::Cuprite::Driver.new(app, options)
 end
 
 # 要素を特定するために、この属性を使います。
@@ -82,6 +92,11 @@ end
 #   css { |value| "[data-testid='#{value}']" }
 # end
 
+if ENV['CAPYBARA_APP_HOST'].present?
+  # Capybara.javascript_driver = :cuprite_custom
+  Capybara.server_host = "0.0.0.0"
+  Capybara.app_host = "http://web:3000"
+end
 #
 # Capybara の設定ここまで
 #--

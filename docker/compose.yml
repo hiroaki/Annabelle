@@ -1,0 +1,29 @@
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.vips
+    environment:
+      - ANNABELLE_VARIANT_PROCESSOR=vips
+      - RAILS_ENV=test
+      - CHROME_URL=http://chrome:3333
+      - DOCKER=1
+      - CAPYBARA_APP_HOST=http://web:3000
+    volumes:
+      - ../:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - chrome
+    # command: bash -c "bundle exec rails db:setup && bundle exec rspec ./spec/system/auth/account_settings_spec.rb:15"
+    command: bash -c "bundle exec rails db:reset && rails db:setup && bundle exec rails s -b 0.0.0.0"
+
+  chrome:
+    image: browserless/chrome
+    ports:
+      - "3333:3333"
+    volumes:
+      - .:/app:cached
+    environment:
+      - PORT=3333
+      - CONNECTION_TIMEOUT=600000
