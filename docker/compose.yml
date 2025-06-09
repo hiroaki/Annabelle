@@ -12,4 +12,5 @@ services:
     ports:
       - "3000:3000"
     # command: bash -c "bundle exec rails db:setup && bundle exec rspec ./spec/system/auth/account_settings_spec.rb:15"
-    command: bash -c "bundle exec rails db:reset && rails db:setup && bundle exec rspec spec/system/auth/account_settings_spec.rb:15"
+    # command: bash -c "bundle exec rails db:reset && rails db:setup && bundle exec rspec spec/system/auth/account_settings_spec.rb:15"
+    command: bash -c "bundle exec rails db:reset && rails db:setup && bundle exec rspec"
