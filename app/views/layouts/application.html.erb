@@ -40,21 +40,21 @@
     </header>
 
     <% if in_configuration %>
-      <div class="flex">
+      <div class="flex flex-1">
         <nav class="px-2">
           <%= render 'layouts/configuration_menu' %>
         </nav>
-        <main class="px-2">
+        <main class="px-2 flex-1">
           <%= yield %>
         </main>
       </div>
     <% else %>
-      <main class="">
+      <main class="flex-1 bg-gray-100">
         <%= yield %>
       </main>
     <% end %>
 
-    <footer class=" mt-auto p-1 text-xs text-center text-slate-400 bg-green-500 text-white">
+    <footer class="p-1 text-xs text-center bg-green-500 text-white">
       <span>Annabelle - Message Board</span>
     </footer>
   </body>
