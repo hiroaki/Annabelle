@@ -13,6 +13,13 @@ RUN apt-get update && \
       curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Chromium for headless browser testing (ARM64 compatible)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      chromium \
+      chromium-driver \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN useradd -m -s /bin/bash rails
 WORKDIR /app
 RUN chown rails:rails /app
