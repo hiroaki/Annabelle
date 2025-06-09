@@ -16,7 +16,7 @@ services:
     depends_on:
       - chrome
     # command: bash -c "bundle exec rails db:setup && bundle exec rspec ./spec/system/auth/account_settings_spec.rb:15"
-    command: bash -c "bundle exec rails db:reset && rails db:setup && bundle exec rails s -b 0.0.0.0"
+    command: bash -c "bundle exec rails db:reset && rails db:setup && bundle exec rails s -b 0.0.0.0 -p 13000"
 
   chrome:
     image: browserless/chrome
@@ -27,3 +27,5 @@ services:
     environment:
       - PORT=3333
       - CONNECTION_TIMEOUT=600000
+      - MAX_CONCURRENT_SESSIONS=10
+      - FUNCTION_MODE=false

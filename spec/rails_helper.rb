@@ -69,6 +69,9 @@ Capybara.register_driver(:cuprite_custom) do |app|
     slowmo: ENV['SLOWMO']&.to_f,
     inspector: true,
     browser_options: browser_options,
+    reuse_existing_browser: true,
+    process_timeout: 30,
+    window_open_timeout: 10
   }
 
   if ENV['CAPYBARA_APP_HOST'].present?
@@ -93,9 +96,10 @@ end
 # end
 
 if ENV['CAPYBARA_APP_HOST'].present?
-  # Capybara.javascript_driver = :cuprite_custom
+  Capybara.javascript_driver = :cuprite_custom
   Capybara.server_host = "0.0.0.0"
-  Capybara.app_host = "http://web:3000"
+  Capybara.server_port = "3000"
+  Capybara.app_host = ENV['CAPYBARA_APP_HOST']
 end
 #
 # Capybara の設定ここまで
