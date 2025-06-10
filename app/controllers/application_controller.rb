@@ -23,15 +23,26 @@ class ApplicationController < ActionController::Base
     cookies.permanent[:locale] = locale
   end
 
+  def set_locale_to_session(locale)
+    session[:locale] = locale
+  end
+
   def set_locale(locale = nil)
-    I18n.locale = locale || extract_locale || I18n.default_locale
+    I18n.locale = locale.presence || extract_locale || I18n.default_locale
   end
 
   private
 
+  # ユーザ設定の言語とは別に、一時的に別の表示言語に変えることができるように、
+  # session にも保存しています。
+  # cookie はログインしていない状況のために使います。
   def extract_locale
     locale = locale_from_params
     Rails.logger.debug "locale_from_params: #{locale}"
+    return locale if locale
+
+    locale = locale_from_session
+    Rails.logger.debug "locale_from_session: #{locale}"
     return locale if locale
 
     locale = locale_from_user
@@ -58,14 +69,18 @@ class ApplicationController < ActionController::Base
     current_user.preferred_language unless current_user.preferred_language.empty?
   end
 
-  # def locale_from_session
-  #   session[:locale] if valid_locale?(session[:locale])
-  # end
+  def locale_from_session # このメソッドを有効化または追加
+    session[:locale] if valid_locale?(session[:locale])
+  end
 
   def locale_from_cookie
     cookies[:locale] if valid_locale?(cookies[:locale])
   end
 
+  # 『Railsガイド』より引用：
+  # 実際には、この信頼性を実現するのにより堅固なコードが必要です。
+  # Iain Hackerのhttp_accept_languageライブラリやRyan TomaykoのlocaleRackミドルウェアが
+  # この問題へのソリューションを提供しています。
   def locale_from_header
     return unless request.env['HTTP_ACCEPT_LANGUAGE']
     locale = request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first

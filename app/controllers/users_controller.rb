@@ -13,13 +13,18 @@ class UsersController < ApplicationController
   # PATCH /users/:id(.:format)
   # PUT /users/:id(.:format)
   def update
-    previous_locale = @user.preferred_language
+    # 現在優先されている言語設定の値を得ます
+    previous_locale = extract_locale
+
     if @user.update(user_params_for_profile)
       if @user.preferred_language != previous_locale
+        # 言語が変更された場合は画面を切り替えます
         set_locale(@user.preferred_language)
+        set_locale_to_session(@user.preferred_language)
         @requires_full_page_reload_to = edit_user_path(@user)
       end
 
+      # ログアウト後をフォローするため変更がなくとも cookie の値は更新します
       set_locale_to_cookie(@user.preferred_language)
 
       flash[:notice] = I18n.t('users.update.success')
