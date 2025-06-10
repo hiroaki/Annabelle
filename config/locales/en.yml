@@ -94,6 +94,9 @@ en:
       less_than: "must be less than %{count}"
       even: "must be even"
       odd: "must be odd"
+    locale:
+      invalid_type: "must be a String or Symbol"
+      invalid_value: "is not a valid locale"
   helpers:
     page_entries_info:
       more_pages:

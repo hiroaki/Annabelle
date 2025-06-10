@@ -413,4 +413,37 @@ RSpec.describe User, type: :model do
       expect(uri).to include("otpauth://totp/")
     end
   end
+
+  describe "preferred_language バリデーション（LocaleValidator統合テスト）" do
+    subject { build(:user) }
+
+    context '有効な値' do
+      it '有効なロケール文字列を受け入れる' do
+        subject.preferred_language = 'ja'
+        expect(subject).to be_valid
+      end
+
+      it '空文字を受け入れる（デフォルト値）' do
+        subject.preferred_language = ''
+        expect(subject).to be_valid
+      end
+    end
+
+    context '無効な値' do
+      it '無効なロケールを拒否し、適切なエラーメッセージを表示する' do
+        I18n.with_locale(:ja) do
+          subject.preferred_language = 'invalid'
+          expect(subject).not_to be_valid
+          expect(subject.errors[:preferred_language]).to include('は有効なロケールではありません')
+        end
+      end
+
+      it 'I18n.available_localesに含まれるロケールのみを受け入れる' do
+        I18n.available_locales.each do |locale|
+          user = build(:user, preferred_language: locale.to_s)
+          expect(user).to be_valid, "#{locale} should be valid"
+        end
+      end
+    end
+  end
 end

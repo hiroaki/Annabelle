@@ -22,8 +22,8 @@ class User < ApplicationRecord
     format: { with: /\A[a-zA-Z0-9_]+\z/, message: :invalid_format },
     length: { minimum: 3, maximum: 255 }
 
-  validates :preferred_language,
-    inclusion: { in: I18n.available_locales.map(&:to_s) + [''] }
+  # カスタムバリデータ LocaleValidator が用意されてあります。
+  validates :preferred_language, locale: true
 
   # 管理者ユーザを返します。（これは db:seed で追加されている特別なレコードです）
   # TODO: 変更不可にする

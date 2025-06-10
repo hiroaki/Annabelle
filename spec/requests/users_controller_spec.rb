@@ -91,7 +91,7 @@ RSpec.describe UsersController, type: :request do
         patch user_path(user), params: { user: { preferred_language: "unsupported" } }
         expect(response).to have_http_status(:ok)
         expect(user.reload.preferred_language).not_to eq("unsupported")
-        expect(response.body).to include("Display Language is not included in the list")
+        expect(response.body).to include("Display Language is not a valid locale")
       end
     end
   end

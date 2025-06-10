@@ -20,14 +20,25 @@ class ApplicationController < ActionController::Base
   protected
 
   def set_locale_to_cookie(locale)
-    cookies.permanent[:locale] = locale
+    cookies.permanent[:locale] = locale if valid_locale?(locale)
   end
 
   def set_locale_to_session(locale)
-    session[:locale] = locale
+    session[:locale] = locale if valid_locale?(locale)
   end
 
+  # TODO: FIXME:
+  #   現在の実装は session や cookie を用いています。
+  #   ロケールを URL の一部として扱うようにルーティングから見直してください。
+  #
+  # 『Railsガイド』から引用：
+  # https://railsguides.jp/i18n.html
+  # 2.2.5 セッションやcookieに含まれるロケールの保存について
+  #   開発者は、選択したロケールをセッションやcookieに保存したくなる誘惑にかられるかもしれません。
+  #   しかしこれは行ってはいけません。
+  #   ロケールは透過的にすべきであり、かつURLの一部に含めるべきです。
   def set_locale(locale = nil)
+    # FORM からのパラメータで、言語未設定の場合は locale が空文字になります。
     I18n.locale = locale.presence || extract_locale || I18n.default_locale
   end
 
@@ -69,12 +80,14 @@ class ApplicationController < ActionController::Base
     current_user.preferred_language unless current_user.preferred_language.empty?
   end
 
-  def locale_from_session # このメソッドを有効化または追加
-    session[:locale] if valid_locale?(session[:locale])
+  def locale_from_session
+    locale = session[:locale]
+    locale if valid_locale?(locale)
   end
 
   def locale_from_cookie
-    cookies[:locale] if valid_locale?(cookies[:locale])
+    locale = cookies[:locale]
+    locale if valid_locale?(locale)
   end
 
   # 『Railsガイド』より引用：
@@ -88,7 +101,7 @@ class ApplicationController < ActionController::Base
   end
 
   def valid_locale?(locale)
-    I18n.available_locales.map(&:to_s).include?(locale.to_s)
+    LocaleValidator.valid_locale?(locale)
   end
 
   def configure_permitted_parameters
