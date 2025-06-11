@@ -1,5 +1,5 @@
 <%= users_frame('users.edit.profile') do %>
-  <%= form_for(user, html: { method: :put, class: "space-y-6" }) do |f| %>
+  <%= form_for(user, html: { method: :put, class: "space-y-6", data: { turbo: false } }) do |f| %>
     <%= render "shared/error_messages", resource: user %>
 
     <div class="mb-6">
@@ -25,11 +25,6 @@
     </div>
 
     <div class="flex items-center justify-between">
-      <%# ロケールが変更された時はページ全体を書き換えたいですが、
-        このボタンに data-turbo-frame="_top" を置いてしまうと、
-        ロケールの変更がなくてもページ全体の書き換えになってしまいます。
-        UserController#update のビューで Turbo.visit することで対応しています。
-      %>
       <%= f.submit t('users.edit.update'), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
     </div>
 

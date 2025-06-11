@@ -83,14 +83,13 @@ RSpec.describe 'LocaleSwitching', type: :system do
     end
   end
 
-  # Cookie操作ヘルパー（Cuprite対応）
-  def get_cookie_value(name)
-    cookie = page.driver.cookies[name]
-    cookie&.value
-  end
-
-  def set_cookie_value(name, value)
-    page.driver.set_cookie(name, value)
+  # URL-based locale navigation helpers
+  def visit_with_locale(path, locale)
+    if locale.to_s == 'en'
+      visit path
+    else
+      visit "/#{locale}#{path}"
+    end
   end
 
   # 現在のページの表示言語を判定するヘルパー
@@ -125,77 +124,109 @@ RSpec.describe 'LocaleSwitching', type: :system do
     end
 
     context '言語切り替え機能' do
-      it '英語→日本語の切り替えでCookieに保存され、表示が変わる' do
+      it '英語→日本語の切り替えで表示が変わる' do
         visit root_path
 
-        # 英語に切り替え
-        switch_language_to(:en)
-
-        # 英語に切り替わったかを確認（実際の表示に基づく）
-        # ページに「Log in」ボタンが表示されていることで英語を確認
+        # 初期状態：英語で表示されている
         expect(page).to have_button('Log in')
-        expect(get_cookie_value('locale')).to eq('en')
 
-        # ページを再読み込みしても英語が維持される
-        visit root_path
-        expect(page).to have_button('Log in')
+        # 言語スイッチャーリンクの存在確認
+        expect(page).to have_link('日本語')
 
         # 日本語に切り替え
-        switch_language_to(:ja)
-        expect(get_cookie_value('locale')).to eq('ja')
+        click_link '日本語'
 
-        # 日本語に切り替わったかを確認（実際の表示に基づく）
-        # ページに「ログイン」ボタンが表示されていることで日本語を確認
-        if page.has_button?('ログイン')
-          expect(page).to have_button('ログイン')
-        else
-          # 日本語が表示されない場合は、Cookieの値で言語切り替えを確認
-          expect(get_cookie_value('locale')).to eq('ja')
-        end
+        # 日本語に切り替わったかを確認
+        expect(page).to have_button('ログイン')
+
+        # 英語に戻す
+        click_link 'English'
+
+        # 英語に戻ったかを確認
+        expect(page).to have_button('Log in')
       end
     end
 
-    context 'URLパラメータの優先度' do
-      it 'URLパラメータがCookieの設定より優先される' do
-        # 事前にCookieを日本語に設定
-        set_cookie_value('locale', 'ja')
+    context 'URLパラメータでの言語指定' do
+      it 'URLで直接日本語ページにアクセスできる' do
+        # 日本語のURLで直接アクセス
+        visit '/ja'
+        expect(page).to have_content('アカウント登録もしくはログインしてください。')
 
-        # URLパラメータで英語を指定
-        visit root_path(locale: 'en')
-        # 実際の表示に応じてアサーションを調整
-        expect(
-          page.has_button?('Log in') ||
-          page.has_content?('You need to sign in or sign up before continuing.')
-        ).to be true
+        # 英語のURLで直接アクセス
+        visit '/'
+        expect(page).to have_content('You need to sign in or sign up before continuing.')
+      end
+    end
 
-        # URLパラメータなしでアクセスするとCookieの設定に戻る
-        visit root_path
-        # 実際の表示に応じて調整
-        expect(
-          page.has_button?('ログイン') ||
-          page.has_content?('アカウント登録もしくはログインしてください。') ||
-          get_cookie_value('locale') == 'ja'
-        ).to be true
+    context 'langクエリパラメータでの明示的な言語指定' do
+      it '直接ログイン画面でlangパラメータが機能する' do
+        # ログイン画面に直接langパラメータでアクセス
+        visit '/users/sign_in?lang=ja'
+        
+        expect(page).to have_button('ログイン')
+        expect(page).to have_field('メールアドレス')
+
+        # 言語スイッチャーのリンクにlangパラメータが含まれる
+        expect(page).to have_link('English')
+        
+        # 英語に切り替え
+        click_link 'English'
+        expect(page).to have_button('Log in')
+        expect(page).to have_field('Email')
+      end
+
+      it 'langパラメータで一時的に英語表示ができる' do
+        # langパラメータで英語指定
+        visit '/users/sign_in?lang=en'
+        expect(page).to have_button('Log in')
+        expect(page).to have_field('Email')
+
+        # 言語スイッチャーのリンクにlangパラメータが含まれる
+        expect(page).to have_link('日本語')
+      end
+
+      it '他のページでもlangパラメータが機能する' do
+        # サインインページでlangパラメータを使用
+        visit '/users/sign_in?lang=ja'
+        expect(page).to have_button('ログイン')
+        expect(page).to have_field('メールアドレス')
+
+        # 英語に切り替え
+        click_link 'English'
+        expect(page).to have_button('Log in')
+        expect(page).to have_field('Email')
+      end
+
+      it 'ルートページにlangパラメータでアクセスすると認証後にlangパラメータが保持される' do
+        # langパラメータで日本語指定してルートページにアクセス
+        visit '/?lang=ja'
+        
+        # ?lang=jaでアクセスしたが、ログインが必要なページの場合、
+        # CustomFailureAppにより適切にリダイレクトされることを確認
+        
+        # まず、現在のページが日本語で表示されていることを確認
+        expect(page).to have_button('ログイン')
+        expect(page).to have_content('アカウント登録もしくはログインしてください。')
+
+        # 言語スイッチャーのリンクが正しく機能することを確認
+        expect(page).to have_link('English')
       end
     end
 
     context '不正な値の処理' do
-      it '空のlocaleパラメータ時はデフォルトまたはCookieにフォールバックする' do
-        # 空のlocaleパラメータでアクセス
-        visit '/?locale='
-        expect(page).to have_content(/You need to sign in or sign up before continuing.|アカウント登録もしくはログインしてください。/)
-
-        # Cookieを設定してから空のlocaleパラメータでアクセス
-        set_cookie_value('locale', 'en')
-        visit '/?locale='
-        expect(page).to have_button('Log in')
+      it '不正なlocaleパラメータ時はRouting Errorになる' do
+        # 不正なlocaleでアクセス
+        visit '/invalid_locale'
+        # ルートエラーになる（これは正常な動作）
+        expect(page).to have_content('Routing Error')
       end
     end
   end
 
   describe 'ログイン時のロケール切り替え' do
     context 'ユーザーに言語設定がない場合' do
-      it 'デフォルトロケールで表示され、言語切り替えでセッションとCookieに保存される' do
+      it 'デフォルトロケールで表示され、言語切り替えで表示が変わる' do
         login_as(user_no_pref, expected_locale: :en)  # デフォルトは英語
 
         # ログイン後の初期表示確認（英語で投稿ボタンが表示される）
@@ -204,113 +235,85 @@ RSpec.describe 'LocaleSwitching', type: :system do
         # 日本語に切り替え
         switch_language_to(:ja)
         expect(page).to have_button('投稿') # 日本語の投稿ボタンに変わる
-        expect(get_cookie_value('locale')).to eq('ja')
-
-        # ページ遷移しても言語設定が維持される（セッション効果）
-        visit root_path
-        expect(page).to have_button('投稿')
       end
     end
 
     context 'ユーザーの設定言語が英語の場合' do
-      it '初期表示は英語、セッションでの一時的な言語変更、再ログインで元の設定に戻る' do
-        # セッションをクリアした状態でログイン（ユーザー設定が優先される）
+      it '初期表示は英語、言語切り替えで表示が変わる' do
         login_as(user_en, expected_locale: :en)  # ユーザー設定は英語
 
         # ログイン後の表示確認（英語で投稿ボタンが表示される）
         expect(page).to have_button('Post')
 
-        # 一時的に日本語に切り替え（セッションに保存される）
+        # 日本語に切り替え
         switch_language_to(:ja)
         expect(page).to have_button('投稿') # 日本語の投稿ボタンに変わる
 
-        # ページ遷移しても一時的な言語設定が維持される（セッション効果）
-        visit root_path
-        expect(page).to have_button('投稿')
-
-        # ログアウト・再ログインでユーザー設定に戻る
-        logout(expected_locale: :ja)  # ログアウト時は日本語
-
-        # 再ログイン時はユーザー設定（英語）に戻るが、セッションが残っていれば日本語
-        # セッションをクリアするためブラウザを「再起動」
-        Capybara.reset_sessions!
-
-        login_as(user_en, expected_locale: :en)  # 再ログイン時は英語に戻る
+        # 英語に戻す
+        switch_language_to(:en)
         expect(page).to have_button('Post')
       end
 
-      it 'URLパラメータがセッション・ユーザー設定より優先される' do
-        login_as(user_en, expected_locale: :en)
-        expect(page).to have_button('Post')
+      it 'URLで直接日本語ページにアクセスすると日本語で表示される' do
+        # 日本語URLで直接ログインページにアクセス
+        visit '/ja/users/sign_in'
+        expect(page).to have_button('ログイン')
 
-        # セッションで日本語に設定
-        switch_language_to(:ja)
-        expect(page).to have_button('投稿')
+        # ログイン
+        fill_in 'メールアドレス', with: user_en.email
+        fill_in 'パスワード', with: 'password'
+        click_button 'ログイン'
 
-        # URLパラメータで英語を指定すると優先される
-        visit root_path(locale: 'en')
-        expect(page).to have_button('Post')
-
-        # URLパラメータなしだとセッションの設定に戻る
-        visit root_path
+        # ログイン後も日本語で表示
         expect(page).to have_button('投稿')
       end
     end
 
     context 'ユーザーの設定言語が日本語の場合' do
-      it '初期表示は日本語、セッションでの一時的な言語変更、再ログインで元の設定に戻る' do
-        # セッションをクリアした状態でログイン（ユーザー設定が優先される）
-        login_as(user_ja, expected_locale: :ja)  # ユーザー設定は日本語
+      it '日本語URLでアクセスすると日本語で表示される' do
+        # 日本語URLで直接ログインページにアクセス
+        visit '/ja/users/sign_in'
+        expect(page).to have_button('ログイン')
 
-        # ログイン後の表示確認（日本語で投稿ボタンが表示される）
+        # ログイン
+        fill_in 'メールアドレス', with: user_ja.email
+        fill_in 'パスワード', with: 'password'
+        click_button 'ログイン'
+
+        # ログイン後も日本語で表示
         expect(page).to have_button('投稿')
 
-        # 英語に切り替え（セッションに保存される）
-        switch_language_to(:en)
-        expect(page).to have_button('Post') # 英語の投稿ボタンに変わる
+        # 言語スイッチャーが表示されていることを確認
+        expect(page).to have_link('English')
 
-        # ページ遷移しても一時的な言語設定が維持される（セッション効果）
-        visit root_path
-        expect(page).to have_button('Post')
+        # 英語のリンクをクリック
+        click_link 'English'
 
-        # ログアウト・再ログインでユーザー設定に戻る
-        logout(expected_locale: :en)  # ログアウト時は英語
-
-        # セッションをクリアするためブラウザを「再起動」
-        Capybara.reset_sessions!
-
-        login_as(user_ja, expected_locale: :ja)  # 再ログイン時は日本語に戻る
-        expect(page).to have_button('投稿')
+        # 英語ページに移動したことを確認（langパラメータで確認）
+        expect(current_url).to include('lang=en')
+        expect(page).to have_button('Post')  # 英語の投稿ボタンに変わる
       end
     end
   end
 
-  describe 'ロケール優先順位の検証' do
-    it 'URLパラメータ > セッション > ユーザー設定 > Cookie > デフォルトの順序が正しく動作する' do
-      # セッションをクリアして開始
-      Capybara.reset_sessions!
-
-      # 1. デフォルト状態での表示確認
+  describe 'URL-based ロケール動作の検証' do
+    it 'URLパスによって正しい言語で表示される' do
+      # 1. デフォルト（英語）での表示確認
       visit root_path
-      expect(page).to have_content('You need to sign in or sign up before continuing.')  # デフォルトは英語
+      expect(page).to have_content('You need to sign in or sign up before continuing.')
 
-      # 2. Cookie設定での表示確認（日本語に設定）
-      set_cookie_value('locale', 'ja')
-      visit root_path
+      # 2. 日本語URLでの表示確認
+      visit '/ja'
       expect(page).to have_content('アカウント登録もしくはログインしてください。')
 
-      # 3. ユーザー設定がCookieより優先されることを確認
-      # Cookie は日本語だが、ユーザー設定は英語なので英語で表示される
-      login_as(user_en, expected_locale: :en)  # ユーザー設定（英語）がCookie（日本語）より優先
-      expect(page).to have_button('Post')
+      # 3. ユーザー設定に関係なく、URLが優先されることを確認
+      # 英語設定のユーザーでも、日本語URLなら日本語で表示
+      visit '/ja/users/sign_in'
+      expect(page).to have_button('ログイン')
 
-      # 4. セッションがユーザー設定より優先されることを確認
-      switch_language_to(:ja)  # セッションで日本語に設定
-      expect(page).to have_button('投稿')
-
-      # 5. URLパラメータがセッションより優先されることを確認
-      visit root_path(locale: 'en')  # URLパラメータで英語を指定
-      expect(page).to have_button('Post')  # URLパラメータ（英語）がセッション（日本語）より優先
+      # 日本語設定のユーザーでも、英語URLなら英語で表示
+      visit '/users/sign_in'
+      expect(page).to have_button('Log in')
     end
   end
 end

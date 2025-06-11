@@ -21,6 +21,10 @@ module Users::AuthenticateWithOtpTwoFactor
   def prompt_for_otp_two_factor(user)
     @user = user
 
+    # ロケールを確実に設定してから二要素認証画面を表示
+    locale_service = LocaleService.new(self)
+    locale_service.set_locale
+
     session[:otp_user_id] = user.id
     render 'devise/sessions/two_factor', status: :see_other
   end
@@ -33,10 +37,18 @@ module Users::AuthenticateWithOtpTwoFactor
       remember_me(user) if user_params[:remember_me] == '1'
       user.save!
 
+      # ロケールを確実に設定してからフラッシュメッセージを設定
+      locale_service = LocaleService.new(self)
+      locale_service.set_locale
+
       set_flash_message!(:notice, :signed_in)
       sign_in(user, event: :authentication)
       respond_with resource, location: after_sign_in_path_for(resource)
     else
+      # ロケールを確実に設定してからエラーメッセージを設定
+      locale_service = LocaleService.new(self)
+      locale_service.set_locale
+
       flash.now[:alert] = I18n.t('devise.sessions.invalid_otp')
       prompt_for_otp_two_factor(user)
     end

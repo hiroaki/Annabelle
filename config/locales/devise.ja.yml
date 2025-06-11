@@ -82,6 +82,7 @@ ja:
       signed_in: "ログインしました。"
       signed_out: "ログアウトしました。"
       already_signed_out: "既にログアウト済みです。"
+      invalid_otp: "認証コードが正しくありません。"
       authenticate: "認証"
       email: "メールアドレス"
       log_in: "ログイン"
