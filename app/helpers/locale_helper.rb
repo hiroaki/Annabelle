@@ -49,10 +49,4 @@ module LocaleHelper
     skip_paths = ['/up', '/locale', '/users/auth']
     skip_paths.any? { |skip_path| path.start_with?(skip_path) }
   end
-
-  # URLがデフォルトロケールを示しているかどうかを判定
-  def url_indicates_default_locale?(params, path)
-    return params[:lang] == I18n.default_locale.to_s if params[:lang].present?
-    path != '/'
-  end
 end
