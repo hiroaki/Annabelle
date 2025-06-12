@@ -55,6 +55,7 @@ class LocaleService
     return lang_param.to_s if LocaleValidator.valid_locale?(lang_param)
 
     # 3. URLパスのlocale（RESTfulなURL）
+    # WARN: localeが省略されたパスの場合はここで決定せずユーザー設定の判定へ。
     url_locale = params[:locale]
     return url_locale.to_s if LocaleValidator.valid_locale?(url_locale)
 
