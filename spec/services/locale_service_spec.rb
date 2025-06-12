@@ -89,30 +89,29 @@ RSpec.describe LocaleService do
   end
 
   describe '#redirect_path_for_user' do
-    context 'when user has non-default locale' do
-      let(:user) { double(preferred_language: 'ja') }
-
+    context 'when fallback locale is non-default' do
       it 'returns localized path' do
-        result = service.redirect_path_for_user(user)
+        allow(service).to receive(:determine_fallback_locale).and_return('ja')
+        result = service.redirect_path_for_user(double)
         expect(result).to eq('/ja')
       end
     end
 
-    context 'when user has default locale' do
-      let(:user) { double(preferred_language: 'en') }
-
+    context 'when fallback locale is default' do
       it 'returns :root_path symbol' do
-        result = service.redirect_path_for_user(user)
+        allow(service).to receive(:determine_fallback_locale).and_return('en')
+        result = service.redirect_path_for_user(double)
         expect(result).to eq(:root_path)
       end
     end
 
-    context 'when user has no preferred language' do
-      let(:user) { double(preferred_language: '') }
-
-      it 'returns :root_path symbol' do
+    context 'with specific fallback scenarios' do
+      it 'uses user preference through fallback for Japanese user' do
+        user = double(preferred_language: 'ja')
+        # userがcurrent_userとして設定される前提で、extract_from_userが動作することを確認
+        allow(service).to receive(:current_user).and_return(user)
         result = service.redirect_path_for_user(user)
-        expect(result).to eq(:root_path)
+        expect(result).to eq('/ja')
       end
     end
   end
@@ -124,17 +123,8 @@ RSpec.describe LocaleService do
       end
 
       it 'ignores invalid locale and falls back' do
-        allow(service).to receive(:extract_from_user).and_return(nil)
-        allow(service).to receive(:extract_from_header).and_return(nil)
+        allow(service).to receive(:determine_fallback_locale).and_return(LocaleConfiguration.default_locale.to_s)
         expect(service.determine_effective_locale('invalid')).to eq(LocaleConfiguration.default_locale.to_s)
-      end
-    end
-
-    context 'with lang query parameter' do
-      let(:params) { { lang: 'ja' } }
-
-      it 'returns lang parameter if valid' do
-        expect(service.determine_effective_locale).to eq('ja')
       end
     end
 
@@ -146,25 +136,45 @@ RSpec.describe LocaleService do
       end
     end
 
+    context 'with invalid URL locale parameter' do
+      let(:params) { { locale: 'invalid' } }
+
+      it 'falls back when URL locale is invalid' do
+        allow(service).to receive(:determine_fallback_locale).and_return('en')
+        expect(service.determine_effective_locale).to eq('en')
+      end
+    end
+
+    context 'fallback scenarios' do
+      let(:params) { {} }  # URLパラメータなし
+
+      it 'uses fallback locale when no URL locale provided' do
+        allow(service).to receive(:determine_fallback_locale).and_return('ja')
+        expect(service.determine_effective_locale).to eq('ja')
+      end
+    end
+  end
+
+  describe '#determine_fallback_locale' do
     context 'with user preference' do
       let(:current_user) { double(preferred_language: 'ja') }
 
       it 'returns user preference if valid' do
-        expect(service.determine_effective_locale).to eq('ja')
+        expect(service.determine_fallback_locale).to eq('ja')
       end
     end
 
     context 'with browser header' do
       let(:request) { double(env: { 'HTTP_ACCEPT_LANGUAGE' => 'ja,en-US;q=0.9,en;q=0.8' }) }
 
-      it 'returns header locale if valid' do
-        expect(service.determine_effective_locale).to eq('ja')
+      it 'returns header locale if valid and no user preference' do
+        expect(service.determine_fallback_locale).to eq('ja')
       end
     end
 
     context 'with no preferences' do
       it 'returns default locale' do
-        expect(service.determine_effective_locale).to eq(LocaleConfiguration.default_locale.to_s)
+        expect(service.determine_fallback_locale).to eq(LocaleConfiguration.default_locale.to_s)
       end
     end
   end
@@ -186,23 +196,21 @@ RSpec.describe LocaleService do
   end
 
   describe '#redirect_path_with_user_locale' do
-    let(:user) { double(preferred_language: 'ja') }
-    
     before do
       allow(controller).to receive(:root_path).and_return('/root')
     end
 
-    context 'when redirect_path_for_user returns a path' do
-      it 'returns the path' do
-        expect(service.redirect_path_with_user_locale(user)).to eq('/ja')
+    context 'when fallback locale is non-default' do
+      it 'returns the localized path' do
+        allow(service).to receive(:determine_fallback_locale).and_return('ja')
+        expect(service.redirect_path_with_user_locale(double)).to eq('/ja')
       end
     end
 
-    context 'when redirect_path_for_user returns :root_path' do
-      let(:user) { double(preferred_language: 'en') }
-
+    context 'when fallback locale is default' do
       it 'returns controller.root_path' do
-        expect(service.redirect_path_with_user_locale(user)).to eq('/root')
+        allow(service).to receive(:determine_fallback_locale).and_return('en')
+        expect(service.redirect_path_with_user_locale(double)).to eq('/root')
       end
     end
   end
@@ -217,18 +225,18 @@ RSpec.describe LocaleService do
 
     context 'when no stored location' do
       let(:stored_location) { nil }
-      let(:resource) { double(preferred_language: 'ja') }
 
       it 'returns redirect_path_with_user_locale result' do
+        allow(service).to receive(:determine_fallback_locale).and_return('ja')
         expect(service.determine_post_login_redirect_path(resource)).to eq('/ja')
       end
     end
 
     context 'when stored location is locale-only path' do
       let(:stored_location) { '/ja' }
-      let(:resource) { double(preferred_language: 'ja') }
 
       it 'returns redirect_path_with_user_locale result' do
+        allow(service).to receive(:determine_fallback_locale).and_return('ja')
         expect(service.determine_post_login_redirect_path(resource)).to eq('/ja')
       end
     end

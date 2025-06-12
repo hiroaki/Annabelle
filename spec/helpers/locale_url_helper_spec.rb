@@ -29,31 +29,16 @@ RSpec.describe LocaleUrlHelper do
   describe '.current_path_with_locale_query' do
     let(:mock_request) { double(path: '/messages', query_string: 'page=2') }
 
-    it 'generates query-based locale URL' do
+    it 'generates path-based locale URL (step 4: unified strategy)' do
       result = LocaleUrlHelper.current_path_with_locale_query(mock_request, 'ja')
-      expect(result).to eq('/messages?lang=ja&page=2')
+      expect(result).to eq('/ja/messages')
     end
   end
 
   describe '.current_path_with_locale_unified' do
     let(:mock_request) { double(path: '/messages', query_string: 'page=2') }
 
-    context 'when path-based locale is disabled' do
-      before do
-        allow(LocaleUrlHelper).to receive(:use_path_based_locale?).and_return(false)
-      end
-
-      it 'uses query-based approach' do
-        result = LocaleUrlHelper.current_path_with_locale_unified(mock_request, 'ja')
-        expect(result).to eq('/messages?lang=ja&page=2')
-      end
-    end
-
-    context 'when path-based locale is enabled' do
-      before do
-        allow(LocaleUrlHelper).to receive(:use_path_based_locale?).and_return(true)
-      end
-
+    context 'after step 4: unified to path-based strategy' do
       it 'uses path-based approach' do
         result = LocaleUrlHelper.current_path_with_locale_unified(mock_request, 'ja')
         expect(result).to eq('/ja/messages')

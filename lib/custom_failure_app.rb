@@ -22,9 +22,9 @@ class CustomFailureApp < Devise::FailureApp
       return path_locale if valid_locale?(path_locale)
     end
     
-    # 3. langパラメータ（下位互換性）
-    lang_param = request.params[:lang]
-    return lang_param if valid_locale?(lang_param)
+    # 3. ステップ4: langパラメータ処理を削除（パスベース戦略に統一）
+    # locale_param = request.params[:locale]
+    # return locale_param if valid_locale?(locale_param)
     
     # 4. デフォルトロケール
     LocaleConfiguration.default_locale.to_s

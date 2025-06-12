@@ -69,8 +69,9 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
   def store_locale_for_redirect
     # OAuth認証パラメータからロケールを取得
+    # ステップ4: langパラメータ処理を削除し、パスベース戦略に統一
     omniauth_params = request.env["omniauth.params"] || {}
-    locale_param = params[:lang] || params[:locale] ||
+    locale_param = params[:locale] ||
                    omniauth_params["lang"] || omniauth_params["locale"]
 
     # LocaleServiceを使用してロケールを決定

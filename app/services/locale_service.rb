@@ -40,41 +40,38 @@ class LocaleService
 
   # ユーザー設定に基づいてリダイレクトパスを決定（LocaleHelperから移動）
   def redirect_path_for_user(resource)
-    user_locale = extract_from_user(resource)
+    # フォールバックロケールを使用してリダイレクト先を決定
+    fallback_locale = determine_fallback_locale
 
-    if user_locale && user_locale != LocaleConfiguration.default_locale.to_s
-      # ユーザーの設定言語がデフォルト以外の場合、その言語のrootパスにリダイレクト
-      "/#{user_locale}"
+    if fallback_locale != LocaleConfiguration.default_locale.to_s
+      # デフォルト以外の言語の場合、その言語のrootパスにリダイレクト
+      "/#{fallback_locale}"
     else
-      # デフォルト言語またはユーザー設定がない場合はrootパス（ApplicationControllerで解決）
+      # デフォルト言語の場合はrootパス（ApplicationControllerで解決）
       :root_path
     end
   end
 
   # ロケール決定の優先順位を一元化
+  # ステップ3で明示的ロケールが必須になったため、ロジックを簡素化
   def determine_effective_locale(locale = nil)
-    # 1. 明示的な引数
+    # 1. 明示的な引数（メソッド呼び出し時の指定）
     return locale.to_s if LocaleValidator.valid_locale?(locale)
 
-    # 2. langクエリパラメータ（一時的な言語切り替え）
-    lang_param = params[:lang]
-    return lang_param.to_s if LocaleValidator.valid_locale?(lang_param)
-
-    # 3. URLパスのlocale（RESTfulなURL）
-    # WARN: localeが省略されたパスの場合はここで決定せずユーザー設定の判定へ。
+    # 2. URLパスのlocale（明示的ロケール必須化により常に存在）
     url_locale = params[:locale]
     return url_locale.to_s if LocaleValidator.valid_locale?(url_locale)
 
-    # 4. ユーザー設定言語
-    user_locale = extract_from_user(current_user)
-    return user_locale if user_locale
+    # 3. フォールバック（リダイレクト処理時やOAuth例外時のみ使用）
+    determine_fallback_locale
+  end
 
-    # 5. ブラウザ設定言語
-    header_locale = extract_from_header(request.env['HTTP_ACCEPT_LANGUAGE'])
-    return header_locale if header_locale
-
-    # 6. デフォルト言語
-    LocaleConfiguration.default_locale.to_s
+  # フォールバック用のロケール決定（リダイレクト時やOAuth例外時）
+  def determine_fallback_locale
+    # ユーザー設定 → ブラウザ設定 → デフォルト
+    extract_from_user(current_user) ||
+      extract_from_header(request.env['HTTP_ACCEPT_LANGUAGE']) ||
+      LocaleConfiguration.default_locale.to_s
   end
 
   # ログイン後のリダイレクト先を決定

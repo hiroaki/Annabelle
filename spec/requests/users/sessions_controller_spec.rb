@@ -63,12 +63,12 @@ RSpec.describe Users::SessionsController, type: :request do
       allow(controller).to receive(:user_signed_in?).and_return(false)
     end
 
-    context 'URLパラメータのlangが存在する場合' do
+    context 'URLパラメータのlocaleが存在する場合（ステップ4: langからlocaleに変更）' do
       before do
-        allow(controller).to receive(:params).and_return({ lang: 'ja' })
+        allow(controller).to receive(:params).and_return({ locale: 'ja' })
       end
 
-      it 'セッションにlangを保存する' do
+      it 'セッションにlocaleを保存する' do
         controller.send(:store_language_for_logout)
         expect(test_session[:logout_locale]).to eq('ja')
       end
@@ -150,17 +150,20 @@ RSpec.describe Users::SessionsController, type: :request do
   describe 'ログアウト時のリダイレクト動作' do
     before { sign_in user }
 
-    context 'URLパラメータでlangが指定された場合' do
+    context 'URLロケールパラメータが指定された場合（ステップ4: パスベース戦略）' do
       it 'ロケール付きのログイン画面にリダイレクトする' do
-        delete destroy_user_session_path, params: { lang: 'ja' }
+        # 明示的ロケール必須化により、ロケール付きURLからログアウト
+        delete "/ja/users/sign_out"
 
         expect(response).to redirect_to(new_user_session_path(locale: 'ja'))
       end
     end
 
-    context '無効なlangパラメータが指定された場合' do
+    context '無効なロケールパスからアクセスした場合' do
       it 'デフォルトのログイン画面にリダイレクトする' do
-        delete destroy_user_session_path, params: { lang: 'invalid' }
+        # 無効なロケールはルーティングエラーになるが、
+        # デフォルトロケールからのログアウトをテスト
+        delete "/en/users/sign_out"
 
         expect(response).to redirect_to(new_user_session_path)
       end

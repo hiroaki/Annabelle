@@ -3,15 +3,23 @@
 module LocaleHelper
   module_function
 
-  # 現在のパスでロケールを変更したURLを生成（langパラメータ使用）
+  # 現在のパスでロケールを変更したURLを生成（ステップ4: パスベース戦略に変更）
   def current_path_with_locale(request, locale)
     path = remove_locale_prefix(request.path)
 
-    query_params = Rack::Utils.parse_query(request.query_string)
-    query_params.delete('lang')
-    query_params['lang'] = locale.to_s
-
-    path + (query_params.any? ? "?#{query_params.to_query}" : "?lang=#{locale}")
+    # ステップ4: langパラメータからパスベースロケールに変更
+    # パスベースロケール戦略に統一
+    if locale.to_s == LocaleConfiguration.default_locale.to_s
+      # デフォルトロケールの場合はプレフィックスなし
+      path.empty? ? '/' : path
+    else
+      # 非デフォルトロケールの場合はプレフィックス付き
+      if path.empty? || path == '/'
+        "/#{locale}"
+      else
+        "/#{locale}#{path}"
+      end
+    end
   end
 
   # パスからロケールプレフィックスを削除

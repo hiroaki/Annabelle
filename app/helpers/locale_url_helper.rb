@@ -3,27 +3,22 @@
 module LocaleUrlHelper
   module_function
 
-  # 新しいパスベースURL生成メソッド（ステップ3以降で使用）
+  # 現在のパスベースURL生成メソッド（ステップ4: 統一戦略）
   # 例: current_path_with_locale_path(request, :ja) => "/ja/messages"
   def current_path_with_locale_path(request, locale)
     path = LocaleHelper.remove_locale_prefix(request.path)
     LocaleHelper.add_locale_prefix(path, locale)
   end
 
-  # 現在のクエリパラメータベースURL生成メソッド（後方互換性）
-  # 例: current_path_with_locale_query(request, :ja) => "/messages?lang=ja"
+  # ステップ4: クエリパラメータベースを削除し、パスベースに統一
+  # 後方互換性のため、パスベースURL生成にリダイレクト
   def current_path_with_locale_query(request, locale)
-    LocaleHelper.current_path_with_locale(request, locale)
+    current_path_with_locale_path(request, locale)
   end
 
-  # 統一されたURL生成メソッド（フィーチャーフラグで切り替え可能）
-  # 現在はクエリパラメータ方式、将来的にパスベース方式に切り替え
+  # 統一されたURL生成メソッド（ステップ4: パスベース戦略に統一）
   def current_path_with_locale_unified(request, locale)
-    if use_path_based_locale?
-      current_path_with_locale_path(request, locale)
-    else
-      current_path_with_locale_query(request, locale)
-    end
+    current_path_with_locale_path(request, locale)
   end
 
   # パスベースロケールを使用するかどうかの判定
