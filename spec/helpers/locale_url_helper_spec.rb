@@ -14,9 +14,9 @@ RSpec.describe LocaleUrlHelper do
       expect(result).to eq('/ja/messages')
     end
 
-    it 'handles default locale' do
+    it 'handles default locale (explicit locale required)' do
       result = LocaleUrlHelper.current_path_with_locale_path(mock_request, 'en')
-      expect(result).to eq('/messages')
+      expect(result).to eq('/en/messages')
     end
 
     it 'handles root path' do

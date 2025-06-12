@@ -58,8 +58,8 @@ RSpec.describe LocaleHelper do
       expect(LocaleHelper.add_locale_prefix('/', 'ja')).to eq('/ja')
     end
 
-    it 'does not add default locale prefix' do
-      expect(LocaleHelper.add_locale_prefix('/messages', 'en')).to eq('/messages')
+    it 'adds default locale prefix (explicit locale required)' do
+      expect(LocaleHelper.add_locale_prefix('/messages', 'en')).to eq('/en/messages')
     end
   end
 

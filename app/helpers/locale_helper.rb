@@ -35,8 +35,7 @@ module LocaleHelper
 
   # パスにロケールプレフィックスを追加
   def add_locale_prefix(path, locale)
-    return path if locale.to_s == LocaleConfiguration.default_locale.to_s
-
+    # ステップ3: 明示的ロケール必須化により、全てのロケールでプレフィックスを追加
     clean_path = remove_locale_prefix(path)
     clean_path = '/' if clean_path.blank?
 

@@ -160,6 +160,12 @@ RSpec.configure do |config|
     Rails.application.routes.default_url_options[:locale] = :en
   end
 
+  # OmniAuth テスト設定
+  config.before(:each) do
+    OmniAuth.config.test_mode = true
+    OmniAuth.config.mock_auth[:github] = nil
+  end
+
   # config.before(:each, type: :job) do
   #   ActiveJob::Base.queue_adapter = :test
   # end

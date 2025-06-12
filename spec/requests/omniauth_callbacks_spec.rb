@@ -67,17 +67,18 @@ RSpec.describe 'OmniauthCallbacks', type: :request do
         get user_github_omniauth_callback_path
         expect(response).to redirect_to(new_user_registration_path)
         follow_redirect!
-        expect(flash[:alert]).to eq(I18n.t('devise.omniauth_callbacks.failure', provider: 'GitHub'))
+        expect(flash[:alert]).to eq(I18n.t('devise.omniauth_callbacks.failure', kind: 'GitHub'))
       end
     end
   end
 
   describe 'GET /users/auth/failure' do
     it 'redirects to sign in with failure message' do
+      # OmniAuth失敗パスはロケールスコープ外なのでロケールなしでアクセス
       get '/users/auth/failure'
-      expect(response).to redirect_to(new_user_session_path)
+      expect(response).to redirect_to(new_user_session_path(locale: 'en'))
       follow_redirect!
-      expect(flash[:alert]).to eq(I18n.t('devise.omniauth_callbacks.failure', provider: I18n.t('devise.omniauth_callbacks.unknown_provider')))
+      expect(flash[:alert]).to eq(I18n.t('devise.omniauth_callbacks.failure', kind: I18n.t('devise.omniauth_callbacks.unknown_provider')))
     end
   end
 end

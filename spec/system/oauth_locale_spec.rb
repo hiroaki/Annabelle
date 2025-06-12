@@ -19,7 +19,7 @@ RSpec.describe 'OAuth Language Processing', type: :system, js: true do
       visit '/ja/users/sign_in'
       expect(page).to have_button('ログイン')
     else
-      visit '/users/sign_in'
+      visit '/en/users/sign_in'
       expect(page).to have_button('Log in')
     end
 
@@ -27,7 +27,8 @@ RSpec.describe 'OAuth Language Processing', type: :system, js: true do
   end
 
   def visit_signin_with_lang_param_and_oauth(lang)
-    visit "/users/sign_in?lang=#{lang}"
+    # 明示的ロケール必須化により、ロケール付きパスでアクセス
+    visit "/#{lang}/users/sign_in"
 
     if lang == 'ja'
       expect(page).to have_button('ログイン')
@@ -100,14 +101,14 @@ RSpec.describe 'OAuth Language Processing', type: :system, js: true do
       it 'displays in English (OAuth context) not Japanese (user preference)' do
         mock_github_auth(uid: "existing_oauth_en_uid", email: existing_user.email)
 
-        # 英語ページからOAuth開始
-        visit '/users/sign_in'
+        # 明示的ロケール必須化により、英語ロケール付きパスでアクセス
+        visit '/en/users/sign_in'
         expect(page).to have_button('Log in')
         find('[data-testid="signin_with_github"]').click
 
         # ログイン後、英語ロケールのルートページに遷移することを確認
         # ユーザー設定(ja)ではなく、OAuth開始時のコンテキスト(en)を優先
-        expect(page).to have_current_path(root_path)  # デフォルト英語
+        expect(page).to have_current_path(root_path(locale: 'en'))  # 明示的に英語ロケール
 
         # 英語表示を確認
         expect(page).to have_content('Post')  # not '投稿'

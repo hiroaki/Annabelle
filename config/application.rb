@@ -48,6 +48,9 @@ module Annabelle
 
     # My experimental feature
     config.x.auto_login = config_for(Rails.root.join('config/x/auto_login.yml'))
+
+    # ステップ3: 明示的ロケール必須化 - パスベースロケールを有効化
+    config.x.use_path_based_locale = true
   end
 
   # Set default_url_options For Entire Application

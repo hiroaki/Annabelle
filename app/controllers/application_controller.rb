@@ -4,13 +4,13 @@ class ApplicationController < ActionController::Base
   before_action :conditional_auto_login
 
   # URLヘルパーに自動的にロケールパラメータを追加
-  # ステップ2: フィーチャーフラグによる段階的移行対応
+  # ステップ3: 明示的ロケール必須化対応
   def default_url_options
     if use_path_based_locale?
-      # パスベース方式: /ja/users (ロケールはパスに含まれる)
+      # パスベース方式: /ja/users (ロケールは必須)
       { locale: I18n.locale }
     else
-      # クエリパラメータ方式: /users?lang=ja (デフォルトは空)
+      # クエリパラメータ方式: /users?lang=ja (下位互換性のため保持)
       {}
     end
   end
