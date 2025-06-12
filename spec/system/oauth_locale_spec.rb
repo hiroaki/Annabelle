@@ -6,8 +6,8 @@ RSpec.describe 'OAuth Language Processing', type: :system, js: true do
   include OmniauthMacros
 
   before do
-    I18n.default_locale = :en
-    allow(I18n).to receive(:available_locales).and_return([:ja, :en])
+    I18n.default_locale = LocaleConfiguration.default_locale
+    allow(I18n).to receive(:available_locales).and_return(LocaleConfiguration.available_locales)
   end
 
   after do

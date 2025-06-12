@@ -150,8 +150,8 @@ RSpec.describe LocaleValidator, type: :validator do
     end
 
     context 'I18n.available_localesとの整合性' do
-      it 'I18n.available_localesに含まれる全てのロケールでtrueを返す' do
-        I18n.available_locales.each do |locale|
+      it 'LocaleConfiguration.available_localesに含まれる全てのロケールでtrueを返す' do
+        LocaleConfiguration.available_locales.each do |locale|
           expect(LocaleValidator.valid_locale?(locale)).to be true
           expect(LocaleValidator.valid_locale?(locale.to_s)).to be true
         end

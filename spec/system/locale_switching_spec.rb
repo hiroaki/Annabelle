@@ -105,8 +105,8 @@ RSpec.describe 'LocaleSwitching', type: :system do
   # セットアップ
   # ===================================================================
   before do
-    I18n.default_locale = :en  # 実際のアプリケーションのデフォルトに合わせる
-    allow(I18n).to receive(:available_locales).and_return([:ja, :en])
+    I18n.default_locale = LocaleConfiguration.default_locale  # 実際のアプリケーションのデフォルトに合わせる
+    allow(I18n).to receive(:available_locales).and_return(LocaleConfiguration.available_locales)
   end
 
   # ===================================================================

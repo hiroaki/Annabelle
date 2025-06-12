@@ -13,8 +13,9 @@ RSpec.describe LocaleService do
     allow(controller).to receive(:current_user).and_return(current_user)
     allow(controller).to receive(:respond_to?).with(:current_user).and_return(true)
     
-    I18n.default_locale = :en
-    allow(I18n).to receive(:available_locales).and_return([:ja, :en])
+    # LocaleConfigurationから動的に設定を取得
+    I18n.default_locale = LocaleConfiguration.default_locale
+    allow(I18n).to receive(:available_locales).and_return(LocaleConfiguration.available_locales)
   end
 
   describe '#extract_from_user' do
@@ -125,7 +126,7 @@ RSpec.describe LocaleService do
       it 'ignores invalid locale and falls back' do
         allow(service).to receive(:extract_from_user).and_return(nil)
         allow(service).to receive(:extract_from_header).and_return(nil)
-        expect(service.determine_effective_locale('invalid')).to eq('en')
+        expect(service.determine_effective_locale('invalid')).to eq(LocaleConfiguration.default_locale.to_s)
       end
     end
 
@@ -163,7 +164,7 @@ RSpec.describe LocaleService do
 
     context 'with no preferences' do
       it 'returns default locale' do
-        expect(service.determine_effective_locale).to eq('en')
+        expect(service.determine_effective_locale).to eq(LocaleConfiguration.default_locale.to_s)
       end
     end
   end

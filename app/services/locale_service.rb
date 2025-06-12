@@ -32,7 +32,7 @@ class LocaleService
     parser = HttpAcceptLanguage::Parser.new(accept_language_header)
     
     # 利用可能なロケールから最適なものを選択
-    available_locales = I18n.available_locales.map(&:to_s)
+    available_locales = LocaleConfiguration.available_locales.map(&:to_s)
     preferred_locale = parser.preferred_language_from(available_locales)
     
     LocaleValidator.valid_locale?(preferred_locale) ? preferred_locale : nil
@@ -42,7 +42,7 @@ class LocaleService
   def redirect_path_for_user(resource)
     user_locale = extract_from_user(resource)
 
-    if user_locale && user_locale != I18n.default_locale.to_s
+    if user_locale && user_locale != LocaleConfiguration.default_locale.to_s
       # ユーザーの設定言語がデフォルト以外の場合、その言語のrootパスにリダイレクト
       "/#{user_locale}"
     else
@@ -74,7 +74,7 @@ class LocaleService
     return header_locale if header_locale
 
     # 6. デフォルト言語
-    I18n.default_locale.to_s
+    LocaleConfiguration.default_locale.to_s
   end
 
   # ログイン後のリダイレクト先を決定

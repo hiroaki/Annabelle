@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe LocaleHelper do
   before do
-    I18n.default_locale = :en
-    allow(I18n).to receive(:available_locales).and_return([:ja, :en])
+    I18n.default_locale = LocaleConfiguration.default_locale
+    allow(I18n).to receive(:available_locales).and_return(LocaleConfiguration.available_locales)
   end
 
   describe '.current_path_with_locale' do

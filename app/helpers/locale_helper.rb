@@ -21,7 +21,7 @@ module LocaleHelper
     # ダブルスラッシュを修正
     path = path.gsub('//', '/')
 
-    I18n.available_locales.each do |locale|
+    LocaleConfiguration.available_locales.each do |locale|
       locale_str = locale.to_s
       if path.start_with?("/#{locale_str}/")
         return path.sub(%r{^/#{locale_str}}, '')
@@ -35,7 +35,7 @@ module LocaleHelper
 
   # パスにロケールプレフィックスを追加
   def add_locale_prefix(path, locale)
-    return path if locale.to_s == I18n.default_locale.to_s
+    return path if locale.to_s == LocaleConfiguration.default_locale.to_s
 
     clean_path = remove_locale_prefix(path)
     clean_path = '/' if clean_path.blank?

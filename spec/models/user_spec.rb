@@ -439,7 +439,7 @@ RSpec.describe User, type: :model do
       end
 
       it 'I18n.available_localesに含まれるロケールのみを受け入れる' do
-        I18n.available_locales.each do |locale|
+        LocaleConfiguration.available_locales.each do |locale|
           user = build(:user, preferred_language: locale.to_s)
           expect(user).to be_valid, "#{locale} should be valid"
         end

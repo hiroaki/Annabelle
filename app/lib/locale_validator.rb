@@ -27,7 +27,7 @@ class LocaleValidator < ActiveModel::EachValidator
   end
 
   def valid_locale_value?(value)
-    I18n.available_locales.map(&:to_s).include?(value.to_s)
+    LocaleConfiguration.available_locales.map(&:to_s).include?(value.to_s)
   end
 
   # クラスメソッド版
@@ -39,7 +39,7 @@ class LocaleValidator < ActiveModel::EachValidator
     end
 
     def valid_locale_value?(value)
-      I18n.available_locales.map(&:to_s).include?(value.to_s)
+      LocaleConfiguration.available_locales.map(&:to_s).include?(value.to_s)
     end
   end
 end
