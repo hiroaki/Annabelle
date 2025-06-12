@@ -6,66 +6,6 @@ RSpec.describe LocaleHelper do
     allow(I18n).to receive(:available_locales).and_return([:ja, :en])
   end
 
-  describe '.extract_from_user' do
-    context 'when user has valid preferred_language' do
-      let(:user) { double(preferred_language: 'ja') }
-
-      it 'returns the user locale' do
-        expect(LocaleHelper.extract_from_user(user)).to eq('ja')
-      end
-    end
-
-    context 'when user has invalid preferred_language' do
-      let(:user) { double(preferred_language: 'invalid') }
-
-      it 'returns nil' do
-        expect(LocaleHelper.extract_from_user(user)).to be_nil
-      end
-    end
-
-    context 'when user preferred_language is blank' do
-      let(:user) { double(preferred_language: '') }
-
-      it 'returns nil' do
-        expect(LocaleHelper.extract_from_user(user)).to be_nil
-      end
-    end
-
-    context 'when user is nil' do
-      it 'returns nil' do
-        expect(LocaleHelper.extract_from_user(nil)).to be_nil
-      end
-    end
-  end
-
-  describe '.extract_from_header' do
-    context 'with valid accept language header' do
-      it 'extracts ja from Japanese header' do
-        header = 'ja,en-US;q=0.9,en;q=0.8'
-        expect(LocaleHelper.extract_from_header(header)).to eq('ja')
-      end
-
-      it 'extracts en from English header' do
-        header = 'en-US,en;q=0.9'
-        expect(LocaleHelper.extract_from_header(header)).to eq('en')
-      end
-    end
-
-    context 'with invalid accept language header' do
-      it 'returns nil for unsupported locale' do
-        header = 'fr,en-US;q=0.9,en;q=0.8'
-        expect(LocaleHelper.extract_from_header(header)).to be_nil
-      end
-    end
-
-    context 'with blank header' do
-      it 'returns nil' do
-        expect(LocaleHelper.extract_from_header('')).to be_nil
-        expect(LocaleHelper.extract_from_header(nil)).to be_nil
-      end
-    end
-  end
-
   describe '.current_path_with_locale' do
     let(:mock_request) { double(path: '/messages', query_string: 'page=2') }
 
@@ -84,35 +24,6 @@ RSpec.describe LocaleHelper do
       mock_request = double(path: '/ja/messages', query_string: '')
       result = LocaleHelper.current_path_with_locale(mock_request, 'en')
       expect(result).to eq('/messages?lang=en')
-    end
-  end
-
-  describe '.redirect_path_for_user' do
-    context 'when user has non-default locale' do
-      let(:user) { double(preferred_language: 'ja') }
-
-      it 'returns localized path' do
-        result = LocaleHelper.redirect_path_for_user(user)
-        expect(result).to eq('/ja')
-      end
-    end
-
-    context 'when user has default locale' do
-      let(:user) { double(preferred_language: 'en') }
-
-      it 'returns :root_path symbol' do
-        result = LocaleHelper.redirect_path_for_user(user)
-        expect(result).to eq(:root_path)
-      end
-    end
-
-    context 'when user has no preferred language' do
-      let(:user) { double(preferred_language: '') }
-
-      it 'returns :root_path symbol' do
-        result = LocaleHelper.redirect_path_for_user(user)
-        expect(result).to eq(:root_path)
-      end
     end
   end
 

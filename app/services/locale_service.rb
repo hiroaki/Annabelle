@@ -16,6 +16,35 @@ class LocaleService
     I18n.locale = determine_effective_locale(locale)
   end
 
+  # ユーザー設定からロケールを取得（LocaleHelperから移動）
+  def extract_from_user(user)
+    return nil unless user&.preferred_language.present?
+
+    locale = user.preferred_language
+    LocaleValidator.valid_locale?(locale) ? locale : nil
+  end
+
+  # HTTPヘッダーからロケールを取得（LocaleHelperから移動）
+  def extract_from_header(accept_language_header)
+    return nil unless accept_language_header.present?
+
+    locale = accept_language_header.scan(/^[a-z]{2}/).first
+    LocaleValidator.valid_locale?(locale) ? locale : nil
+  end
+
+  # ユーザー設定に基づいてリダイレクトパスを決定（LocaleHelperから移動）
+  def redirect_path_for_user(resource)
+    user_locale = extract_from_user(resource)
+
+    if user_locale && user_locale != I18n.default_locale.to_s
+      # ユーザーの設定言語がデフォルト以外の場合、その言語のrootパスにリダイレクト
+      "/#{user_locale}"
+    else
+      # デフォルト言語またはユーザー設定がない場合はrootパス（ApplicationControllerで解決）
+      :root_path
+    end
+  end
+
   # ロケール決定の優先順位を一元化
   def determine_effective_locale(locale = nil)
     # 1. 明示的な引数
@@ -30,11 +59,11 @@ class LocaleService
     return url_locale.to_s if LocaleValidator.valid_locale?(url_locale)
 
     # 4. ユーザー設定言語
-    user_locale = LocaleHelper.extract_from_user(current_user)
+    user_locale = extract_from_user(current_user)
     return user_locale if user_locale
 
     # 5. ブラウザ設定言語
-    header_locale = LocaleHelper.extract_from_header(request.env['HTTP_ACCEPT_LANGUAGE'])
+    header_locale = extract_from_header(request.env['HTTP_ACCEPT_LANGUAGE'])
     return header_locale if header_locale
 
     # 6. デフォルト言語
@@ -59,7 +88,7 @@ class LocaleService
 
   # ユーザーの言語設定に基づいてリダイレクトパスを決定
   def redirect_path_with_user_locale(resource)
-    result = LocaleHelper.redirect_path_for_user(resource)
+    result = redirect_path_for_user(resource)
     result == :root_path ? controller.root_path : result
   end
 
