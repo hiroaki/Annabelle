@@ -155,6 +155,7 @@ GEM
     globalid (1.2.1)
       activesupport (>= 6.1)
     hashie (5.0.0)
+    http_accept_language (2.1.1)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     image_processing (1.14.0)
@@ -441,6 +442,7 @@ DEPENDENCIES
   devise-two-factor
   dotenv-rails
   factory_bot_rails
+  http_accept_language
   image_processing (~> 1.2)
   importmap-rails
   jbuilder

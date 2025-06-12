@@ -1,6 +1,6 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   skip_before_action :verify_authenticity_token, only: :github
-  
+
   # OAuthパラメータからロケールを先に保存
   before_action :store_locale_for_redirect
 
@@ -24,7 +24,6 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
         @is_new_user = @user.saved_change_to_id?
 
         sign_in(@user, event: :authentication)
-        # 言語を考慮したリダイレクト先を明示的に指定
         redirect_to determine_oauth_redirect_path
         flash[:notice] = I18n.t("devise.omniauth_callbacks.provider.success", provider: OmniAuth::Utils.camelize(auth.provider)) if is_navigational_format?
       else
@@ -41,74 +40,48 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
   private
 
+  def locale_service
+    @locale_service ||= LocaleService.new(self)
+  end
+
   def store_locale_for_redirect
-    # OAuthプロセス開始時の言語設定を保持
     Rails.logger.debug "OAuth: All params: #{params.inspect}"
     Rails.logger.debug "OAuth: Omniauth params: #{request.env['omniauth.params']}"
-    Rails.logger.debug "OAuth: Omniauth origin: #{request.env['omniauth.origin']}"
-    
-    # OAuth認証では request.env["omniauth.params"] から取得
+
+    # OAuth認証パラメータからロケールを取得
     omniauth_params = request.env["omniauth.params"] || {}
-    locale_param = params[:lang] || params[:locale] || omniauth_params["lang"] || omniauth_params["locale"]
-    
-    # omniauth.originからロケールを抽出することも試す
-    if locale_param.blank? && request.env['omniauth.origin'].present?
-      origin_uri = URI.parse(request.env['omniauth.origin'])
-      if origin_uri.path =~ /^\/([a-z]{2})\//
-        locale_param = $1
-      end
-      origin_params = Rack::Utils.parse_query(origin_uri.query) if origin_uri.query
-      locale_param ||= origin_params&.dig('lang')
-    end
-    
-    if locale_param.present? && LocaleValidator.valid_locale?(locale_param)
-      @oauth_locale = locale_param
-      Rails.logger.debug "OAuth: Stored locale parameter '#{locale_param}' in instance variable"
-    else
-      Rails.logger.debug "OAuth: No valid locale parameter found. params[:lang] = '#{params[:lang]}', params[:locale] = '#{params[:locale]}', omniauth lang='#{omniauth_params["lang"]}', omniauth locale='#{omniauth_params["locale"]}'"
-      # 現在のロケールがデフォルトでない場合は保存
-      if I18n.locale != I18n.default_locale
-        @oauth_locale = I18n.locale.to_s
-        Rails.logger.debug "OAuth: Stored current I18n.locale '#{I18n.locale}' in instance variable"
-      end
-    end
-    
-    Rails.logger.debug "OAuth: Instance oauth_locale: #{@oauth_locale}"
+    locale_param = params[:lang] || params[:locale] ||
+                   omniauth_params["lang"] || omniauth_params["locale"]
+
+    # LocaleServiceを使用してロケールを決定
+    @oauth_locale = locale_service.determine_effective_locale(locale_param)
+
+    Rails.logger.debug "OAuth: Final oauth_locale: #{@oauth_locale}"
   end
 
   def stored_locale
-    # セッションの代わりにインスタンス変数を使用
-    locale = @oauth_locale if LocaleValidator.valid_locale?(@oauth_locale)
-    Rails.logger.debug "OAuth: Retrieved stored locale '#{locale}' from instance variable"
-    locale
+    @oauth_locale if LocaleValidator.valid_locale?(@oauth_locale)
+  end
+
+  def localized_path_for_redirect(path_symbol, **options)
+    locale = stored_locale || locale_service.determine_effective_locale
+    if locale == I18n.default_locale.to_s
+      send(path_symbol, **options)
+    else
+      send(path_symbol, **options.merge(locale: locale))
+    end
   end
 
   def localized_edit_registration_path
-    locale = stored_locale || I18n.locale.to_s
-    Rails.logger.debug "OAuth: Using locale '#{locale}' for edit registration path (stored: #{stored_locale}, I18n: #{I18n.locale})"
-    if locale == I18n.default_locale.to_s
-      edit_user_registration_path
-    else
-      edit_user_registration_path(locale: locale)
-    end
+    localized_path_for_redirect(:edit_user_registration_path)
   end
 
   def localized_new_registration_path
-    locale = stored_locale || I18n.locale.to_s
-    if locale == I18n.default_locale.to_s
-      new_user_registration_path
-    else
-      new_user_registration_path(locale: locale)
-    end
+    localized_path_for_redirect(:new_user_registration_path)
   end
 
   def localized_new_session_path
-    locale = stored_locale || I18n.locale.to_s
-    if locale == I18n.default_locale.to_s
-      new_user_session_path
-    else
-      new_user_session_path(locale: locale)
-    end
+    localized_path_for_redirect(:new_user_session_path)
   end
 
   def determine_oauth_redirect_path
@@ -116,12 +89,12 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       # 新規ユーザーはアカウント設定ページへ
       localized_edit_registration_path
     else
-      # 既存ユーザーは適切な言語のルートページへ
-      locale = stored_locale || I18n.locale.to_s
-      if locale == I18n.default_locale.to_s
-        root_path
+      # 既存ユーザーは現在のOAuthコンテキストのロケールを優先
+      oauth_locale = stored_locale
+      if oauth_locale && oauth_locale != I18n.default_locale.to_s
+        root_path(locale: oauth_locale)
       else
-        root_path(locale: locale)
+        root_path
       end
     end
   end
