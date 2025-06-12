@@ -63,9 +63,19 @@ RSpec.describe LocaleService do
     end
 
     context 'with invalid accept language header' do
-      it 'returns nil for unsupported locale' do
-        header = 'fr,en-US;q=0.9,en;q=0.8'
+      it 'returns nil for completely unsupported locales' do
+        header = 'fr,de,zh-CN'
         expect(service.extract_from_header(header)).to be_nil
+      end
+
+      it 'returns supported locale even when unsupported ones are present' do
+        header = 'fr,en-US;q=0.9,en;q=0.8'
+        expect(service.extract_from_header(header)).to eq('en')
+      end
+
+      it 'respects quality values and returns highest priority supported locale' do
+        header = 'fr;q=0.9,ja;q=0.8,en;q=0.7'
+        expect(service.extract_from_header(header)).to eq('ja')
       end
     end
 

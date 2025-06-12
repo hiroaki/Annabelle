@@ -28,8 +28,14 @@ class LocaleService
   def extract_from_header(accept_language_header)
     return nil unless accept_language_header.present?
 
-    locale = accept_language_header.scan(/^[a-z]{2}/).first
-    LocaleValidator.valid_locale?(locale) ? locale : nil
+    # http_accept_languageを使用してブラウザの言語設定を解析
+    parser = HttpAcceptLanguage::Parser.new(accept_language_header)
+    
+    # 利用可能なロケールから最適なものを選択
+    available_locales = I18n.available_locales.map(&:to_s)
+    preferred_locale = parser.preferred_language_from(available_locales)
+    
+    LocaleValidator.valid_locale?(preferred_locale) ? preferred_locale : nil
   end
 
   # ユーザー設定に基づいてリダイレクトパスを決定（LocaleHelperから移動）
