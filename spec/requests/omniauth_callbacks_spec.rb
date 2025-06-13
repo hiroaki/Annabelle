@@ -81,4 +81,86 @@ RSpec.describe 'OmniauthCallbacks', type: :request do
       expect(flash[:alert]).to eq(I18n.t('devise.omniauth_callbacks.failure', kind: I18n.t('devise.omniauth_callbacks.unknown_provider')))
     end
   end
+
+  # ステップ5: OAuth改善のテストケース
+  describe 'OAuth locale handling improvements' do
+    context 'with session-based locale fallback' do
+      it 'uses session locale when omniauth params are missing' do
+        # OAuth認証開始時のシミュレーション：セッションにロケール保存
+        # （実際はDeviseのOAuth開始リンクから行われる）
+
+        # 既存ユーザーであることを明示的に設定
+        allow(user).to receive(:saved_change_to_id?).and_return(false)
+        allow(User).to receive(:from_omniauth).and_return(user)
+
+        # セッションベースの設定のテスト
+        # OAuthコールバックでセッションからロケールを復元することをモック
+        allow_any_instance_of(Users::OmniauthCallbacksController).to receive(:restore_oauth_locale_from_session).and_return('ja')
+
+        get user_github_omniauth_callback_path
+
+        # 既存ユーザーはrootパスにリダイレクトされる
+        expect(response).to redirect_to(root_path(locale: 'ja'))
+      end
+    end
+
+    context 'with Accept-Language header fallback' do
+      it 'uses browser language when other sources are unavailable' do
+        # 既存ユーザーであることを明示的に設定
+        allow(user).to receive(:saved_change_to_id?).and_return(false)
+        allow(User).to receive(:from_omniauth).and_return(user)
+
+        # 日本語のAccept-Languageヘッダーを設定
+        get user_github_omniauth_callback_path, headers: { 'HTTP_ACCEPT_LANGUAGE' => 'ja,en;q=0.8' }
+
+        # 既存ユーザーはrootパスにリダイレクトされる
+        expect(response).to redirect_to(root_path(locale: 'ja'))
+      end
+    end
+
+    context 'with user preference fallback' do
+      let(:ja_user) { create(:user, :confirmed, preferred_language: 'ja') }
+
+      context 'when user is signed in (account linking)' do
+        before { sign_in ja_user }
+
+        it 'uses user preference for account linking page' do
+          get user_github_omniauth_callback_path
+
+          # サインイン済みユーザーはアカウント連携のため編集ページにリダイレクト
+          expect(response).to redirect_to(edit_user_registration_path(locale: 'ja'))
+        end
+      end
+
+      context 'when user is NOT signed in (login)' do
+        it 'uses user preference after OAuth login' do
+          # OAuth認証で取得するユーザーの言語設定を日本語に設定
+          allow(ja_user).to receive(:saved_change_to_id?).and_return(false)
+          allow(ja_user).to receive(:preferred_language).and_return('ja')
+          allow(User).to receive(:from_omniauth).and_return(ja_user)
+
+          get user_github_omniauth_callback_path
+
+          # OAuth経由ログイン後、ユーザー設定に基づいてrootパスにリダイレクト
+          expect(response).to redirect_to(root_path(locale: 'ja'))
+        end
+      end
+    end
+
+    context 'with new user registration' do
+      let(:new_user) { build(:user, :confirmed) }
+
+      it 'redirects new user to edit registration page with proper locale' do
+        # 新規ユーザーとしてモック
+        allow(new_user).to receive(:persisted?).and_return(true)
+        allow(new_user).to receive(:saved_change_to_id?).and_return(true)
+        allow(User).to receive(:from_omniauth).and_return(new_user)
+
+        get user_github_omniauth_callback_path, headers: { 'HTTP_ACCEPT_LANGUAGE' => 'ja,en;q=0.8' }
+
+        # 新規ユーザーは編集ページにリダイレクトされる
+        expect(response).to redirect_to(edit_user_registration_path(locale: 'ja'))
+      end
+    end
+  end
 end

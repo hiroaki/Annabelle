@@ -5,9 +5,7 @@ class Users::SessionsController < Devise::SessionsController
     if: -> { action_name == 'create' && otp_two_factor_enabled? }
 
   protect_from_forgery with: :exception, prepend: true, except: :destroy
-
-  # ログアウト前に言語設定を保存
-  before_action :store_language_for_logout, only: [:destroy]
+  before_action :store_language_for_logout, only: [:destroy]  # ログアウト前に言語設定を保存
 
   # (override)
   # デフォルトの root_path はログインが必須なため、ログイン画面へリダイレクトします。

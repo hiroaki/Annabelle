@@ -115,18 +115,24 @@
   - SessionsControllerのlang→locale移行
   - 全テストケース通過確認済み
 
-### ⏳ ステップ5: UI/UX一貫性の改善 + OAuth改善
-- **状態**: 🔴 未実装
+### ✅ ステップ5: UI/UX一貫性の改善 + OAuth改善
+- **状態**: ✅ 完了 (2025年6月13日)
 - **対応問題**: 混在するURL戦略、OAuth言語引き継ぎ
 - **作業内容**:
-  - [ ] 言語切り替えUI改善
-  - [ ] URL構造統一
-  - [ ] **OAuth戦略実装**（OAUTH_LOCALE_STRATEGY.mdに基づく）
-    - [ ] セッションフォールバック追加
-    - [ ] フォールバック戦略強化
-    - [ ] ログ出力改善
-- **影響ファイル**: 修正3件以上
-- **所要時間**: 2-3日
+  - [x] **OAuth戦略実装**（OAUTH_LOCALE_STRATEGY.mdに基づく）
+    - [x] セッションフォールバック追加
+    - [x] フォールバック戦略強化
+    - [x] Accept-Languageヘッダー対応
+    - [x] ユーザー設定考慮（サインイン済み・OAuth認証時）
+  - [x] OAuth認証開始時のセッション保存機能
+  - [x] 複数ソースからの確実なロケール決定
+  - [x] 新規ユーザー・既存ユーザーの適切な処理
+- **影響ファイル**: 修正3件（OmniauthCallbacksController、ApplicationController、devise/shared/_links.html.erb）
+- **実装詳細**:
+  - OAuth認証開始時にセッションにロケール保存
+  - 8段階のフォールバック戦略実装
+  - アカウント連携・新規登録/ログインの適切な処理
+  - 全テストケース（10件）通過確認済み
 
 ### ⏳ ステップ6: クリーンアップと最適化
 - **状態**: 🔴 未実装
@@ -138,6 +144,20 @@
   - [ ] テストカバレッジ改善
 - **影響ファイル**: 全体的なクリーンアップ
 - **所要時間**: 1日
+
+### ⏳ ステップ7: LocaleService リファクタリング
+- **状態**: 🔴 未実装
+- **対応問題**: LocaleServiceの設計改善とコード重複削除
+- **作業内容**:
+  - [ ] スーパークラス（LocaleService）のsource情報対応拡張
+  - [ ] 戻り値形式の統一（`[locale, source]`配列形式）
+  - [ ] OAuthLocaleServiceの簡素化（extract_from_sessionのみオーバーライド）
+  - [ ] 重複コードの削除（extract_from_user, extract_from_headerの共通化）
+  - [ ] 後方互換性を保った段階的移行
+  - [ ] テストケースの更新
+- **影響ファイル**: LocaleService、OAuthLocaleService、関連テスト
+- **所要時間**: 1-2日
+- **参照**: `LOCALE_SERVICE_REFACTORING_PLAN.md`参照
 
 ## OAuth認証の特別扱い
 
@@ -177,12 +197,16 @@ OAuth認証は**固定コールバックURL**のため、明示的ロケール�
 - ✅ **ステップ2**: URL戦略変更の準備（2025年6月12日完了）
 - ✅ **ステップ3**: ルーティング構造の修正（明示的ロケール必須化）（2025年6月12日完了）
 - ✅ **ステップ4**: LocaleServiceロジックの簡素化（2025年6月13日完了）
+- ✅ **ステップ5**: UI/UX一貫性の改善 + OAuth改善（2025年6月13日完了）
 
 ### 現在のステップ
-- 🔄 **ステップ5実装待ち**: UI/UX一貫性の改善 + OAuth改善
+- 🔄 **ステップ6実装待ち**: クリーンアップと最適化
+- 🔄 **ステップ7実装待ち**: LocaleService リファクタリング
 
 ### 次回セッションの推奨開始点
-**ステップ5から開始**: UI/UX一貫性の改善 + OAuth改善
+**ステップ6から開始**: クリーンアップと最適化
+または
+**ステップ7から開始**: LocaleService リファクタリング（LOCALE_SERVICE_REFACTORING_PLAN.md参照）
 
 ## 検証基準
 
@@ -193,6 +217,7 @@ OAuth認証は**固定コールバックURL**のため、明示的ロケール�
 4. **ステップ4**: ロケール決定ロジックが単純化される
 5. **ステップ5**: UI/UXが一貫し、OAuth言語引き継ぎが確実になる
 6. **ステップ6**: コードが最適化され、ドキュメントが更新される
+7. **ステップ7**: LocaleServiceが簡潔になり、重複コードが削除される
 
 ### 最終目標
 - 🎯 一貫したURL構造（パスベースのみ）
@@ -209,6 +234,7 @@ OAuth認証は**固定コールバックURL**のため、明示的ロケール�
 - `LOCALE_SYSTEM_REFACTORING_PLAN.md`: 詳細分析と戦略
 - `LOCALE_SYSTEM_REFACTORING_EXECUTION_PLAN.md`: 実行手順
 - `OAUTH_LOCALE_STRATEGY.md`: OAuth特別戦略
+- `LOCALE_SERVICE_REFACTORING_PLAN.md`: LocaleServiceリファクタリング計画（ステップ7用）
 
 ### 重要なファイル群
 ```
