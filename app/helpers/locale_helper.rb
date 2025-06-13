@@ -4,9 +4,9 @@ module LocaleHelper
   module_function
 
   # 現在のパスでロケールを変更したURLを生成
-  def current_path_with_locale(request, locale)
-    path = remove_locale_prefix(request.path)
-    add_locale_prefix(path, locale)
+  def current_path_with_locale(path, locale)
+    path_without_locale = remove_locale_prefix(path)
+    add_locale_prefix(path_without_locale, locale)
   end
 
   # パスからロケールプレフィックスを削除

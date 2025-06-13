@@ -7,21 +7,18 @@ RSpec.describe LocaleUrlHelper do
   end
 
   describe '.current_path_with_locale_path' do
-    let(:mock_request) { double(path: '/messages', query_string: 'page=2') }
-
     it 'generates path-based locale URL' do
-      result = LocaleUrlHelper.current_path_with_locale_path(mock_request, 'ja')
+      result = LocaleUrlHelper.current_path_with_locale_path('/messages', 'ja')
       expect(result).to eq('/ja/messages')
     end
 
     it 'handles default locale (explicit locale required)' do
-      result = LocaleUrlHelper.current_path_with_locale_path(mock_request, 'en')
+      result = LocaleUrlHelper.current_path_with_locale_path('/messages', 'en')
       expect(result).to eq('/en/messages')
     end
 
     it 'handles root path' do
-      mock_request = double(path: '/', query_string: '')
-      result = LocaleUrlHelper.current_path_with_locale_path(mock_request, 'ja')
+      result = LocaleUrlHelper.current_path_with_locale_path('/', 'ja')
       expect(result).to eq('/ja')
     end
   end

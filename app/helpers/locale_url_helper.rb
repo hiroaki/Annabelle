@@ -4,10 +4,10 @@ module LocaleUrlHelper
   module_function
 
   # ロケールプレフィックス付きのURLを生成
-  # 例: current_path_with_locale_path(request, :ja) => "/ja/messages"
-  def current_path_with_locale_path(request, locale)
-    path = LocaleHelper.remove_locale_prefix(request.path)
-    LocaleHelper.add_locale_prefix(path, locale)
+  # 例: current_path_with_locale_path('/messages', :ja) => "/ja/messages"
+  def current_path_with_locale_path(path, locale)
+    path_without_locale = LocaleHelper.remove_locale_prefix(path)
+    LocaleHelper.add_locale_prefix(path_without_locale, locale)
   end
 
 

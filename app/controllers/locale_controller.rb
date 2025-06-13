@@ -1,5 +1,3 @@
-require 'ostruct'
-
 class LocaleController < ApplicationController
   def update
     locale = params[:locale].to_s
@@ -12,8 +10,7 @@ class LocaleController < ApplicationController
                         end
       
       # LocaleHelperを使用してパスベースロケールURLを生成
-      mock_request = OpenStruct.new(path: redirect_to_path, query_string: '')
-      redirect_path = LocaleHelper.current_path_with_locale(mock_request, locale)
+      redirect_path = LocaleHelper.current_path_with_locale(redirect_to_path, locale)
       redirect_to redirect_path
     else
       redirect_back(fallback_location: root_path, alert: "Unsupported locale")

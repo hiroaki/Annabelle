@@ -7,34 +7,28 @@ RSpec.describe LocaleHelper do
   end
 
   describe '.current_path_with_locale' do
-    let(:mock_request) { double(path: '/messages', query_string: 'page=2') }
-
     it 'generates path-based locale URL for non-default locale' do
-      result = LocaleHelper.current_path_with_locale(mock_request, 'ja')
+      result = LocaleHelper.current_path_with_locale('/messages', 'ja')
       expect(result).to eq('/ja/messages')
     end
 
     it 'generates default locale URL with prefix' do
-      mock_request = double(path: '/messages', query_string: 'page=2')
-      result = LocaleHelper.current_path_with_locale(mock_request, 'en')
+      result = LocaleHelper.current_path_with_locale('/messages', 'en')
       expect(result).to eq('/en/messages')
     end
 
     it 'handles path with existing locale prefix' do
-      mock_request = double(path: '/ja/messages', query_string: '')
-      result = LocaleHelper.current_path_with_locale(mock_request, 'en')
+      result = LocaleHelper.current_path_with_locale('/ja/messages', 'en')
       expect(result).to eq('/en/messages')
     end
 
     it 'handles root path correctly' do
-      mock_request = double(path: '/', query_string: '')
-      result = LocaleHelper.current_path_with_locale(mock_request, 'ja')
+      result = LocaleHelper.current_path_with_locale('/', 'ja')
       expect(result).to eq('/ja')
     end
 
     it 'handles root path for default locale' do
-      mock_request = double(path: '/', query_string: '')
-      result = LocaleHelper.current_path_with_locale(mock_request, 'en')
+      result = LocaleHelper.current_path_with_locale('/', 'en')
       expect(result).to eq('/en')
     end
   end
