@@ -94,8 +94,8 @@ RSpec.describe 'OmniauthCallbacks', type: :request do
         allow(User).to receive(:from_omniauth).and_return(user)
 
         # セッションベースの設定のテスト
-        # OAuthコールバックでセッションからロケールを復元することをモック
-        allow_any_instance_of(Users::OmniauthCallbacksController).to receive(:restore_oauth_locale_from_session).and_return('ja')
+        # OAuthLocaleServiceのrestore_oauth_locale_from_sessionメソッドをモック
+        allow_any_instance_of(OAuthLocaleService).to receive(:restore_oauth_locale_from_session).and_return('ja')
 
         get user_github_omniauth_callback_path
 
@@ -160,6 +160,66 @@ RSpec.describe 'OmniauthCallbacks', type: :request do
 
         # 新規ユーザーは編集ページにリダイレクトされる
         expect(response).to redirect_to(edit_user_registration_path(locale: 'ja'))
+      end
+    end
+  end
+
+  describe 'OmniAuthCallbacksController#extract_provider_name_for_error' do
+    let(:controller) { Users::OmniauthCallbacksController.new }
+
+    context 'when error_strategy with name exists' do
+      it 'returns camalized name of the strategy' do
+        # エラー戦略のモックを作成
+        error_strategy = double('OmniAuth::Strategies::Base')
+        allow(error_strategy).to receive(:name).and_return(:github)
+
+        # コントローラーのrequestをモック
+        request = double('request')
+        allow(request).to receive(:env).and_return({"omniauth.error.strategy" => error_strategy})
+        allow(controller).to receive(:request).and_return(request)
+
+        # メソッドを実行して結果を検証
+        result = controller.send(:extract_provider_name_for_error)
+        expect(result).to eq('GitHub') # OmniAuth::Utils.camelize('github')の結果
+      end
+    end
+
+    context 'when error_strategy does not exist' do
+      it 'returns unknown provider message' do
+        # 空のrequestをモック
+        request = double('request')
+        allow(request).to receive(:env).and_return({})
+        allow(controller).to receive(:request).and_return(request)
+
+        # メソッドを実行して結果を検証
+        result = controller.send(:extract_provider_name_for_error)
+        expect(result).to eq(I18n.t('devise.omniauth_callbacks.unknown_provider'))
+      end
+    end
+  end
+
+  describe 'OmniAuthCallbacksController#generate_failure_message' do
+    let(:controller) { Users::OmniauthCallbacksController.new }
+
+    context 'when translation key has all required interpolations' do
+      it 'returns the translated message with provider' do
+        allow(I18n).to receive(:t).with("devise.omniauth_callbacks.failure", kind: "GitHub").and_return("Could not authenticate you from GitHub")
+
+        result = controller.send(:generate_failure_message, "GitHub")
+        expect(result).to eq("Could not authenticate you from GitHub")
+        expect(I18n).to have_received(:t).with("devise.omniauth_callbacks.failure", kind: "GitHub")
+      end
+    end
+
+    context 'when MissingInterpolationArgument exception occurs' do
+      it 'returns the fallback message' do
+        # 例外をスローするように設定
+        allow(I18n).to receive(:t).with("devise.omniauth_callbacks.failure", kind: "GitHub").and_raise(I18n::MissingInterpolationArgument.new("key", "string", "values"))
+        allow(I18n).to receive(:t).with("devise.omniauth_callbacks.failure_fallback").and_return("Authentication failed")
+
+        result = controller.send(:generate_failure_message, "GitHub")
+        expect(result).to eq("Authentication failed")
+        expect(I18n).to have_received(:t).with("devise.omniauth_callbacks.failure_fallback")
       end
     end
   end
