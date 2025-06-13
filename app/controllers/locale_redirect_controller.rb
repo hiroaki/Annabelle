@@ -5,7 +5,7 @@ class LocaleRedirectController < ApplicationController
   # ルートパス (/) へのアクセス時に適切なロケール付きURLにリダイレクト
   def root
     # LocaleServiceを使用してロケールを決定
-    locale_service = LocaleService.new(self)
+    locale_service = LocaleService.new(self, current_user)
     effective_locale = locale_service.determine_effective_locale
     
     # リダイレクト前にI18n.localeを設定（flashメッセージの言語統一のため）

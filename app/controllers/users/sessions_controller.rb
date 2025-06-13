@@ -26,7 +26,7 @@ class Users::SessionsController < Devise::SessionsController
 
   def store_language_for_logout
     # 現在の言語設定を一時的に保存
-    # ステップ4: langパラメータを削除し、localeパラメータを使用
+    # langパラメータを削除し、localeパラメータを使用
     # 1. URLパラメータのlocale（明示的ロケール必須化により常に存在）
     # 2. 現在のI18n.locale
     # 3. ユーザーの設定言語

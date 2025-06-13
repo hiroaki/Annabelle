@@ -1,5 +1,5 @@
 # ロケール関連のURL生成を統一するヘルパーモジュール
-# ステップ2: URL戦略の統一化とヘルパーメソッドの整備
+# URL戦略の統一化とヘルパーメソッドの整備
 module LocaleUrlHelper
   module_function
 
@@ -10,7 +10,7 @@ module LocaleUrlHelper
     LocaleHelper.add_locale_prefix(path, locale)
   end
 
-  # ステップ4: クエリパラメータベースを削除し、パスベースに統一
+  # パスベースURL戦略に統一
   # 後方互換性のため、パスベースURL生成にリダイレクト
   def current_path_with_locale_query(request, locale)
     current_path_with_locale_path(request, locale)
@@ -23,7 +23,7 @@ module LocaleUrlHelper
 
   # パスベースロケールを使用するかどうかの判定
   def use_path_based_locale?
-    # ステップ3で実装予定: 環境変数やconfigで制御
+    # パスベースロケール戦略有効時の判定（環境変数やconfigで制御）
     return false unless Rails.application.config.respond_to?(:x)
     return false unless Rails.application.config.x.respond_to?(:use_path_based_locale)
 

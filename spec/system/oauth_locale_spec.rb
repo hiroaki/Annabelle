@@ -77,7 +77,6 @@ RSpec.describe 'OAuth Language Processing', type: :system, js: true do
       end
     end
 
-    # TODO: 見直しが必要です（ロケールの選択ロジックについて全体的に）
     context 'when existing user uses OAuth authentication' do
       let!(:existing_user) { create(:user, email: "existing_oauth@example.com", preferred_language: '') }
 
@@ -94,7 +93,6 @@ RSpec.describe 'OAuth Language Processing', type: :system, js: true do
       end
     end
 
-    # TODO: 見直しが必要です（ロケールの選択ロジックについて全体的に）
     context 'when existing user with Japanese preference uses OAuth from English page' do
       let!(:existing_user) { create(:user, email: "existing_oauth_en@example.com", preferred_language: 'ja') }
 

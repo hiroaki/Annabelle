@@ -5,13 +5,11 @@ RSpec.describe LocaleService do
   let(:params) { {} }
   let(:request) { double('Request', env: {}) }
   let(:current_user) { nil }
-  let(:service) { described_class.new(controller) }
+  let(:service) { described_class.new(controller, current_user) }
 
   before do
     allow(controller).to receive(:params).and_return(params)
     allow(controller).to receive(:request).and_return(request)
-    allow(controller).to receive(:current_user).and_return(current_user)
-    allow(controller).to receive(:respond_to?).with(:current_user).and_return(true)
     
     # LocaleConfigurationから動的に設定を取得
     I18n.default_locale = LocaleConfiguration.default_locale
@@ -22,68 +20,68 @@ RSpec.describe LocaleService do
     context 'when user has valid preferred_language' do
       let(:user) { double(preferred_language: 'ja') }
 
-      it 'returns the user locale' do
-        expect(service.extract_from_user(user)).to eq('ja')
+      it 'returns the user locale with source' do
+        expect(service.extract_from_user(user)).to eq({ locale: 'ja', source: LocaleService::SOURCE_USER_PREFERENCE })
       end
     end
 
     context 'when user has invalid preferred_language' do
       let(:user) { double(preferred_language: 'invalid') }
 
-      it 'returns nil' do
-        expect(service.extract_from_user(user)).to be_nil
+      it 'returns nil values' do
+        expect(service.extract_from_user(user)).to eq({ locale: nil, source: nil })
       end
     end
 
     context 'when user preferred_language is blank' do
       let(:user) { double(preferred_language: '') }
 
-      it 'returns nil' do
-        expect(service.extract_from_user(user)).to be_nil
+      it 'returns nil values' do
+        expect(service.extract_from_user(user)).to eq({ locale: nil, source: nil })
       end
     end
 
     context 'when user is nil' do
-      it 'returns nil' do
-        expect(service.extract_from_user(nil)).to be_nil
+      it 'returns nil values' do
+        expect(service.extract_from_user(nil)).to eq({ locale: nil, source: nil })
       end
     end
   end
 
   describe '#extract_from_header' do
     context 'with valid accept language header' do
-      it 'extracts ja from Japanese header' do
+      it 'extracts ja from Japanese header with source' do
         header = 'ja,en-US;q=0.9,en;q=0.8'
-        expect(service.extract_from_header(header)).to eq('ja')
+        expect(service.extract_from_header(header)).to eq({ locale: 'ja', source: LocaleService::SOURCE_BROWSER_HEADER })
       end
 
-      it 'extracts en from English header' do
+      it 'extracts en from English header with source' do
         header = 'en-US,en;q=0.9'
-        expect(service.extract_from_header(header)).to eq('en')
+        expect(service.extract_from_header(header)).to eq({ locale: 'en', source: LocaleService::SOURCE_BROWSER_HEADER })
       end
     end
 
     context 'with invalid accept language header' do
-      it 'returns nil for completely unsupported locales' do
+      it 'returns nil values for completely unsupported locales' do
         header = 'fr,de,zh-CN'
-        expect(service.extract_from_header(header)).to be_nil
+        expect(service.extract_from_header(header)).to eq({ locale: nil, source: nil })
       end
 
-      it 'returns supported locale even when unsupported ones are present' do
+      it 'returns supported locale with source even when unsupported ones are present' do
         header = 'fr,en-US;q=0.9,en;q=0.8'
-        expect(service.extract_from_header(header)).to eq('en')
+        expect(service.extract_from_header(header)).to eq({ locale: 'en', source: LocaleService::SOURCE_BROWSER_HEADER })
       end
 
-      it 'respects quality values and returns highest priority supported locale' do
+      it 'respects quality values and returns highest priority supported locale with source' do
         header = 'fr;q=0.9,ja;q=0.8,en;q=0.7'
-        expect(service.extract_from_header(header)).to eq('ja')
+        expect(service.extract_from_header(header)).to eq({ locale: 'ja', source: LocaleService::SOURCE_BROWSER_HEADER })
       end
     end
 
     context 'with blank header' do
-      it 'returns nil' do
-        expect(service.extract_from_header('')).to be_nil
-        expect(service.extract_from_header(nil)).to be_nil
+      it 'returns nil values' do
+        expect(service.extract_from_header('')).to eq({ locale: nil, source: nil })
+        expect(service.extract_from_header(nil)).to eq({ locale: nil, source: nil })
       end
     end
   end

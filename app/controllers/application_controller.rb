@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   before_action :conditional_auto_login
 
   # URLヘルパーに自動的にロケールパラメータを追加
-  # ステップ3: 明示的ロケール必須化対応
+  # 明示的ロケール必須化対応
   def default_url_options
     if use_path_based_locale?
       # パスベース方式: /ja/users (ロケールは必須)
@@ -31,7 +31,7 @@ class ApplicationController < ActionController::Base
 
   # ロケール処理を担当するサービスオブジェクト
   def locale_service
-    @locale_service ||= LocaleService.new(self)
+    @locale_service ||= LocaleService.new(self, current_user)
   end
 
   # パスベースロケールを使用するかどうかの判定（ステップ2追加）
