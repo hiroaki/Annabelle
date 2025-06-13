@@ -4,7 +4,6 @@ class LocaleController < ApplicationController
   def update
     locale = params[:locale].to_s
     if LocaleValidator.valid_locale?(locale)
-      # パスベースロケール戦略に変更
       # refererから現在のパスを取得し、新しいロケール付きパスにリダイレクト
       if request.referer
         referer_uri = URI(request.referer)

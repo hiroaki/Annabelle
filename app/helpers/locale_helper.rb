@@ -3,22 +3,10 @@
 module LocaleHelper
   module_function
 
-  # 現在のパスでロケールを変更したURLを生成（パスベース戦略）
+  # 現在のパスでロケールを変更したURLを生成
   def current_path_with_locale(request, locale)
     path = remove_locale_prefix(request.path)
-
-    # パスベースロケール戦略に統一
-    if locale.to_s == LocaleConfiguration.default_locale.to_s
-      # デフォルトロケールの場合はプレフィックスなし
-      path.empty? ? '/' : path
-    else
-      # 非デフォルトロケールの場合はプレフィックス付き
-      if path.empty? || path == '/'
-        "/#{locale}"
-      else
-        "/#{locale}#{path}"
-      end
-    end
+    add_locale_prefix(path, locale)
   end
 
   # パスからロケールプレフィックスを削除
@@ -42,7 +30,6 @@ module LocaleHelper
 
   # パスにロケールプレフィックスを追加
   def add_locale_prefix(path, locale)
-    # 明示的ロケール必須化により、全てのロケールでプレフィックスを追加
     clean_path = remove_locale_prefix(path)
     clean_path = '/' if clean_path.blank?
 

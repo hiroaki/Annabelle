@@ -14,16 +14,16 @@ RSpec.describe LocaleHelper do
       expect(result).to eq('/ja/messages')
     end
 
-    it 'generates default locale URL without prefix' do
+    it 'generates default locale URL with prefix' do
       mock_request = double(path: '/messages', query_string: 'page=2')
       result = LocaleHelper.current_path_with_locale(mock_request, 'en')
-      expect(result).to eq('/messages')
+      expect(result).to eq('/en/messages')
     end
 
     it 'handles path with existing locale prefix' do
       mock_request = double(path: '/ja/messages', query_string: '')
       result = LocaleHelper.current_path_with_locale(mock_request, 'en')
-      expect(result).to eq('/messages')
+      expect(result).to eq('/en/messages')
     end
 
     it 'handles root path correctly' do
@@ -35,7 +35,7 @@ RSpec.describe LocaleHelper do
     it 'handles root path for default locale' do
       mock_request = double(path: '/', query_string: '')
       result = LocaleHelper.current_path_with_locale(mock_request, 'en')
-      expect(result).to eq('/')
+      expect(result).to eq('/en')
     end
   end
 
