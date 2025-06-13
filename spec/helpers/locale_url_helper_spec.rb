@@ -26,16 +26,7 @@ RSpec.describe LocaleUrlHelper do
     end
   end
 
-  describe '.current_path_with_locale_unified' do
-    let(:mock_request) { double(path: '/messages', query_string: 'page=2') }
 
-    context 'after step 4: unified to path-based strategy' do
-      it 'uses path-based approach' do
-        result = LocaleUrlHelper.current_path_with_locale_unified(mock_request, 'ja')
-        expect(result).to eq('/ja/messages')
-      end
-    end
-  end
 
   describe '.localized_path_for' do
     before do

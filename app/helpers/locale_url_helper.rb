@@ -10,24 +10,7 @@ module LocaleUrlHelper
     LocaleHelper.add_locale_prefix(path, locale)
   end
 
-  # 標準のURL生成メソッド
-  def current_path_with_locale_unified(request, locale)
-    current_path_with_locale_path(request, locale)
-  end
 
-  # 言語切り替えリンク生成（ビューで使用）
-  def locale_switch_link_to(text, locale, request, options = {})
-    url = current_path_with_locale_unified(request, locale)
-    css_classes = base_link_classes(locale, options[:class])
-
-    # このメソッドはビューから呼ばれることを前提とし、単純にURLとクラスを返す
-    {
-      text: text,
-      url: url,
-      class: css_classes,
-      options: options.except(:class)
-    }
-  end
 
   # ロケール付きパスの生成（コントローラーで使用）
   def localized_path_for(path_symbol, locale = nil, **options)

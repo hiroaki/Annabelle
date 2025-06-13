@@ -1,8 +1,12 @@
 <%# Show current locale and provide links to change it %>
 <div class="language-switcher flex items-center space-x-2" data-turbo="false">
-  <% ja_link = LocaleUrlHelper.current_path_with_locale_unified(request, :ja) %>
-  <% en_link = LocaleUrlHelper.current_path_with_locale_unified(request, :en) %>
-  <%= link_to_unless_current "日本語", ja_link, class: "hover:text-slate-600 #{I18n.locale == :ja ? 'font-bold' : ''}" %>
+  <%
+    # 現在のパスを明示的にリダイレクト先として指定
+    current_path = request.path
+    ja_class = "hover:text-slate-600 #{I18n.locale == :ja ? 'font-bold' : ''}"
+    en_class = "hover:text-slate-600 #{I18n.locale == :en ? 'font-bold' : ''}"
+  %>
+  <%= link_to_unless_current "日本語", locale_path(locale: "ja", redirect_to: current_path), class: ja_class %>
   <span>|</span>
-  <%= link_to_unless_current "English", en_link, class: "hover:text-slate-600 #{I18n.locale == :en ? 'font-bold' : ''}" %>
+  <%= link_to_unless_current "English", locale_path(locale: "en", redirect_to: current_path), class: en_class %>
 </div>
