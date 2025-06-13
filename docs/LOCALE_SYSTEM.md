@@ -1,4 +1,7 @@
-# Locale System / ロケールシステム
+# Locale System / ロケールシステム (改修前の状態)
+
+⚠️ **重要**: このドキュメントは改修前の現在のシステムを記録したものです。
+改修計画については `LOCALE_REFACTORING_MASTER_PLAN.md` を参照してください。
 
 This document explains the locale system architecture and usage rules for developers.
 

@@ -3,7 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe 'OAuth Language Processing', type: :system, js: true do
-  # TODO: 見直しが必要です（ロケールの選択ロジックについて全体的に）
   describe 'ログアウト後の言語保持' do
     let!(:user) { create(:user, preferred_language: 'ja') }
 

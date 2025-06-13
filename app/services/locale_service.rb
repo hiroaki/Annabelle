@@ -1,14 +1,19 @@
 # ロケール関連の処理を集約するサービスクラス
-# 主にコントローラーで利用される、ロケール決定とリダイレクト処理を担当
+# ロケール決定、言語切替、リダイレクト処理を担当
 class LocaleService
+  SOURCE_USER_PREFERENCE = :user_preference
+  SOURCE_BROWSER_HEADER  = :browser_header
+  SOURCE_OMNIAUTH_PARAMS = :omniauth_params
+  SOURCE_SESSION         = :session
+  SOURCE_DEFAULT         = :default
+
   attr_reader :controller, :params, :request, :current_user
 
-  # コントローラーのコンテキストを受け取るコンストラクタ
-  def initialize(controller)
+  def initialize(controller, current_user = nil)
     @controller = controller
     @params = controller.params
     @request = controller.request
-    @current_user = controller.current_user if controller.respond_to?(:current_user)
+    @current_user = current_user
   end
 
   # ロケール設定のメイン処理
@@ -16,65 +21,77 @@ class LocaleService
     I18n.locale = determine_effective_locale(locale)
   end
 
-  # ユーザー設定からロケールを取得（LocaleHelperから移動）
+  # ユーザー設定からロケールを取得
+  # @param user [User, nil] ユーザーオブジェクト（nilの場合は空の結果を返す）
   def extract_from_user(user)
-    return nil unless user&.preferred_language.present?
+    return { locale: nil, source: nil } unless user&.preferred_language.present?
 
-    locale = user.preferred_language
-    LocaleValidator.valid_locale?(locale) ? locale : nil
+    locale = user&.preferred_language
+    if LocaleValidator.valid_locale?(locale)
+      { locale: locale, source: SOURCE_USER_PREFERENCE }
+    else
+      { locale: nil, source: nil }
+    end
   end
 
-  # HTTPヘッダーからロケールを取得（LocaleHelperから移動）
+  # HTTPヘッダーからロケールを取得
   def extract_from_header(accept_language_header)
-    return nil unless accept_language_header.present?
+    return { locale: nil, source: nil } unless accept_language_header.present?
 
     # http_accept_languageを使用してブラウザの言語設定を解析
     parser = HttpAcceptLanguage::Parser.new(accept_language_header)
     
     # 利用可能なロケールから最適なものを選択
-    available_locales = I18n.available_locales.map(&:to_s)
+    available_locales = LocaleConfiguration.available_locales.map(&:to_s)
     preferred_locale = parser.preferred_language_from(available_locales)
     
-    LocaleValidator.valid_locale?(preferred_locale) ? preferred_locale : nil
+    if LocaleValidator.valid_locale?(preferred_locale)
+      { locale: preferred_locale, source: SOURCE_BROWSER_HEADER }
+    else
+      { locale: nil, source: nil }
+    end
   end
 
-  # ユーザー設定に基づいてリダイレクトパスを決定（LocaleHelperから移動）
+  # ユーザー設定に基づいてリダイレクトパスを決定
   def redirect_path_for_user(resource)
-    user_locale = extract_from_user(resource)
+    # フォールバックロケールを使用してリダイレクト先を決定
+    fallback_locale = determine_fallback_locale
 
-    if user_locale && user_locale != I18n.default_locale.to_s
-      # ユーザーの設定言語がデフォルト以外の場合、その言語のrootパスにリダイレクト
-      "/#{user_locale}"
+    if fallback_locale != LocaleConfiguration.default_locale.to_s
+      # デフォルト以外の言語の場合、その言語のrootパスにリダイレクト
+      "/#{fallback_locale}"
     else
-      # デフォルト言語またはユーザー設定がない場合はrootパス（ApplicationControllerで解決）
+      # デフォルト言語の場合はrootパス（ApplicationControllerで解決）
       :root_path
     end
   end
 
   # ロケール決定の優先順位を一元化
+  # 明示的ロケールが必須になったため、ロジックを簡素化
   def determine_effective_locale(locale = nil)
-    # 1. 明示的な引数
+    # 1. 明示的な引数（メソッド呼び出し時の指定）
     return locale.to_s if LocaleValidator.valid_locale?(locale)
 
-    # 2. langクエリパラメータ（一時的な言語切り替え）
-    lang_param = params[:lang]
-    return lang_param.to_s if LocaleValidator.valid_locale?(lang_param)
-
-    # 3. URLパスのlocale（RESTfulなURL）
-    # WARN: localeが省略されたパスの場合はここで決定せずユーザー設定の判定へ。
+    # 2. URLパスのlocale（明示的ロケール必須化により常に存在）
     url_locale = params[:locale]
     return url_locale.to_s if LocaleValidator.valid_locale?(url_locale)
 
-    # 4. ユーザー設定言語
-    user_locale = extract_from_user(current_user)
-    return user_locale if user_locale
+    # 3. フォールバック（リダイレクト処理時やOAuth例外時のみ使用）
+    determine_fallback_locale
+  end
 
-    # 5. ブラウザ設定言語
-    header_locale = extract_from_header(request.env['HTTP_ACCEPT_LANGUAGE'])
-    return header_locale if header_locale
+  # フォールバック用のロケール決定（リダイレクト時やOAuth例外時）
+  def determine_fallback_locale
+    # ユーザー設定 → ブラウザ設定 → デフォルト
+    if current_user
+      result = extract_from_user(current_user)
+      return result[:locale] if result[:locale]
+    end
 
-    # 6. デフォルト言語
-    I18n.default_locale.to_s
+    result = extract_from_header(request.env['HTTP_ACCEPT_LANGUAGE'])
+    return result[:locale] if result[:locale]
+
+    LocaleConfiguration.default_locale.to_s
   end
 
   # ログイン後のリダイレクト先を決定

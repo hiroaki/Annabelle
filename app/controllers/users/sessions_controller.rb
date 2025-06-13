@@ -5,9 +5,7 @@ class Users::SessionsController < Devise::SessionsController
     if: -> { action_name == 'create' && otp_two_factor_enabled? }
 
   protect_from_forgery with: :exception, prepend: true, except: :destroy
-
-  # ログアウト前に言語設定を保存
-  before_action :store_language_for_logout, only: [:destroy]
+  before_action :store_language_for_logout, only: [:destroy]  # ログアウト前に言語設定を保存
 
   # (override)
   # デフォルトの root_path はログインが必須なため、ログイン画面へリダイレクトします。
@@ -28,11 +26,12 @@ class Users::SessionsController < Devise::SessionsController
 
   def store_language_for_logout
     # 現在の言語設定を一時的に保存
-    # 1. URLパラメータのlang
+    # langパラメータを削除し、localeパラメータを使用
+    # 1. URLパラメータのlocale（明示的ロケール必須化により常に存在）
     # 2. 現在のI18n.locale
     # 3. ユーザーの設定言語
-    if params[:lang].present? && LocaleValidator.valid_locale?(params[:lang])
-      session[:logout_locale] = params[:lang]
+    if params[:locale].present? && LocaleValidator.valid_locale?(params[:locale])
+      session[:logout_locale] = params[:locale]
     elsif I18n.locale && I18n.locale != I18n.default_locale
       session[:logout_locale] = I18n.locale.to_s
     elsif user_signed_in? && current_user.preferred_language.present?

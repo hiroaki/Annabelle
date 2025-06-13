@@ -6,8 +6,8 @@ RSpec.describe 'OAuth Language Processing', type: :system, js: true do
   include OmniauthMacros
 
   before do
-    I18n.default_locale = :en
-    allow(I18n).to receive(:available_locales).and_return([:ja, :en])
+    I18n.default_locale = LocaleConfiguration.default_locale
+    allow(I18n).to receive(:available_locales).and_return(LocaleConfiguration.available_locales)
   end
 
   after do
@@ -19,7 +19,7 @@ RSpec.describe 'OAuth Language Processing', type: :system, js: true do
       visit '/ja/users/sign_in'
       expect(page).to have_button('ログイン')
     else
-      visit '/users/sign_in'
+      visit '/en/users/sign_in'
       expect(page).to have_button('Log in')
     end
 
@@ -27,7 +27,8 @@ RSpec.describe 'OAuth Language Processing', type: :system, js: true do
   end
 
   def visit_signin_with_lang_param_and_oauth(lang)
-    visit "/users/sign_in?lang=#{lang}"
+    # 明示的ロケール必須化により、ロケール付きパスでアクセス
+    visit "/#{lang}/users/sign_in"
 
     if lang == 'ja'
       expect(page).to have_button('ログイン')
@@ -76,7 +77,6 @@ RSpec.describe 'OAuth Language Processing', type: :system, js: true do
       end
     end
 
-    # TODO: 見直しが必要です（ロケールの選択ロジックについて全体的に）
     context 'when existing user uses OAuth authentication' do
       let!(:existing_user) { create(:user, email: "existing_oauth@example.com", preferred_language: '') }
 
@@ -93,21 +93,20 @@ RSpec.describe 'OAuth Language Processing', type: :system, js: true do
       end
     end
 
-    # TODO: 見直しが必要です（ロケールの選択ロジックについて全体的に）
     context 'when existing user with Japanese preference uses OAuth from English page' do
       let!(:existing_user) { create(:user, email: "existing_oauth_en@example.com", preferred_language: 'ja') }
 
       it 'displays in English (OAuth context) not Japanese (user preference)' do
         mock_github_auth(uid: "existing_oauth_en_uid", email: existing_user.email)
 
-        # 英語ページからOAuth開始
-        visit '/users/sign_in'
+        # 明示的ロケール必須化により、英語ロケール付きパスでアクセス
+        visit '/en/users/sign_in'
         expect(page).to have_button('Log in')
         find('[data-testid="signin_with_github"]').click
 
         # ログイン後、英語ロケールのルートページに遷移することを確認
         # ユーザー設定(ja)ではなく、OAuth開始時のコンテキスト(en)を優先
-        expect(page).to have_current_path(root_path)  # デフォルト英語
+        expect(page).to have_current_path(root_path(locale: 'en'))  # 明示的に英語ロケール
 
         # 英語表示を確認
         expect(page).to have_content('Post')  # not '投稿'

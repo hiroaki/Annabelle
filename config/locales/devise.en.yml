@@ -29,8 +29,10 @@ en:
       password_change:
         subject: "Password Changed"
     omniauth_callbacks:
-      failure: "Could not authenticate you from %{provider} because of an error. Please try again."
+      failure: "Could not authenticate you from %{kind} because of an error. Please try again."
       success: "Successfully authenticated from %{provider} account."
+      # CSRFエラーなど、providerパラメータが不正な場合のフォールバック
+      failure_fallback: "Could not authenticate you because of an error. Please try again."
       provider:
         already_linked: "This %{provider} account is already linked to another account. Changes have been canceled."
         success: "Successfully linked with %{provider}."

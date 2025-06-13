@@ -2,28 +2,40 @@ require 'rails_helper'
 
 RSpec.describe LocaleHelper do
   before do
-    I18n.default_locale = :en
-    allow(I18n).to receive(:available_locales).and_return([:ja, :en])
+    I18n.default_locale = LocaleConfiguration.default_locale
+    allow(I18n).to receive(:available_locales).and_return(LocaleConfiguration.available_locales)
   end
 
   describe '.current_path_with_locale' do
     let(:mock_request) { double(path: '/messages', query_string: 'page=2') }
 
-    it 'adds lang parameter to URL' do
+    it 'generates path-based locale URL for non-default locale' do
       result = LocaleHelper.current_path_with_locale(mock_request, 'ja')
-      expect(result).to eq('/messages?lang=ja&page=2')
+      expect(result).to eq('/ja/messages')
     end
 
-    it 'replaces existing lang parameter' do
-      mock_request = double(path: '/messages', query_string: 'lang=en&page=2')
-      result = LocaleHelper.current_path_with_locale(mock_request, 'ja')
-      expect(result).to eq('/messages?lang=ja&page=2')
+    it 'generates default locale URL without prefix' do
+      mock_request = double(path: '/messages', query_string: 'page=2')
+      result = LocaleHelper.current_path_with_locale(mock_request, 'en')
+      expect(result).to eq('/messages')
     end
 
-    it 'handles path with locale prefix' do
+    it 'handles path with existing locale prefix' do
       mock_request = double(path: '/ja/messages', query_string: '')
       result = LocaleHelper.current_path_with_locale(mock_request, 'en')
-      expect(result).to eq('/messages?lang=en')
+      expect(result).to eq('/messages')
+    end
+
+    it 'handles root path correctly' do
+      mock_request = double(path: '/', query_string: '')
+      result = LocaleHelper.current_path_with_locale(mock_request, 'ja')
+      expect(result).to eq('/ja')
+    end
+
+    it 'handles root path for default locale' do
+      mock_request = double(path: '/', query_string: '')
+      result = LocaleHelper.current_path_with_locale(mock_request, 'en')
+      expect(result).to eq('/')
     end
   end
 
@@ -58,8 +70,8 @@ RSpec.describe LocaleHelper do
       expect(LocaleHelper.add_locale_prefix('/', 'ja')).to eq('/ja')
     end
 
-    it 'does not add default locale prefix' do
-      expect(LocaleHelper.add_locale_prefix('/messages', 'en')).to eq('/messages')
+    it 'adds default locale prefix (explicit locale required)' do
+      expect(LocaleHelper.add_locale_prefix('/messages', 'en')).to eq('/en/messages')
     end
   end
 
@@ -73,6 +85,124 @@ RSpec.describe LocaleHelper do
     it 'returns false for normal paths' do
       expect(LocaleHelper.skip_locale_redirect?('/messages')).to be false
       expect(LocaleHelper.skip_locale_redirect?('/users/sign_in')).to be false
+    end
+  end
+
+  describe '.prepare_oauth_locale_params' do
+    let(:session) { {} }
+    let(:current_time) { Time.current }
+
+    before do
+      allow(Time).to receive(:current).and_return(current_time)
+      allow(I18n).to receive(:locale).and_return(:en)
+      allow(I18n).to receive(:default_locale).and_return(:en)
+    end
+
+    context 'with locale parameter' do
+      it 'includes lang parameter for non-default locale' do
+        params = { locale: 'ja' }
+        result = LocaleHelper.prepare_oauth_locale_params(params, session)
+
+        expect(result[:lang]).to eq('ja')
+        expect(session[:oauth_locale]).to eq('ja')
+        expect(session[:oauth_locale_timestamp]).to eq(current_time.to_i)
+      end
+
+      it 'omits lang parameter for default locale' do
+        params = { locale: 'en' }
+        result = LocaleHelper.prepare_oauth_locale_params(params, session)
+
+        expect(result[:lang]).to be_nil
+        expect(session[:oauth_locale]).to eq('en')
+        expect(session[:oauth_locale_timestamp]).to eq(current_time.to_i)
+      end
+
+      it 'validates locale before including and falls back to I18n.locale' do
+        params = { locale: 'invalid' }
+        result = LocaleHelper.prepare_oauth_locale_params(params, session)
+
+        expect(result[:lang]).to be_nil
+        expect(session[:oauth_locale]).to eq('en') # falls back to I18n.locale
+        expect(session[:oauth_locale_timestamp]).to eq(current_time.to_i)
+      end
+    end
+
+    context 'with lang parameter (backward compatibility)' do
+      it 'uses lang parameter when locale is not present' do
+        params = { lang: 'ja' }
+        result = LocaleHelper.prepare_oauth_locale_params(params, session)
+
+        expect(result[:lang]).to eq('ja')
+        expect(session[:oauth_locale]).to eq('en') # falls back to I18n.locale
+        expect(session[:oauth_locale_timestamp]).to eq(current_time.to_i)
+      end
+
+      it 'prioritizes locale over lang parameter' do
+        params = { locale: 'ja', lang: 'fr' }
+        result = LocaleHelper.prepare_oauth_locale_params(params, session)
+
+        expect(result[:lang]).to eq('ja')
+        expect(session[:oauth_locale]).to eq('ja')
+        expect(session[:oauth_locale_timestamp]).to eq(current_time.to_i)
+      end
+
+      it 'validates lang parameter' do
+        params = { lang: 'invalid' }
+        result = LocaleHelper.prepare_oauth_locale_params(params, session)
+
+        expect(result[:lang]).to be_nil
+        expect(session[:oauth_locale]).to eq('en') # falls back to I18n.locale
+        expect(session[:oauth_locale_timestamp]).to eq(current_time.to_i)
+      end
+    end
+
+    context 'without locale parameters' do
+      it 'uses current I18n locale for session storage' do
+        allow(I18n).to receive(:locale).and_return(:ja)
+        params = {}
+        result = LocaleHelper.prepare_oauth_locale_params(params, session)
+
+        expect(result[:lang]).to eq('ja')
+        expect(session[:oauth_locale]).to eq('ja')
+        expect(session[:oauth_locale_timestamp]).to eq(current_time.to_i)
+      end
+
+      it 'omits lang parameter when current locale is default' do
+        allow(I18n).to receive(:locale).and_return(:en)
+        params = {}
+        result = LocaleHelper.prepare_oauth_locale_params(params, session)
+
+        expect(result[:lang]).to be_nil
+        expect(session[:oauth_locale]).to eq('en')
+        expect(session[:oauth_locale_timestamp]).to eq(current_time.to_i)
+      end
+    end
+
+    context 'session handling' do
+      it 'stores valid locale in session with timestamp' do
+        params = { locale: 'ja' }
+        LocaleHelper.prepare_oauth_locale_params(params, session)
+
+        expect(session[:oauth_locale]).to eq('ja')
+        expect(session[:oauth_locale_timestamp]).to eq(current_time.to_i)
+      end
+
+      it 'stores fallback locale when invalid locale provided' do
+        params = { locale: 'invalid' }
+        LocaleHelper.prepare_oauth_locale_params(params, session)
+
+        expect(session[:oauth_locale]).to eq('en') # falls back to I18n.locale
+        expect(session[:oauth_locale_timestamp]).to eq(current_time.to_i)
+      end
+
+      it 'stores fallback locale when no valid parameter provided' do
+        allow(I18n).to receive(:locale).and_return(:ja)
+        params = { locale: 'invalid' }
+        LocaleHelper.prepare_oauth_locale_params(params, session)
+
+        expect(session[:oauth_locale]).to eq('ja')
+        expect(session[:oauth_locale_timestamp]).to eq(current_time.to_i)
+      end
     end
   end
 end

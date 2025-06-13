@@ -33,7 +33,9 @@ module Annabelle
     ActiveRecord::SessionStore::Session.serializer = :json
 
     # rails-i18n (gem) settings
+    # デフォルトは既存の設定を保持し、初期化時に動的に設定
     config.i18n.available_locales = [:en, :ja]
+    config.i18n.default_locale = :en
 
     # Use environment variable to select image processing backend (mini_magick or vips)
     valid_processors = [:mini_magick, :vips]
@@ -46,6 +48,9 @@ module Annabelle
 
     # My experimental feature
     config.x.auto_login = config_for(Rails.root.join('config/x/auto_login.yml'))
+
+    # ステップ3: 明示的ロケール必須化 - パスベースロケールを有効化
+    config.x.use_path_based_locale = true
   end
 
   # Set default_url_options For Entire Application

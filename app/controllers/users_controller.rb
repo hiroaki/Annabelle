@@ -62,8 +62,8 @@ class UsersController < ApplicationController
       new_preferred_language
     else
       # 未選択（""）の場合はブラウザ設定に従う
-      header_locale = locale_service.extract_from_header(request.env['HTTP_ACCEPT_LANGUAGE'])
-      header_locale || I18n.default_locale.to_s
+      result = locale_service.extract_from_header(request.env['HTTP_ACCEPT_LANGUAGE'])
+      result[:locale] || I18n.default_locale.to_s
     end
   end
 

@@ -5,32 +5,32 @@ RSpec.describe LocaleController, type: :request do
 
   describe "GET /locale/:locale" do
     context "from root path" do
-      it "redirects to root with lang parameter for Japanese" do
+      it "redirects to root with Japanese locale prefix" do
         get locale_path(locale: 'ja')
 
-        expect(response).to redirect_to("/?lang=ja")
+        expect(response).to redirect_to("/ja")
       end
 
-      it "redirects to root with lang parameter for English" do
+      it "redirects to root without prefix for English (default locale)" do
         get locale_path(locale: 'en')
 
-        expect(response).to redirect_to("/?lang=en")
+        expect(response).to redirect_to("/")
       end
     end
 
     context "from other paths" do
-      it "preserves the current path and adds lang parameter" do
+      it "preserves the current path with Japanese locale prefix" do
         # /messages にいるときに日本語に切り替える場合
         get locale_path(locale: 'ja'), env: { 'HTTP_REFERER' => 'http://www.example.com/messages' }
 
-        expect(response).to redirect_to("/messages?lang=ja")
+        expect(response).to redirect_to("/ja/messages")
       end
 
-      it "handles paths with existing query parameters" do
-        # クエリパラメータがある場合
-        get locale_path(locale: 'en'), env: { 'HTTP_REFERER' => 'http://www.example.com/users?page=2' }
+      it "handles paths with English (default) locale" do
+        # パスベースロケール戦略: デフォルトロケールはプレフィックスなし
+        get locale_path(locale: 'en'), env: { 'HTTP_REFERER' => 'http://www.example.com/ja/users' }
 
-        expect(response).to redirect_to("/users?lang=en&page=2")
+        expect(response).to redirect_to("/users")
       end
     end
 
