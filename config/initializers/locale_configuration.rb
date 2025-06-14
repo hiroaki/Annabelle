@@ -13,12 +13,7 @@ Rails.application.config.after_initialize do
   # 設定が正常に読み込まれたことをログに出力
   Rails.logger.info "[LocaleConfig] Available locales: #{LocaleConfiguration.available_locales}"
   Rails.logger.info "[LocaleConfig] Default locale: #{LocaleConfiguration.default_locale}"
-  
-  # 開発環境では設定の自動リロードを有効にする
-  if Rails.env.development?
-    Rails.logger.info "[LocaleConfig] Development mode: Auto-reload enabled"
-  end
-  
+
   # I18n設定との整合性をチェック
   if I18n.available_locales.sort != LocaleConfiguration.available_locales.sort
     Rails.logger.warn "[LocaleConfig] Mismatch detected between I18n.available_locales and LocaleConfiguration.available_locales"

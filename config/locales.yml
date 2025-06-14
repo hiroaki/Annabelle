@@ -17,8 +17,3 @@ locales:
       name: "Japanese"
       native_name: "日本語"
       direction: ltr
-
-# キャッシュ設定
-cache:
-  enabled: true
-  ttl: 3600  # 1時間（秒）

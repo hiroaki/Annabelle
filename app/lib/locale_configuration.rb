@@ -1,12 +1,10 @@
 # 外部化されたロケール設定を管理するクラス
-# YAMLファイルからの読み込みとキャッシュ機能を提供
+# YAMLファイルからの読み込みと設定へのアクセスを提供
 class LocaleConfiguration
   include Singleton
 
   def initialize
-    @config_cache = {}
-    @cache_timestamp = nil
-    reload_config!
+    load_config
   end
 
   # 利用可能なロケール一覧を取得
@@ -29,91 +27,66 @@ class LocaleConfiguration
     instance.locale_native_name(locale)
   end
 
-  # 設定の強制リロード
-  def self.reload!
-    instance.reload_config!
-  end
-
-  # キャッシュが有効か確認
-  def self.cache_valid?
-    instance.cache_valid?
-  end
-
   def available_locales
-    ensure_cache_valid!
-    @config_cache[:available_locales] ||= begin
-      config_data.dig('locales', 'available')&.map(&:to_sym) || [:en, :ja]
-    end
+    @available_locales ||= @config.dig('locales', 'available').map(&:to_sym)
   end
 
   def default_locale
-    ensure_cache_valid!
-    @config_cache[:default_locale] ||= begin
-      default = config_data.dig('locales', 'default')
-      default ? default.to_sym : :en
-    end
+    @default_locale ||= @config.dig('locales', 'default').to_sym
   end
 
   def locale_name(locale)
-    ensure_cache_valid!
     locale_str = locale.to_s
-    config_data.dig('locales', 'metadata', locale_str, 'name') || locale_str.capitalize
+    metadata = @config.dig('locales', 'metadata', locale_str)
+    
+    if metadata && metadata['name']
+      metadata['name']
+    else
+      # 未知のロケールは大文字で始まるように（互換性維持）
+      locale_str.capitalize
+    end
   end
 
   def locale_native_name(locale)
-    ensure_cache_valid!
     locale_str = locale.to_s
-    config_data.dig('locales', 'metadata', locale_str, 'native_name') || locale_name(locale)
-  end
-
-  def reload_config!
-    @config_cache.clear
-    @cache_timestamp = Time.current
-    config_data(force_reload: true)
-    Rails.logger.info "[LocaleConfiguration] Configuration reloaded at #{@cache_timestamp}"
-  end
-
-  def cache_valid?
-    return false unless @cache_timestamp
+    metadata = @config.dig('locales', 'metadata', locale_str)
     
-    cache_ttl = config_data.dig('cache', 'ttl') || 3600
-    Time.current - @cache_timestamp < cache_ttl.seconds
+    if metadata && metadata['native_name']
+      metadata['native_name']
+    else
+      # 代替としてロケール名を返す（互換性維持）
+      locale_name(locale)
+    end
   end
 
   private
 
-  def ensure_cache_valid!
-    reload_config! unless cache_valid?
-  end
-
-  def config_data(force_reload: false)
-    if force_reload || @config_data.nil?
-      config_path = Rails.root.join('config', 'locales.yml')
-      if config_path.exist?
-        @config_data = YAML.load_file(config_path)
-        Rails.logger.debug "[LocaleConfiguration] Loaded config from #{config_path}"
-      else
-        Rails.logger.warn "[LocaleConfiguration] Config file not found at #{config_path}, using defaults"
-        @config_data = default_config
-      end
+  def load_config
+    config_path = Rails.root.join('config', 'locales.yml')
+    unless config_path.exist?
+      raise "Configuration file not found: #{config_path}. Please ensure 'config/locales.yml' exists."
     end
-    @config_data
+    
+    @config = YAML.load_file(config_path)
+    
+    # 必須の設定キーが存在するか検証
+    validate_config!
+    
+    Rails.logger.debug "[LocaleConfiguration] Loaded config from #{config_path}"
   end
-
-  def default_config
-    {
-      'locales' => {
-        'default' => 'en',
-        'available' => ['en', 'ja'],
-        'metadata' => {
-          'en' => { 'name' => 'English', 'native_name' => 'English' },
-          'ja' => { 'name' => 'Japanese', 'native_name' => '日本語' }
-        }
-      },
-      'cache' => {
-        'enabled' => true,
-        'ttl' => 3600
-      }
-    }
+  
+  # 最低限必要な設定が含まれているか検証
+  def validate_config!
+    unless @config.dig('locales', 'available').is_a?(Array) && !@config.dig('locales', 'available').empty?
+      raise "Missing or invalid 'locales.available' setting in config/locales.yml"
+    end
+    
+    unless @config.dig('locales', 'default').is_a?(String)
+      raise "Missing or invalid 'locales.default' setting in config/locales.yml"
+    end
+    
+    unless @config.dig('locales', 'metadata').is_a?(Hash)
+      raise "Missing or invalid 'locales.metadata' setting in config/locales.yml"
+    end
   end
 end
