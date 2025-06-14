@@ -120,4 +120,23 @@ class LocaleService
   def current_path_with_locale(locale)
     LocaleHelper.current_path_with_locale(request.path, locale)
   end
+
+  # 指定URLにロケールを付与したURLを返す
+  # パス操作はヘルパーに委譲し、ロケール決定のみサービスで担当
+  def add_locale_to_url(url, locale = nil)
+    locale ||= determine_effective_locale
+    return url if locale.nil? || locale.empty?
+
+    if url.start_with?('http')
+      uri = URI.parse(url)
+      path = uri.path
+      # 既にロケールが付与されていればそのまま返す
+      return url if path.match(%r{^/[a-z]{2}/})
+      uri.path = LocaleHelper.add_locale_prefix(LocaleHelper.remove_locale_prefix(path), locale)
+      uri.to_s
+    else
+      # 相対パスの場合
+      LocaleHelper.add_locale_prefix(LocaleHelper.remove_locale_prefix(url), locale)
+    end
+  end
 end
