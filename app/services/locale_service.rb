@@ -118,6 +118,6 @@ class LocaleService
 
   # 現在のパスでロケールを変更したURLを生成
   def current_path_with_locale(locale)
-    LocaleHelper.current_path_with_locale(request, locale)
+    LocaleHelper.current_path_with_locale(request.path, locale)
   end
 end

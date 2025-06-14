@@ -11,26 +11,26 @@ RSpec.describe LocaleController, type: :request do
         expect(response).to redirect_to("/ja")
       end
 
-      it "redirects to root without prefix for English (default locale)" do
+      it "redirects to root with prefix for English (default locale)" do
         get locale_path(locale: 'en')
 
-        expect(response).to redirect_to("/")
+        expect(response).to redirect_to("/en")
       end
     end
 
     context "from other paths" do
-      it "preserves the current path with Japanese locale prefix" do
-        # /messages にいるときに日本語に切り替える場合
-        get locale_path(locale: 'ja'), env: { 'HTTP_REFERER' => 'http://www.example.com/messages' }
+      it "preserves the current path with Japanese locale prefix when redirect_to is provided" do
+        # redirect_toパラメータで/messagesに移動する場合
+        get locale_path(locale: 'ja', redirect_to: '/messages')
 
         expect(response).to redirect_to("/ja/messages")
       end
 
-      it "handles paths with English (default) locale" do
-        # パスベースロケール戦略: デフォルトロケールはプレフィックスなし
-        get locale_path(locale: 'en'), env: { 'HTTP_REFERER' => 'http://www.example.com/ja/users' }
+      it "handles paths with English (default) locale when redirect_to is provided" do
+        # redirect_toパラメータで/usersに移動する場合
+        get locale_path(locale: 'en', redirect_to: '/users')
 
-        expect(response).to redirect_to("/users")
+        expect(response).to redirect_to("/en/users")
       end
     end
 
@@ -40,6 +40,13 @@ RSpec.describe LocaleController, type: :request do
 
         expect(response).to redirect_to(root_path)
         expect(flash[:alert]).to eq("Unsupported locale")
+      end
+
+      it "redirects with alert for unsupported locale (user-friendly message)" do
+        get locale_path(locale: 'xx')
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq(I18n.t('errors.locale.unsupported_locale'))
       end
     end
   end

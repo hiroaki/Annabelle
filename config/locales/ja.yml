@@ -97,6 +97,7 @@ ja:
     locale:
       invalid_type: "は文字列またはシンボルである必要があります"
       invalid_value: "は有効なロケールではありません"
+      unsupported_locale: "サポートされていない言語です"
   helpers:
     page_entries_info:
       more_pages:

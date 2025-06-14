@@ -188,7 +188,7 @@ RSpec.describe LocaleService do
     let(:request) { double(path: '/messages', query_string: 'page=2') }
 
     it 'delegates to LocaleHelper.current_path_with_locale' do
-      expect(LocaleHelper).to receive(:current_path_with_locale).with(request, 'ja')
+      expect(LocaleHelper).to receive(:current_path_with_locale).with('/messages', 'ja')
       service.current_path_with_locale('ja')
     end
   end
