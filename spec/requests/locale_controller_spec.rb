@@ -41,6 +41,13 @@ RSpec.describe LocaleController, type: :request do
         expect(response).to redirect_to(root_path)
         expect(flash[:alert]).to eq("Unsupported locale")
       end
+
+      it "redirects with alert for unsupported locale (user-friendly message)" do
+        get locale_path(locale: 'xx')
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq(I18n.t('errors.locale.unsupported_locale'))
+      end
     end
   end
 end

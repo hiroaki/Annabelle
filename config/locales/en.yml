@@ -97,6 +97,7 @@ en:
     locale:
       invalid_type: "must be a String or Symbol"
       invalid_value: "is not a valid locale"
+      unsupported_locale: "Unsupported locale"
   helpers:
     page_entries_info:
       more_pages:

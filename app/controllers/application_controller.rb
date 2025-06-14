@@ -3,6 +3,8 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :conditional_auto_login
 
+  rescue_from I18n::InvalidLocale, with: :handle_invalid_locale
+
   # URLヘルパーに自動的にロケールパラメータを追加
   def default_url_options
     # 常にロケールパラメータを付与する
@@ -22,6 +24,12 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  # ロケール例外時の共通処理
+  def handle_invalid_locale(exception)
+    Rails.logger.error("[Locale] Invalid locale error: #{exception.message} (params: #{params.inspect})")
+    # ユーザーへの通知やリダイレクトは行わない
+  end
 
   # ロケール処理を担当するサービスオブジェクト
   def locale_service
