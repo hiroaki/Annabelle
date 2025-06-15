@@ -21,7 +21,7 @@ Annabelleのロケールシステムは、利用可能な言語（ロケール�
 
 ## 4. URL・パスのロケール制御
 - すべての主要なパスは `/ja/xxx` のようにロケールプレフィックス付きで生成。
-- `LocaleHelper`/`LocaleUrlHelper` でパスからロケール部分の除去・付与を一貫して実装。
+- `LocaleHelper` でパスからロケール部分の除去・付与を一貫して実装。
 - ロケール切替時は、現在のパスをロケール付きでリダイレクトすることでUXを維持。
 - `LocaleController`/`LocaleRedirectController` がロケール切替・自動リダイレクトを担当。
 
@@ -33,7 +33,8 @@ Annabelleのロケールシステムは、利用可能な言語（ロケール�
 ## 6. 主要クラス・モジュールの役割
 - `LocaleConfiguration`：ロケール設定の読み込み・API化
 - `LocaleService`：リクエストごとのロケール決定ロジック
-- `LocaleHelper`/`LocaleUrlHelper`：パス・URLのロケール制御
+- `LocaleHelper`：パス・URLのロケール制御（統合済み）
+- `LocalePathUtils`：パス操作の純粋関数（新規）
 - `LocaleValidator`：ロケール値のバリデーション
 - `LocaleController`/`LocaleRedirectController`：ロケール切替・リダイレクト処理
 

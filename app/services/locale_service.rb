@@ -1,6 +1,8 @@
 # ロケール関連の処理を集約するサービスクラス
 # ロケール決定、言語切替、リダイレクト処理を担当
 class LocaleService
+  include LocalePathUtils
+  
   SOURCE_USER_PREFERENCE = :user_preference
   SOURCE_BROWSER_HEADER  = :browser_header
   SOURCE_OMNIAUTH_PARAMS = :omniauth_params
@@ -118,11 +120,11 @@ class LocaleService
 
   # 現在のパスでロケールを変更したURLを生成
   def current_path_with_locale(locale)
-    LocaleHelper.current_path_with_locale(request.path, locale)
+    super(request.path, locale)
   end
 
   # 指定URLにロケールを付与したURLを返す
-  # パス操作はヘルパーに委譲し、ロケール決定のみサービスで担当
+  # パス操作はLocalePathUtilsに委譲し、ロケール決定のみサービスで担当
   def add_locale_to_url(url, locale = nil)
     locale ||= determine_effective_locale
     return url if locale.nil? || locale.empty?
@@ -130,13 +132,12 @@ class LocaleService
     if url.start_with?('http')
       uri = URI.parse(url)
       path = uri.path
-      # 既にロケールが付与されていればそのまま返す
-      return url if path.match(%r{^/[a-z]{2}/})
-      uri.path = LocaleHelper.add_locale_prefix(LocaleHelper.remove_locale_prefix(path), locale)
+      # 既存ロケールの有無に関わらず、常に置き換える
+      uri.path = add_locale_prefix(remove_locale_prefix(path), locale)
       uri.to_s
     else
       # 相対パスの場合
-      LocaleHelper.add_locale_prefix(LocaleHelper.remove_locale_prefix(url), locale)
+      add_locale_prefix(remove_locale_prefix(url), locale)
     end
   end
 end

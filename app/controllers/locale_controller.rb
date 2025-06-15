@@ -1,4 +1,6 @@
 class LocaleController < ApplicationController
+  include LocaleHelper
+
   def update
     locale = params[:locale].to_s
     if LocaleValidator.valid_locale?(locale)
@@ -9,8 +11,8 @@ class LocaleController < ApplicationController
                           '/'
                         end
       
-      # LocaleHelperを使用してパスベースロケールURLを生成
-      redirect_path = LocaleHelper.current_path_with_locale(redirect_to_path, locale)
+      # インスタンスメソッドで呼び出し
+      redirect_path = current_path_with_locale(redirect_to_path, locale)
       redirect_to redirect_path
     else
       redirect_back(fallback_location: root_path, alert: "Unsupported locale")

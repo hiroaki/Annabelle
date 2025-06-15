@@ -1,40 +1,7 @@
-# ロケール関連のユーティリティ処理を集約するヘルパーモジュール
-# 低レベルなロケール操作（パス操作、文字列処理等）を担当
+# ロケール関連のヘルパーモジュール（統合版）
+# パス・URL操作、ロケール判定、OAuth処理などを統一的に提供
 module LocaleHelper
-  module_function
-
-  # 現在のパスでロケールを変更したURLを生成
-  def current_path_with_locale(path, locale)
-    path_without_locale = remove_locale_prefix(path)
-    add_locale_prefix(path_without_locale, locale)
-  end
-
-  # パスからロケールプレフィックスを削除
-  def remove_locale_prefix(path)
-    return '/' if path.blank? || path == '/'
-
-    # ダブルスラッシュを修正
-    path = path.gsub('//', '/')
-
-    LocaleConfiguration.available_locales.each do |locale|
-      locale_str = locale.to_s
-      if path.start_with?("/#{locale_str}/")
-        return path.sub(%r{^/#{locale_str}}, '')
-      elsif path == "/#{locale_str}"
-        return '/'
-      end
-    end
-
-    path
-  end
-
-  # パスにロケールプレフィックスを追加
-  def add_locale_prefix(path, locale)
-    clean_path = remove_locale_prefix(path)
-    clean_path = '/' if clean_path.blank?
-
-    "/#{locale}#{clean_path == '/' ? '' : clean_path}"
-  end
+  include LocalePathUtils
 
   # ロケールリダイレクトをスキップすべきパスかどうかを判定
   def skip_locale_redirect?(path)
@@ -66,5 +33,21 @@ module LocaleHelper
     end
 
     oauth_params
+  end
+
+  # ロケール付きパスの生成（旧LocaleUrlHelperから統合）
+  def localized_path_for(path_symbol, locale = nil, **options)
+    locale ||= I18n.locale
+
+    # すべてのロケールでプレフィックスを付与
+    Rails.application.routes.url_helpers.send(path_symbol, **options.merge(locale: locale))
+  end
+
+  # リンクのベースCSSクラスを生成（旧LocaleUrlHelperから統合）
+  def base_link_classes(locale, additional_classes = nil)
+    classes = ["hover:text-slate-600"]
+    classes << (I18n.locale == locale.to_sym ? 'font-bold' : '')
+    classes << additional_classes if additional_classes.present?
+    classes.compact.join(' ')
   end
 end
