@@ -132,9 +132,7 @@ class LocaleService
     if url.start_with?('http')
       uri = URI.parse(url)
       path = uri.path
-      # 既にロケールが付与されていればそのまま返す
-      return url if path.match(%r{^/[a-z]{2}/})
-      # インスタンスメソッドとして呼び出し
+      # 既存ロケールの有無に関わらず、常に置き換える
       uri.path = add_locale_prefix(remove_locale_prefix(path), locale)
       uri.to_s
     else

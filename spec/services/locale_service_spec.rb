@@ -256,4 +256,60 @@ RSpec.describe LocaleService do
       end
     end
   end
+
+  describe '#add_locale_to_url' do
+    let(:request) { double(path: '/messages', env: {}) }
+    let(:service) { described_class.new(controller, current_user) }
+    before { allow(service).to receive(:request).and_return(request) }
+
+    it 'returns url unchanged if locale is nil or empty' do
+      allow(service).to receive(:determine_effective_locale).and_return(nil)
+      expect(service.add_locale_to_url('/foo', nil)).to eq('/foo')
+      expect(service.add_locale_to_url('/foo', '')).to eq('/foo')
+    end
+
+    it 'returns url unchanged if already has locale prefix (absolute url)' do
+      url = 'https://example.com/ja/messages'
+      expect(service.add_locale_to_url(url, 'ja')).to eq(url)
+    end
+
+    it 'adds locale prefix to absolute url without locale' do
+      url = 'https://example.com/messages'
+      expect(service.add_locale_to_url(url, 'ja')).to eq('https://example.com/ja/messages')
+    end
+
+    it 'adds locale prefix to relative url without locale' do
+      url = '/messages'
+      expect(service.add_locale_to_url(url, 'ja')).to eq('/ja/messages')
+    end
+
+    it 'removes existing locale and adds new one (absolute url)' do
+      url = 'https://example.com/en/messages'
+      expect(service.add_locale_to_url(url, 'ja')).to eq('https://example.com/ja/messages')
+    end
+
+    it 'removes existing locale and adds new one (relative url)' do
+      url = '/en/messages'
+      expect(service.add_locale_to_url(url, 'ja')).to eq('/ja/messages')
+    end
+
+    it 'adds locale to absolute url with query string' do
+      url = 'https://example.com/messages?foo=bar'
+      expect(service.add_locale_to_url(url, 'ja')).to eq('https://example.com/ja/messages?foo=bar')
+    end
+
+    it 'adds locale to relative url with query string' do
+      url = '/messages?foo=bar'
+      expect(service.add_locale_to_url(url, 'ja')).to eq('/ja/messages?foo=bar')
+    end
+
+    it 'raises error for invalid path in absolute url' do
+      url = 'https://example.com//ja/messages'
+      expect { service.add_locale_to_url(url, 'ja') }.to raise_error(ArgumentError, /Invalid path format/)
+    end
+    it 'raises error for invalid path in relative url' do
+      url = '//ja/messages'
+      expect { service.add_locale_to_url(url, 'ja') }.to raise_error(ArgumentError, /Invalid path format/)
+    end
+  end
 end
