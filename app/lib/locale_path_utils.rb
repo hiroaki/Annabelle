@@ -1,8 +1,6 @@
 # ロケール付きパス/URLの生成・除去などのコアロジックを提供するモジュール
-# 純粋関数として実装し、副作用を持たない
+# インスタンスメソッドとして実装し、mix-inで利用できるようにする
 module LocalePathUtils
-  module_function
-
   # 現在のパスでロケールを変更したURLを生成
   def current_path_with_locale(path, locale)
     path_without_locale = remove_locale_prefix(path)

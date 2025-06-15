@@ -120,7 +120,7 @@ class LocaleService
 
   # 現在のパスでロケールを変更したURLを生成
   def current_path_with_locale(locale)
-    LocalePathUtils.current_path_with_locale(request.path, locale)
+    super(request.path, locale)
   end
 
   # 指定URLにロケールを付与したURLを返す
@@ -134,11 +134,12 @@ class LocaleService
       path = uri.path
       # 既にロケールが付与されていればそのまま返す
       return url if path.match(%r{^/[a-z]{2}/})
-      uri.path = LocalePathUtils.add_locale_prefix(LocalePathUtils.remove_locale_prefix(path), locale)
+      # インスタンスメソッドとして呼び出し
+      uri.path = add_locale_prefix(remove_locale_prefix(path), locale)
       uri.to_s
     else
       # 相対パスの場合
-      LocalePathUtils.add_locale_prefix(LocalePathUtils.remove_locale_prefix(url), locale)
+      add_locale_prefix(remove_locale_prefix(url), locale)
     end
   end
 end

@@ -2,7 +2,7 @@
   <%- resource_class.omniauth_providers.each do |provider| %>
     <% 
       # ステップ5: OAuth改善 - ヘルパーを使用した言語設定保持
-      oauth_params = LocaleHelper.prepare_oauth_locale_params(params, session)
+      oauth_params = prepare_oauth_locale_params(params, session)
     %>
     <%= button_to t('devise.shared.sign_in_with', provider: OmniAuth::Utils.camelize(provider)), 
         omniauth_authorize_path(resource_name, provider), 

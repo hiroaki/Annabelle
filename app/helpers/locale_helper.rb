@@ -2,9 +2,6 @@
 # パス・URL操作、ロケール判定、OAuth処理などを統一的に提供
 module LocaleHelper
   include LocalePathUtils
-  
-  # LocalePathUtilsのメソッドをモジュールメソッドとして公開
-  module_function :current_path_with_locale, :remove_locale_prefix, :add_locale_prefix
 
   # ロケールリダイレクトをスキップすべきパスかどうかを判定
   def skip_locale_redirect?(path)
@@ -12,7 +9,6 @@ module LocaleHelper
     skip_paths = ['/up', '/locale', '/users/auth']
     skip_paths.any? { |skip_path| path.start_with?(skip_path) }
   end
-  module_function :skip_locale_redirect?
 
   # OAuth改善 - OAuth認証開始時のロケール処理
   def prepare_oauth_locale_params(params, session)
@@ -38,7 +34,6 @@ module LocaleHelper
 
     oauth_params
   end
-  module_function :prepare_oauth_locale_params
 
   # ロケール付きパスの生成（旧LocaleUrlHelperから統合）
   def localized_path_for(path_symbol, locale = nil, **options)
@@ -47,7 +42,6 @@ module LocaleHelper
     # すべてのロケールでプレフィックスを付与
     Rails.application.routes.url_helpers.send(path_symbol, **options.merge(locale: locale))
   end
-  module_function :localized_path_for
 
   # リンクのベースCSSクラスを生成（旧LocaleUrlHelperから統合）
   def base_link_classes(locale, additional_classes = nil)
@@ -56,5 +50,4 @@ module LocaleHelper
     classes << additional_classes if additional_classes.present?
     classes.compact.join(' ')
   end
-  module_function :base_link_classes
 end
