@@ -80,9 +80,15 @@ RSpec.describe 'OmniauthCallbacks', type: :request do
       follow_redirect!
       expect(flash[:alert]).to eq(I18n.t('devise.omniauth_callbacks.failure', kind: I18n.t('devise.omniauth_callbacks.unknown_provider')))
     end
+
+    it 'handles auth_failure action correctly' do
+      # failureアクションの正常な動作を確認
+      get '/users/auth/failure'
+      expect(response).to redirect_to(new_user_session_path(locale: 'en'))
+    end
   end
 
-  # ステップ5: OAuth改善のテストケース
+  # OAuth改善のテストケース
   describe 'OAuth locale handling improvements' do
     context 'with session-based locale fallback' do
       it 'uses session locale when omniauth params are missing' do
@@ -164,62 +170,77 @@ RSpec.describe 'OmniauthCallbacks', type: :request do
     end
   end
 
-  describe 'OmniAuthCallbacksController#extract_provider_name_for_error' do
+  # Note: 以下のテストはrequest specの範囲を超えて、privateメソッドの単体テストを行っています。
+  # 本来はspec/models/やspec/lib/に分離するか、controller specで書くべきですが、
+  # 小さな範囲のため、関連の強いこのファイルに含めています。
+
+  describe 'Private methods unit tests (for coverage)' do
     let(:controller) { Users::OmniauthCallbacksController.new }
 
-    context 'when error_strategy with name exists' do
-      it 'returns camalized name of the strategy' do
-        # エラー戦略のモックを作成
-        error_strategy = double('OmniAuth::Strategies::Base')
-        allow(error_strategy).to receive(:name).and_return(:github)
+    describe '#extract_provider_name_for_error' do
+      context 'when error_strategy with name exists' do
+        it 'returns camalized name of the strategy' do
+          error_strategy = double('OmniAuth::Strategies::Base')
+          allow(error_strategy).to receive(:name).and_return(:github)
+          request = double('request')
+          allow(request).to receive(:env).and_return({"omniauth.error.strategy" => error_strategy})
+          allow(controller).to receive(:request).and_return(request)
 
-        # コントローラーのrequestをモック
-        request = double('request')
-        allow(request).to receive(:env).and_return({"omniauth.error.strategy" => error_strategy})
-        allow(controller).to receive(:request).and_return(request)
+          result = controller.send(:extract_provider_name_for_error)
+          expect(result).to eq('GitHub')
+        end
+      end
 
-        # メソッドを実行して結果を検証
-        result = controller.send(:extract_provider_name_for_error)
-        expect(result).to eq('GitHub') # OmniAuth::Utils.camelize('github')の結果
+      context 'when error_strategy does not exist' do
+        it 'returns unknown provider message' do
+          request = double('request')
+          allow(request).to receive(:env).and_return({})
+          allow(controller).to receive(:request).and_return(request)
+
+          result = controller.send(:extract_provider_name_for_error)
+          expect(result).to eq(I18n.t('devise.omniauth_callbacks.unknown_provider'))
+        end
       end
     end
 
-    context 'when error_strategy does not exist' do
-      it 'returns unknown provider message' do
-        # 空のrequestをモック
-        request = double('request')
-        allow(request).to receive(:env).and_return({})
-        allow(controller).to receive(:request).and_return(request)
+    describe '#generate_failure_message' do
+      context 'when translation key has all required interpolations' do
+        it 'returns the translated message with provider' do
+          allow(I18n).to receive(:t).with("devise.omniauth_callbacks.failure", kind: "GitHub").and_return("Could not authenticate you from GitHub")
 
-        # メソッドを実行して結果を検証
-        result = controller.send(:extract_provider_name_for_error)
-        expect(result).to eq(I18n.t('devise.omniauth_callbacks.unknown_provider'))
+          result = controller.send(:generate_failure_message, "GitHub")
+          expect(result).to eq("Could not authenticate you from GitHub")
+          expect(I18n).to have_received(:t).with("devise.omniauth_callbacks.failure", kind: "GitHub")
+        end
       end
-    end
-  end
 
-  describe 'OmniAuthCallbacksController#generate_failure_message' do
-    let(:controller) { Users::OmniauthCallbacksController.new }
+      context 'when MissingInterpolationArgument exception occurs' do
+        it 'returns the fallback message' do
+          allow(I18n).to receive(:t).with("devise.omniauth_callbacks.failure", kind: "GitHub").and_raise(I18n::MissingInterpolationArgument.new("key", "string", "values"))
+          allow(I18n).to receive(:t).with("devise.omniauth_callbacks.failure_fallback").and_return("Authentication failed")
 
-    context 'when translation key has all required interpolations' do
-      it 'returns the translated message with provider' do
-        allow(I18n).to receive(:t).with("devise.omniauth_callbacks.failure", kind: "GitHub").and_return("Could not authenticate you from GitHub")
-
-        result = controller.send(:generate_failure_message, "GitHub")
-        expect(result).to eq("Could not authenticate you from GitHub")
-        expect(I18n).to have_received(:t).with("devise.omniauth_callbacks.failure", kind: "GitHub")
+          result = controller.send(:generate_failure_message, "GitHub")
+          expect(result).to eq("Authentication failed")
+          expect(I18n).to have_received(:t).with("devise.omniauth_callbacks.failure_fallback")
+        end
       end
     end
 
-    context 'when MissingInterpolationArgument exception occurs' do
-      it 'returns the fallback message' do
-        # 例外をスローするように設定
-        allow(I18n).to receive(:t).with("devise.omniauth_callbacks.failure", kind: "GitHub").and_raise(I18n::MissingInterpolationArgument.new("key", "string", "values"))
-        allow(I18n).to receive(:t).with("devise.omniauth_callbacks.failure_fallback").and_return("Authentication failed")
+    describe 'Defensive code branch coverage' do
+      it 'determine_redirect_path handles unknown action' do
+        allow(controller).to receive(:oauth_locale_for).and_return('en')
+        allow(controller).to receive(:root_path).with(locale: 'en').and_return('/en')
 
-        result = controller.send(:generate_failure_message, "GitHub")
-        expect(result).to eq("Authentication failed")
-        expect(I18n).to have_received(:t).with("devise.omniauth_callbacks.failure_fallback")
+        result = controller.send(:determine_redirect_path, :unknown_action, nil)
+        expect(result).to eq('/en')
+      end
+
+      it 'localized_path handles unknown path_name' do
+        allow(controller).to receive(:oauth_locale_for).and_return('en')
+        allow(controller).to receive(:root_path).with(locale: 'en').and_return('/en')
+
+        result = controller.send(:localized_path, :unknown_path, nil)
+        expect(result).to eq('/en')
       end
     end
   end
