@@ -10,9 +10,7 @@ module LocalePathUtils
   # パスからロケールプレフィックスを削除
   def remove_locale_prefix(path)
     return '/' if path.blank? || path == '/'
-
-    # ダブルスラッシュを修正
-    path = path.gsub('//', '/')
+    validate_path!(path)
 
     LocaleConfiguration.available_locales.each do |locale|
       locale_str = locale.to_s
@@ -32,5 +30,17 @@ module LocalePathUtils
     clean_path = '/' if clean_path.blank?
 
     "/#{locale}#{clean_path == '/' ? '' : clean_path}"
+  end
+
+  private
+
+  def validate_path!(path)
+    return if path.blank? # 空文字やnilは許容
+    unless path.is_a?(String) && path.start_with?('/') &&
+           !path.include?('//') &&
+           !path.match?(/[[:cntrl:]\s]/) &&
+           !path.split('/').include?('..')
+      raise ArgumentError, "Invalid path format: must start with '/', not contain '//', '..', or control characters. Got: #{path.inspect}"
+    end
   end
 end

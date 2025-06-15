@@ -55,8 +55,25 @@ RSpec.describe LocalePathUtils do
       expect(remove_locale_prefix(nil)).to eq('/')
     end
 
-    it 'fixes double slashes' do
-      expect(remove_locale_prefix('//ja//messages')).to eq('/messages')
+    it 'raises error for path with double slashes' do
+      expect { remove_locale_prefix('//ja/messages') }.to raise_error(ArgumentError, /Invalid path format/)
+      expect { remove_locale_prefix('/foo//bar') }.to raise_error(ArgumentError, /Invalid path format/)
+    end
+
+    it 'raises error for path with control characters or spaces' do
+      expect { remove_locale_prefix("/foo\nbar") }.to raise_error(ArgumentError, /Invalid path format/)
+      expect { remove_locale_prefix('/foo bar') }.to raise_error(ArgumentError, /Invalid path format/)
+    end
+
+    it 'raises error for path with .. traversal' do
+      expect { remove_locale_prefix('/foo/../bar') }.to raise_error(ArgumentError, /Invalid path format/)
+      expect { remove_locale_prefix('/../bar') }.to raise_error(ArgumentError, /Invalid path format/)
+    end
+
+    it 'raises error for path not starting with slash' do
+      expect { remove_locale_prefix('foo/bar') }.to raise_error(ArgumentError, /Invalid path format/)
+      expect { remove_locale_prefix('') }.not_to raise_error # 空文字は許容
+      expect { remove_locale_prefix(nil) }.not_to raise_error # nilは許容
     end
   end
 
