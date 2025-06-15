@@ -6,6 +6,7 @@ RSpec.describe LocaleHelper do
     allow(I18n).to receive(:available_locales).and_return(LocaleConfiguration.available_locales)
   end
 
+  # パス操作機能のテスト
   describe '.current_path_with_locale' do
     it 'generates path-based locale URL for non-default locale' do
       result = LocaleHelper.current_path_with_locale('/messages', 'ja')
@@ -58,14 +59,64 @@ RSpec.describe LocaleHelper do
   describe '.add_locale_prefix' do
     it 'adds locale prefix to path' do
       expect(LocaleHelper.add_locale_prefix('/messages', 'ja')).to eq('/ja/messages')
+      expect(LocaleHelper.add_locale_prefix('/users', 'en')).to eq('/en/users')
     end
 
     it 'handles root path' do
       expect(LocaleHelper.add_locale_prefix('/', 'ja')).to eq('/ja')
+      expect(LocaleHelper.add_locale_prefix('/', 'en')).to eq('/en')
     end
 
-    it 'adds default locale prefix (explicit locale required)' do
-      expect(LocaleHelper.add_locale_prefix('/messages', 'en')).to eq('/en/messages')
+    it 'handles blank path' do
+      expect(LocaleHelper.add_locale_prefix('', 'ja')).to eq('/ja')
+      expect(LocaleHelper.add_locale_prefix(nil, 'ja')).to eq('/ja')
+    end
+
+    it 'removes existing locale before adding new one' do
+      expect(LocaleHelper.add_locale_prefix('/en/messages', 'ja')).to eq('/ja/messages')
+      expect(LocaleHelper.add_locale_prefix('/ja/users', 'en')).to eq('/en/users')
+    end
+  end
+
+  # URL生成機能のテスト
+  describe '.localized_path_for' do
+    before do
+      allow(Rails.application.routes.url_helpers).to receive(:edit_user_path).with(id: 1).and_return('/users/1/edit')
+      allow(Rails.application.routes.url_helpers).to receive(:edit_user_path).with(id: 1, locale: 'ja').and_return('/ja/users/1/edit')
+    end
+
+    it 'generates path-based URL for non-default locale' do
+      result = LocaleHelper.localized_path_for(:edit_user_path, 'ja', id: 1)
+      expect(result).to eq('/ja/users/1/edit')
+    end
+
+    it 'generates path-based URL for default locale' do
+      allow(Rails.application.routes.url_helpers).to receive(:edit_user_path).with(id: 1, locale: 'en').and_return('/en/users/1/edit')
+      result = LocaleHelper.localized_path_for(:edit_user_path, 'en', id: 1)
+      expect(result).to eq('/en/users/1/edit')
+    end
+  end
+
+  describe '.base_link_classes' do
+    before do
+      allow(I18n).to receive(:locale).and_return(:ja)
+    end
+
+    it 'returns classes with font-bold for current locale' do
+      result = LocaleHelper.base_link_classes(:ja)
+      expect(result).to include('font-bold')
+      expect(result).to include('hover:text-slate-600')
+    end
+
+    it 'returns classes without font-bold for non-current locale' do
+      result = LocaleHelper.base_link_classes(:en)
+      expect(result).not_to include('font-bold')
+      expect(result).to include('hover:text-slate-600')
+    end
+
+    it 'includes additional classes when provided' do
+      result = LocaleHelper.base_link_classes(:ja, 'custom-class')
+      expect(result).to include('custom-class')
     end
   end
 
