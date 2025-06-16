@@ -72,10 +72,6 @@ en:
       authorization: "Authorization"
       message: "Message"
       user: "User"
-  devise:
-    registrations:
-      use_browser_language: "Use browser language"
-      preferred_language_help: "Choose the display language for this application. If not set, your browser's language setting will be used."
   errors:
     messages:
       blank: "can't be blank"
@@ -142,6 +138,8 @@ en:
       profile: "Profile"
       update: "Update"
       username: "Username"
+      use_browser_language: "Use browser language"
+      preferred_language_help: "Choose the display language for this application. If not set, your browser's language setting will be used."
     show:
       dashboard: "Dashboard"
       welcome: "Welcome %{username}!"

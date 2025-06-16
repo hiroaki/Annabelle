@@ -72,10 +72,6 @@ ja:
       authorization: "認証情報"
       message: "メッセージ"
       user: "ユーザー"
-  devise:
-    registrations:
-      use_browser_language: "ブラウザの言語設定を使用"
-      preferred_language_help: "このアプリケーションの表示言語を選択してください。未設定の場合はブラウザの設定に従います。"
   errors:
     messages:
       blank: "を入力してください"
@@ -142,6 +138,8 @@ ja:
       profile: "プロフィール"
       update: "更新"
       username: "ユーザー名"
+      use_browser_language: "ブラウザの言語設定を使用"
+      preferred_language_help: "このアプリケーションの表示言語を選択してください。未設定の場合はブラウザの設定に従います。"
     show:
       dashboard: "ダッシュボード"
       welcome: "%{username}さん、ようこそ！"

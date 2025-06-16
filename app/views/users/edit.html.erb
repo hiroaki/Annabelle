@@ -13,12 +13,12 @@
       <%=
         f.select :preferred_language,
           options_for_select(locale_options, f.object.preferred_language),
-          { include_blank: t('devise.registrations.use_browser_language') },
+          { include_blank: t('users.edit.use_browser_language') },
           class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5",
           **data_with_testid('account-preferred-language')
       %>
       <p class="mt-2 text-sm text-gray-500">
-        <%= t('devise.registrations.preferred_language_help') %>
+        <%= t('users.edit.preferred_language_help') %>
       </p>
     </div>
 
