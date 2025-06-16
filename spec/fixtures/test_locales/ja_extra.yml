@@ -1,0 +1,12 @@
+ja:
+  hello: こんにちは
+  user:
+    name: 名前
+    email: メール
+  deeply:
+    nested:
+      structure:
+        key: 値
+  extra_key: この余分なキー
+  another:
+    extra: さらに余分

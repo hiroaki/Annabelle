@@ -1,0 +1,5 @@
+ja:
+  hello: こんにちは
+  user:
+    name: 名前
+    # email is missing
