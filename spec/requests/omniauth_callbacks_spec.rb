@@ -35,7 +35,7 @@ RSpec.describe 'OmniauthCallbacks', type: :request do
         expect(response).to redirect_to(edit_user_registration_path)
         follow_redirect!
         # flashメッセージはTurbo/redirect後のHTMLには含まれない場合があるため、flash[:notice]で検証
-        expect(flash[:notice]).to eq(I18n.t('devise.omniauth_callbacks.provider.success', provider: 'GitHub'))
+        expect(flash[:notice]).to eq(I18n.t('devise.omniauth_callbacks.provider.linked', provider: 'GitHub'))
       end
     end
 

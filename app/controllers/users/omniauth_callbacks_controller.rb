@@ -27,7 +27,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       flash[:alert] = I18n.t("devise.omniauth_callbacks.provider.already_linked", provider: provider_name)
     else
       current_user.link_with(auth.provider, auth.uid)
-      flash[:notice] = I18n.t("devise.omniauth_callbacks.provider.success", provider: provider_name)
+      flash[:notice] = I18n.t("devise.omniauth_callbacks.provider.linked", provider: provider_name)
     end
 
     redirect_to determine_redirect_path(:link_provider, current_user)
@@ -46,7 +46,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       action = user.saved_change_to_id? ? :new_user : :existing_user
       redirect_to determine_redirect_path(action, user)
 
-      flash[:notice] = I18n.t("devise.omniauth_callbacks.provider.success", provider: provider_name) if is_navigational_format?
+      flash[:notice] = I18n.t("devise.omniauth_callbacks.success", provider: provider_name) if is_navigational_format?
     else
       session["devise.github_data"] = auth.except(:extra)
       redirect_to determine_redirect_path(:registration_failure),

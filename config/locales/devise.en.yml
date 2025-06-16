@@ -31,12 +31,10 @@ en:
     omniauth_callbacks:
       failure: "Could not authenticate you from %{kind} because of an error. Please try again."
       success: "Successfully authenticated from %{provider} account."
-      # CSRFエラーなど、providerパラメータが不正な場合のフォールバック
       failure_fallback: "Could not authenticate you because of an error. Please try again."
       provider:
         already_linked: "This %{provider} account is already linked to another account. Changes have been canceled."
-        success: "Successfully linked with %{provider}."
-        failure: "Could not authenticate you from %{provider} because of an error. Please try again."
+        linked: "Successfully linked with %{provider}."
       unknown_provider: "External Service"
     passwords:
       no_token: "You can't access this page without coming from a password reset email. If you do come from a password reset email, please make sure you used the full URL provided."
@@ -61,6 +59,7 @@ en:
       updated: "Your account has been updated successfully."
       updated_but_not_signed_in: "Your account has been updated successfully, but since your password was changed, you need to sign in again."
       unlink_oauth:
+        label: "Unlink %{provider} account"
         success: "%{provider_name} authentication has been unlinked."
         failure: "Failed to unlink %{provider_name} authentication."
         not_found: "The specified link was not found."
@@ -75,7 +74,6 @@ en:
       sign_up: "Sign up"
       update: "Update"
       unlink_confirm: "Are you sure you want to unlink %{provider} authentication?"
-      unlink_oauth: "Unlink %{provider} account"
       username: "Username"
       your_new_password: "Your new password"
       minimum_characters: "(%{count} characters minimum)"

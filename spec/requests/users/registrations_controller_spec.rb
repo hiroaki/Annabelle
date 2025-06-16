@@ -12,7 +12,7 @@ RSpec.describe Users::RegistrationsController, type: :request do
         delete unlink_oauth_path(provider: 'github')
         expect(response).to redirect_to(edit_user_registration_path)
         follow_redirect!
-        expect(response.body).to include(I18n.t('devise.registrations.unlink_oauth.success', provider_name: 'Github'))
+        expect(response.body).to include(I18n.t('devise.registrations.unlink_oauth.success', provider_name: 'GitHub'))
         expect(user.authorizations.find_by(provider: 'github')).to be_nil
       end
     end
@@ -25,7 +25,7 @@ RSpec.describe Users::RegistrationsController, type: :request do
         delete unlink_oauth_path(provider: 'github')
         expect(response).to redirect_to(edit_user_registration_path)
         follow_redirect!
-        expect(response.body).to include(I18n.t('devise.registrations.unlink_oauth.failure', provider_name: 'Github'))
+        expect(response.body).to include(I18n.t('devise.registrations.unlink_oauth.failure', provider_name: 'GitHub'))
       end
     end
 

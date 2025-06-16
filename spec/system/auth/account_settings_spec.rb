@@ -82,7 +82,7 @@ RSpec.describe 'アカウント設定', type: :system do
         )
 
         find("[data-testid='account-link-github']").click
-        expect(page).to have_content(I18n.t('devise.omniauth_callbacks.provider.success', provider: 'GitHub'))
+        expect(page).to have_content(I18n.t('devise.omniauth_callbacks.provider.linked', provider: 'GitHub'))
         expect(page).to have_selector("[data-testid='account-unlink-github']")
         
         OmniAuth.config.test_mode = false
