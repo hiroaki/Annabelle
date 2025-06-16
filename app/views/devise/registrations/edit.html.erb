@@ -106,9 +106,19 @@
             )
           %>
         <% else %>
+          <% 
+            # OAuth認証時に現在の言語設定を保持するためのパラメータを追加
+            oauth_params = {}
+            if I18n.locale != I18n.default_locale
+              oauth_params[:lang] = I18n.locale.to_s
+            elsif params[:lang].present? && LocaleValidator.valid_locale?(params[:lang])
+              oauth_params[:lang] = params[:lang]
+            end
+          %>
           <%=
             button_to(t('devise.registrations.link_oauth', provider: provider_name),
               omniauth_authorize_path(resource_name, provider),
+              params: oauth_params,
               class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2",
               id: "oauth-button-#{provider}",
               **data_with_testid("account-link-#{provider}",

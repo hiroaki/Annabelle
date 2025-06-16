@@ -66,7 +66,7 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
 
         expect(page).to have_current_path(new_user_registration_path)
         expect(page).to have_content(
-          I18n.t("devise.omniauth_callbacks.failure", provider: "GitHub")
+          I18n.t("devise.omniauth_callbacks.failure", kind: "GitHub")
         )
       end
     end
@@ -151,7 +151,7 @@ RSpec.describe "GitHub OAuth連携", type: :system, js: true do
 
       expect(page).to have_current_path(new_user_registration_path)
       expect(page).to have_content(
-        I18n.t("devise.omniauth_callbacks.failure", provider: "GitHub")
+        I18n.t("devise.omniauth_callbacks.failure", kind: "GitHub")
       )
 
       expect(User.exists?(unconfirmed.id)).to be true

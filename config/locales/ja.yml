@@ -90,10 +90,14 @@ ja:
       present: "は空欄でなければいけません"
       inclusion: "は一覧にありません"
       exclusion: "は予約されています"
-      greater_than: "%{count}より大きい値にしてください"
-      less_than: "%{count}より小さい値にしてください"
+      greater_than: "は%{count}より大きい値にしてください"
+      less_than: "は%{count}より小さい値にしてください"
       even: "は偶数にしてください"
       odd: "は奇数にしてください"
+    locale:
+      invalid_type: "は文字列またはシンボルである必要があります"
+      invalid_value: "は有効なロケールではありません"
+      unsupported_locale: "サポートされていない言語です"
   helpers:
     page_entries_info:
       more_pages:

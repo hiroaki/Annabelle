@@ -50,7 +50,7 @@ RSpec.describe "Messages", type: :request do
         it "rejects message creation with 302" do
           post messages_path, params: { content: "Hi" }
           expect(response).to have_http_status(:found)
-          expect(response.location).to eq 'http://www.example.com/users/sign_in'
+          expect(response.location).to eq 'http://www.example.com/en/users/sign_in'
         end
       end
     end
@@ -99,7 +99,7 @@ RSpec.describe "Messages", type: :request do
         it "rejects message deletion with 302" do
           delete message_path(message)
           expect(response).to have_http_status(:found)
-          expect(response.location).to eq 'http://www.example.com/users/sign_in'
+          expect(response.location).to eq 'http://www.example.com/en/users/sign_in'
         end
       end
     end

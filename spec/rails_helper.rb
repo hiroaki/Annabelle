@@ -154,6 +154,18 @@ RSpec.configure do |config|
     ActiveJob::Base.queue_adapter = :inline
   end
 
+  # ロケール設定
+  config.before(:each) do
+    I18n.locale = :en
+    Rails.application.routes.default_url_options[:locale] = :en
+  end
+
+  # OmniAuth テスト設定
+  config.before(:each) do
+    OmniAuth.config.test_mode = true
+    OmniAuth.config.mock_auth[:github] = nil
+  end
+
   # config.before(:each, type: :job) do
   #   ActiveJob::Base.queue_adapter = :test
   # end

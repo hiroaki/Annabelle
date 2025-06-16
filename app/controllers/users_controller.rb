@@ -13,25 +13,32 @@ class UsersController < ApplicationController
   # PATCH /users/:id(.:format)
   # PUT /users/:id(.:format)
   def update
-    previous_locale = @user.preferred_language
     if @user.update(user_params_for_profile)
-      if @user.preferred_language != previous_locale
-        set_locale(@user.preferred_language)
-        @requires_full_page_reload_to = edit_user_path(@user)
-      end
-
-      set_locale_to_cookie(@user.preferred_language)
-
-      flash[:notice] = I18n.t('users.update.success')
-      respond_to do |format|
-        format.turbo_stream
-        format.html { redirect_to @user }
+      # preferred_languageが実際に変更されたかチェック
+      language_changed = @user.saved_change_to_preferred_language?
+      
+      # フォームで選択された言語を取得
+      form_selected_language = params[:user][:preferred_language]
+      
+      # 有効なロケールを決定（フォーム選択に基づく）
+      effective_locale = determine_effective_locale(form_selected_language)
+      
+      # 現在のURLロケールと異なる場合、または言語が変更された場合はリダイレクト
+      current_url_locale = params[:locale] || I18n.default_locale.to_s
+      
+      # flashメッセージも選択された言語で表示
+      I18n.with_locale(effective_locale) { flash[:notice] = I18n.t('users.update.success') }
+      
+      # 言語設定が変更された場合は、適切なロケールでリダイレクト
+      if effective_locale != current_url_locale || language_changed
+        target_url = build_redirect_url(effective_locale)
+        redirect_to target_url
+      else
+        # 言語設定が変更されていない場合は編集画面に戻る
+        redirect_to edit_user_path(@user)
       end
     else
-      respond_to do |format|
-        format.turbo_stream
-        format.html { render :edit }
-      end
+      render :edit
     end
   end
 
@@ -47,5 +54,27 @@ class UsersController < ApplicationController
 
   def user_params_for_profile
     params.require(:user).permit(:username, :preferred_language)
+  end
+
+  def determine_effective_locale(new_preferred_language)
+    if new_preferred_language.present?
+      # フォームで具体的な言語が選択された場合
+      new_preferred_language
+    else
+      # 未選択（""）の場合はブラウザ設定に従う
+      result = locale_service.extract_from_header(request.env['HTTP_ACCEPT_LANGUAGE'])
+      result[:locale] || I18n.default_locale.to_s
+    end
+  end
+
+  def build_redirect_url(effective_locale)
+    # デフォルトロケール（en）かどうかで判定
+    if effective_locale.to_s == I18n.default_locale.to_s
+      # デフォルトロケール（en）の場合は明示的にロケールを指定
+      edit_user_path(@user, locale: effective_locale)
+    else
+      # 非デフォルトロケールの場合は /ja/users/1/edit のように生成
+      edit_user_path(@user, locale: effective_locale)
+    end
   end
 end

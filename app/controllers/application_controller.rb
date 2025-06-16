@@ -3,77 +3,37 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :conditional_auto_login
 
-  # サインイン後のリダイレクト先を制御しています。
-  # これは通常、デフォルトの root_path にリダイレクトしますが、
-  # session[:just_signed_up] に値がセットされている場合は、プロフィール編集画面（edit）へ遷移させます。
-  #
-  # そのフローはセッションが新規登録ユーザーのものであることを想定しており、
-  # ランダム生成された初期値のユーザー名などを編集してもらうための導線を意図しています。
+  rescue_from I18n::InvalidLocale, with: :handle_invalid_locale
+
+  # URLヘルパーに自動的にロケールパラメータを追加
+  def default_url_options
+    # 常にロケールパラメータを付与する
+    { locale: I18n.locale }
+  end
+
+  # ログイン後のリダイレクト先を決定
   def after_sign_in_path_for(resource)
-    if session.delete(:just_signed_up)
-      edit_user_registration_path
-    else
-      super
-    end
+    locale_service.determine_post_login_redirect_path(resource)
   end
 
   protected
 
-  def set_locale_to_cookie(locale)
-    cookies.permanent[:locale] = locale
-  end
-
+  # ロケールを設定し、必要に応じてリダイレクトを実行
   def set_locale(locale = nil)
-    I18n.locale = locale || extract_locale || I18n.default_locale
+    locale_service.set_locale(locale)
   end
 
   private
 
-  def extract_locale
-    locale = locale_from_params
-    Rails.logger.debug "locale_from_params: #{locale}"
-    return locale if locale
-
-    locale = locale_from_user
-    Rails.logger.debug "locale_from_user: #{locale}"
-    return locale if locale
-
-    locale = locale_from_cookie
-    Rails.logger.debug "locale_from_cookie: #{locale}"
-    return locale if locale
-
-    locale = locale_from_header
-    Rails.logger.debug "locale_from_header: #{locale}"
-    locale
+  # ロケール例外時の共通処理
+  def handle_invalid_locale(exception)
+    Rails.logger.error("[Locale] Invalid locale error: #{exception.message} (params: #{params.inspect})")
+    # ユーザーへの通知やリダイレクトは行わない
   end
 
-  def locale_from_params
-    if params[:locale].present? && valid_locale?(params[:locale])
-      params[:locale]
-    end
-  end
-
-  def locale_from_user
-    return unless user_signed_in?
-    current_user.preferred_language unless current_user.preferred_language.empty?
-  end
-
-  # def locale_from_session
-  #   session[:locale] if valid_locale?(session[:locale])
-  # end
-
-  def locale_from_cookie
-    cookies[:locale] if valid_locale?(cookies[:locale])
-  end
-
-  def locale_from_header
-    return unless request.env['HTTP_ACCEPT_LANGUAGE']
-    locale = request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first
-    locale if valid_locale?(locale)
-  end
-
-  def valid_locale?(locale)
-    I18n.available_locales.map(&:to_s).include?(locale.to_s)
+  # ロケール処理を担当するサービスオブジェクト
+  def locale_service
+    @locale_service ||= LocaleService.new(self, current_user)
   end
 
   def configure_permitted_parameters

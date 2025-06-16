@@ -1,6 +1,14 @@
 <%# Show current locale and provide links to change it %>
 <div class="language-switcher flex items-center space-x-2" data-turbo="false">
-  <%= link_to_unless_current "日本語", locale_path(:ja), class: "hover:text-slate-600 #{I18n.locale == :ja ? 'font-bold' : ''}" %>
-  <span>|</span>
-  <%= link_to_unless_current "English", locale_path(:en), class: "hover:text-slate-600 #{I18n.locale == :en ? 'font-bold' : ''}" %>
+  <%
+    current_path = request.path
+    locales = LocaleConfiguration.available_locales
+  %>
+  <% locales.each_with_index do |locale, idx| %>
+    <% link_class = "hover:text-slate-600 #{I18n.locale.to_s == locale.to_s ? 'font-bold' : ''}" %>
+    <%= link_to_unless_current LocaleConfiguration.locale_native_name(locale), locale_path(locale: locale, redirect_to: current_path), class: link_class %>
+    <% unless idx == locales.size - 1 %>
+      <span>|</span>
+    <% end %>
+  <% end %>
 </div>

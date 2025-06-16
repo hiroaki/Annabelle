@@ -29,8 +29,10 @@ ja:
       password_change:
         subject: "パスワードが変更されました"
     omniauth_callbacks:
-      failure: "%{provider}での認証に失敗しました。もう一度お試しください。"
+      failure: "%{kind}での認証に失敗しました。もう一度お試しください。"
       success: "%{provider}アカウントによる認証に成功しました。"
+      # CSRFエラーなど、providerパラメータが不正な場合のフォールバック
+      failure_fallback: "認証エラーが発生しました。もう一度お試しください。"
       provider:
         already_linked: "既に別の %{provider} アカウントと連携されています。変更はキャンセルされました。"
         success: "%{provider} との連携が成功しました。"
@@ -82,6 +84,7 @@ ja:
       signed_in: "ログインしました。"
       signed_out: "ログアウトしました。"
       already_signed_out: "既にログアウト済みです。"
+      invalid_otp: "認証コードが正しくありません。"
       authenticate: "認証"
       email: "メールアドレス"
       log_in: "ログイン"
