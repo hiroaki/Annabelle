@@ -124,9 +124,11 @@ If you are using dotenv, you can rename the sample file `dot.env.skel` to `.env`
 
 dotenv を利用する場合は、サンプルファイル `dot.env.skel` を `.env` にリネームして利用してください。（本アプリでは `.env` ファイルは必須ではありませんが、環境変数の管理には dotenv を利用すると便利です。）
 
+#### SMTP settings / SMTP 設定
+
 Set the following variables for SMTP configuration:
 
-SMTP サーバ設定のため、以下の変数を設定してください。
+SMTP サーバ設定のため、以下の変数を設定してください：
 
 ```
 SMTP_ADDRESS=smtp.example.com
@@ -136,9 +138,11 @@ SMTP_USERNAME=your_username
 SMTP_PASSWORD=your_password
 ```
 
+#### App Host / アプリケーション・ホスト
+
 These variables are also used to indicate the application's location in outgoing emails:
 
-これらの変数は、送信されるメール本文中にアプリのロケーションを示すためにも利用されます。
+これらの変数は、送信されるメール本文中にアプリケーションのロケーションを示すために利用されます：
 
 ```
 APP_HTTP_HOST=www.example.com
@@ -146,9 +150,23 @@ APP_HTTP_PORT=3000
 APP_HTTP_PROTOCOL=https
 ```
 
+#### Active Record Encryption / Active Record 暗号化
+
+Active Record encryption configuration is required for the two-factor authentication implementation. These values can be generated using `bin/rails db:encryption:init`, and you should copy the strings output to the screen and set them to these environment variables.
+
+Active Record 暗号化の設定で、二要素認証の実装のために必要です。これらの値は `bin/rails db:encryption:init` で生成することができ、画面に出力された文字列をコピーして、これらの環境変数に設定してください：
+
+```
+ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=
+ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=
+ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=
+```
+
+#### OAuth (GitHub authentication) / OAuth (GitHub 認証)
+
 Set the following variables for GitHub authentication:
 
-GitHub 認証のため、以下の変数を設定してください。
+GitHub 認証のため、以下の変数を設定してください：
 
 ```
 GITHUB_CLIENT_ID=...
@@ -159,7 +177,7 @@ GITHUB_CLIENT_SECRET=...
 
 Once everything is configured, start the web server by running:
 
-全ての設定が完了したら、Web サーバを以下のコマンドで起動してください。
+全ての設定が完了したら、Web サーバを以下のコマンドで起動してください：
 
 ```
 $ bin/rails s
