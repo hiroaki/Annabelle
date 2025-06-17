@@ -1,0 +1,28 @@
+<div class="container p-4 max-w-xl mx-auto">
+  <% if flash[:alert] %>
+    <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+      <%= flash[:alert] %>
+    </div>
+  <% end %>
+
+  <h2 class="text-2xl font-bold mb-4"><%= t('devise.sessions.two_factor_authentication') %></h2>
+
+  <%= form_with scope: :user, url: session_path(:user), method: :post, html: { class: "space-y-6" } do |f| %>
+    <div class="mb-6">
+      <label for="user_otp_attempt" class="block mb-2 text-sm font-medium text-gray-900">
+        <%= t('devise.sessions.enter_otp_code') %>
+      </label>
+      <%= f.text_field :otp_attempt,
+          id: "user_otp_attempt",
+          autofocus: true,
+          autocomplete: 'one-time-code',
+          inputmode: "numeric",
+          class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-40 p-2 text-center tracking-widest",
+          **data_with_testid('otp-input') %>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <%= f.submit t('devise.sessions.authenticate'), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center", **data_with_testid('otp-submit') %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,52 @@
+<%#
+  turbo-frame のリンク先がログインが要求されるページであるとき、セッションが切れたままそのリンクをを辿ろうとすると、
+  リクエスト先がログイン画面へのリダイレクトになり、その結果ターゲットのフレームが "Content missing" となっていまいます。
+  このログイン画面は常にウィンドウの "top" で表示されればよいため、それを指示するための meta タグを挿入して対応します。
+  ちなみに turbo-frame に於けるレイアウトのテンプレートはこのファイルになります：
+    turbo-rails-2.0.13/app/views/layouts/turbo_rails/frame.html.erb
+%>
+<%= turbo_page_requires_reload %>
+
+<div class="container p-4 max-w-xl mx-auto">
+  <% if flash[:alert] %>
+    <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+      <%= flash[:alert] %>
+    </div>
+  <% end %>
+  <% if flash[:notice] %>
+    <div class="p-4 mb-4 text-sm text-blue-700 bg-blue-100 rounded-lg" role="alert">
+      <%= flash[:notice] %>
+    </div>
+  <% end %>
+
+  <h2 class="text-2xl font-bold mb-4"><%= t('devise.sessions.log_in') %></h2>
+
+  <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-6" }) do |f| %>
+    <div class="mb-6">
+      <%= f.label :email, t('devise.sessions.email'), class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+    </div>
+
+    <div class="mb-6">
+      <%= f.label :password, t('devise.sessions.password'), class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= f.password_field :password, autocomplete: "current-password", class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+    </div>
+
+    <% if devise_mapping.rememberable? %>
+      <div class="flex items-center mb-6">
+        <%= f.check_box :remember_me, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+        <%= f.label :remember_me, t('devise.sessions.remember_me'), class: "ml-2 block text-sm font-medium text-gray-900" %>
+      </div>
+    <% end %>
+
+    <%= f.hidden_field :otp_attempt, value: '' %>
+
+    <div class="flex items-center justify-between">
+      <%= f.submit t('devise.sessions.log_in'), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center", **data_with_testid('login-submit') %>
+    </div>
+  <% end %>
+
+  <hr class="my-4">
+
+  <%= render "devise/shared/links" %>
+</div>

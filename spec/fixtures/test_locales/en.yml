@@ -1,0 +1,9 @@
+en:
+  hello: Hello
+  user:
+    name: Name
+    email: Email
+  deeply:
+    nested:
+      structure:
+        key: value

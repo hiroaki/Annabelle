@@ -28,19 +28,135 @@
 #       enabled: "ON"
 
 en:
+  activerecord:
+    attributes:
+      authorization:
+        created_at: "Created at"
+        provider: "Provider"
+        uid: "UID"
+        updated_at: "Updated at"
+      message:
+        content: "Content"
+        created_at: "Created at"
+        updated_at: "Updated at"
+        user_id: "User"
+      user:
+        admin: "Admin"
+        confirmation_sent_at: "Confirmation sent at"
+        confirmation_token: "Confirmation token"
+        confirmed_at: "Confirmed at"
+        created_at: "Created at"
+        current_password: "Current password"
+        email: "Email"
+        encrypted_password: "Encrypted password"
+        password: "Password"
+        password_confirmation: "Password confirmation"
+        preferred_language: "Display Language"
+        remember_created_at: "Remember created at"
+        reset_password_sent_at: "Reset password sent at"
+        reset_password_token: "Reset password token"
+        unconfirmed_email: "Unconfirmed email"
+        updated_at: "Updated at"
+        username: "Username"
+    # エラーメッセージを個別にカスタマイズしたい場合はこのような階層で定義できます。
+    # errors:
+    #   models:
+    #     user:
+    #       attributes:
+    #         username:
+    #           blank: "Username can't be blank"
+    #           invalid: "Username has invalid format"
+    #         email:
+    #           blank: "Email can't be blank"
+    models:
+      authorization: "Authorization"
+      message: "Message"
+      user: "User"
+  errors:
+    locale:
+      invalid_type: "must be a String or Symbol"
+      invalid_value: "is not a valid locale"
+      unsupported_locale: "Unsupported locale"
+    messages:
+      accepted: "must be accepted"
+      blank: "can't be blank"
+      confirmation: "doesn't match %{attribute}"
+      even: "must be even"
+      exclusion: "is reserved"
+      greater_than: "must be greater than %{count}"
+      inclusion: "is not included in the list"
+      invalid: "is invalid"
+      invalid_format: "has invalid format"
+      less_than: "must be less than %{count}"
+      not_a_number: "is not a number"
+      odd: "must be odd"
+      present: "must be blank"
+      taken: "has already been taken"
+      too_long: "is too long (maximum is %{count} characters)"
+      too_short: "is too short (minimum is %{count} characters)"
+  helpers:
+    page_entries_info:
+      more_pages:
+        display_entries: "Displaying %{entry_name} <b>%{first}–%{last}</b> of <b>%{total}</b> in total"
+      one_page:
+        display_entries:
+          one: "Displaying <b>1</b> %{entry_name}"
+          other: "Displaying <b>all %{count}</b> %{entry_name}"
+          zero: "No %{entry_name} found"
+  layouts:
+    configuration_menu:
+      account_settings: "Account settings"
+      dashboard: "Dashboard"
+      profile: "Profile"
+      settings: "Settings"
+      sign_out: "Sign out"
+      two_factor_authentication: "Two Factor Authentication"
+  messages:
+    email_confirmation_required: "You need to confirm your email address before posting."
+    errors:
+      generic: "An error occurred: %{error_message}"
+      not_owned: "You cannot delete another user's message."
+    form:
+      comment_label: "Comment"
+      post: "Post"
+  two_factor_settings:
+    backup_codes_already_seen: "You have already seen your backup codes."
+    could_not_disable: "Could not disable two factor authentication."
+    disable: "Disable Two Factor Authentication"
+    disable_confirm: "Are you sure you want to disable two factor authentication?"
+    disabled: "Successfully disabled two factor authentication."
+    enable: "Enable Two Factor Authentication"
+    enable_first: "Please enable two factor authentication first."
+    enabled: "Successfully enabled two factor authentication, please make note of your backup codes."
+    enabled_html: "Two factor authentication is <span class=\"font-semibold text-green-600\">enabled</span>."
+    incorrect_code: "Incorrect Code"
+    incorrect_password: "Incorrect password"
+    not_enabled_html: "Two factor authentication is <span class=\"font-semibold text-red-600\">not enabled</span>."
+    title: "Two Factor Authentication"
+  users:
+    edit:
+      preferred_language_help: "Choose the display language for this application. If not set, your browser's language setting will be used."
+      profile: "Profile"
+      update: "Update"
+      use_browser_language: "Use browser language"
+      username: "Username"
+    show:
+      dashboard: "Dashboard"
+      welcome: "Welcome %{username}!"
+    two_factor_authentication:
+      disable: "Disable Two Factor Authentication"
+      disable_confirm: "Are you sure you want to disable two factor authentication?"
+      enable: "Enable Two Factor Authentication"
+      enabled_html: "Two factor authentication is <span class=\"font-semibold text-green-600\">enabled</span>."
+      not_enabled_html: "Two factor authentication is <span class=\"font-semibold text-red-600\">not enabled</span>."
+      title: "Two Factor Authentication"
+    update:
+      failure: "Failed to update your profile. Please try again later."
+      success: "Your profile has been updated successfully."
   views:
     pagination:
       first: "&laquo;"
       last: "&raquo;"
-      previous: "&lsaquo;"
       next: "&rsaquo;"
+      previous: "&lsaquo;"
       truncate: "&hellip;"
-  helpers:
-    page_entries_info:
-      one_page:
-        display_entries:
-          zero: "No %{entry_name} found"
-          one: "Displaying <b>1</b> %{entry_name}"
-          other: "Displaying <b>all %{count}</b> %{entry_name}"
-      more_pages:
-        display_entries: "Displaying %{entry_name} <b>%{first}–%{last}</b> of <b>%{total}</b> in total"

@@ -1,0 +1,151 @@
+<turbo-frame id="devise">
+<div class="container p-4">
+  <%= content_tag :h2, t('devise.registrations.account_settings'), class: 'text-2xl font-bold mb-4', **data_with_testid('account-settings-title') %>
+
+  <%= render "shared/flash" %>
+
+  <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "space-y-6" }) do |f| %>
+    <%= render "shared/error_messages", resource: resource %>
+
+    <div class="mb-6">
+      <div>
+        <%= f.label :email, class: "block mb-2 text-sm font-medium text-gray-900" %>
+        <%=
+          f.email_field(:email,
+            autofocus: true,
+            autocomplete: "email",
+            class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5",
+            **data_with_testid('account-email')
+          )
+        %>
+      </div>
+
+      <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+        <div class="flex items-center">
+          <p class="text-sm text-gray-500">
+            <%= t('devise.registrations.currently_waiting_confirmation', email: resource.unconfirmed_email) %>
+          </p>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="mb-6">
+      <%= f.label :password, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%=
+        f.password_field(:password,
+          autocomplete: "new-password",
+          placeholder: t('devise.registrations.your_new_password'),
+          class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5",
+          **data_with_testid('account-new-password')
+        )
+      %>
+      <% if @minimum_password_length %>
+        <p class="mt-2 text-sm text-gray-500">
+          <%= t('devise.registrations.minimum_characters', count: @minimum_password_length) %>
+        </p>
+      <% end %>
+    </div>
+
+    <div class="mb-6">
+      <%= f.label :password_confirmation, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%=
+        f.password_field(:password_confirmation,
+          autocomplete: "new-password",
+          placeholder: t('devise.registrations.confirm_new_password'),
+          class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5",
+          **data_with_testid('account-confirm-password')
+        )
+      %>
+    </div>
+
+    <div class="mb-6">
+      <%= f.label :current_password, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%=
+        f.password_field(:current_password,
+          autocomplete: "current-password",
+          placeholder: t('devise.registrations.current_password'),
+          class: "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5",
+          **data_with_testid('account-current-password')
+        )
+      %>
+      <p class="mt-2 text-sm text-gray-500">
+        <%= t('devise.registrations.need_current_password') %>
+      </p>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <%=
+        f.submit(t('devise.registrations.update'),
+          class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center",
+          **data_with_testid('account-update-submit')
+        )
+      %>
+    </div>
+  <% end %>
+
+  <hr class="my-4">
+
+  <div class="mb-4">
+    <%- if devise_mapping.omniauthable? %>
+      <%- resource_class.omniauth_providers.each do |provider| %>
+        <% provider_name = OmniAuth::Utils.camelize(provider) %>
+        <% if resource.linked_with?(provider) %>
+          <%=
+            button_to(t('devise.registrations.unlink_oauth.label', provider: provider_name),
+              unlink_oauth_path,
+              method: :delete,
+              class: "text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2",
+              id: "unlink-button-#{provider}",
+              **data_with_testid("account-unlink-#{provider}",
+                turbo: false,
+                confirm: t('devise.registrations.unlink_confirm', provider: provider_name),
+              ),
+              params: {
+                provider: provider
+              },
+            )
+          %>
+        <% else %>
+          <% 
+            # OAuth認証時に現在の言語設定を保持するためのパラメータを追加
+            oauth_params = {}
+            if I18n.locale != I18n.default_locale
+              oauth_params[:lang] = I18n.locale.to_s
+            elsif params[:lang].present? && LocaleValidator.valid_locale?(params[:lang])
+              oauth_params[:lang] = params[:lang]
+            end
+          %>
+          <%=
+            button_to(t('devise.registrations.link_oauth', provider: provider_name),
+              omniauth_authorize_path(resource_name, provider),
+              params: oauth_params,
+              class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2",
+              id: "oauth-button-#{provider}",
+              **data_with_testid("account-link-#{provider}",
+                turbo: false
+              )
+            )
+          %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <hr class="my-4">
+
+  <h3 class="text-xl font-bold mt-8 mb-4"><%= t('devise.registrations.cancel_my_account') %></h3>
+
+  <div class="mb-4">
+    <%=
+      button_to(t('devise.registrations.cancel_my_account'), registration_path(resource_name),
+        method: :delete,
+        class: "text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center",
+        **data_with_testid('account-cancel',
+          turbo_frame: '_top', # 重要! frame 指定のままだと余分なリダイレクトが発生し、その場合 flash も消えてしまいます
+          turbo_confirm: t('devise.registrations.cancel_confirm'),
+        ),
+      )
+    %>
+  </div>
+</div>
+</turbo-frame>

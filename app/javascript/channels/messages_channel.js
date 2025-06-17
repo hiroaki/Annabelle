@@ -20,7 +20,7 @@ consumer.subscriptions.create("MessagesChannel", {
     const page = document.querySelector('[data-current-page-number]')?.dataset?.currentPageNumber; // or undefined
 
     if (data['created']) {
-      if (page && page == '1') {
+      if (!page || page == '1') {
         messages.insertAdjacentHTML('afterbegin', data['rendered_message']);
       } else {
         notificationTargets.forEach((nt) => nt.classList.remove('hidden'));
@@ -28,7 +28,8 @@ consumer.subscriptions.create("MessagesChannel", {
     }
     else if (data['destroyed']) {
       const destroyed_message_id = data['destroyed']
-      messages.querySelector(`[data-message-id="${destroyed_message_id}"]`).remove();
+      const elem = messages.querySelector(`[data-message-id="${destroyed_message_id}"]`);
+      if (elem) elem.remove();
     }
   }
 });

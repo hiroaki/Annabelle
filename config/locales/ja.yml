@@ -1,0 +1,162 @@
+# Files in the config/locales directory are used for internationalization and
+# are automatically loaded by Rails. If you want to use locales other than
+# English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t "hello"
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t("hello") %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# To learn more about the API, please read the Rails Internationalization guide
+# at https://guides.rubyonrails.org/i18n.html.
+#
+# Be aware that YAML interprets the following case-insensitive strings as
+# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
+# must be quoted to be interpreted as strings. For example:
+#
+#     en:
+#       "yes": yup
+#       enabled: "ON"
+
+ja:
+  activerecord:
+    attributes:
+      authorization:
+        created_at: "作成日時"
+        provider: "プロバイダ"
+        uid: "UID"
+        updated_at: "更新日時"
+      message:
+        content: "内容"
+        created_at: "作成日時"
+        updated_at: "更新日時"
+        user_id: "ユーザー"
+      user:
+        admin: "管理者"
+        confirmation_sent_at: "確認メール送信日時"
+        confirmation_token: "確認トークン"
+        confirmed_at: "確認済み日時"
+        created_at: "作成日時"
+        current_password: "現在のパスワード"
+        email: "メールアドレス"
+        encrypted_password: "暗号化されたパスワード"
+        password: "パスワード"
+        password_confirmation: "パスワード（確認）"
+        preferred_language: "表示言語"
+        remember_created_at: "ログイン状態保持開始日時"
+        reset_password_sent_at: "パスワード再設定メール送信日時"
+        reset_password_token: "パスワード再設定トークン"
+        unconfirmed_email: "未確認メールアドレス"
+        updated_at: "更新日時"
+        username: "ユーザー名"
+    # エラーメッセージを個別にカスタマイズしたい場合はこのような階層で定義できます。
+    # errors:
+    #   models:
+    #     user:
+    #       attributes:
+    #         username:
+    #           blank: "ユーザー名を入力してください"
+    #           invalid: "ユーザー名が不正です"
+    #         email:
+    #           blank: "メールアドレスを入力してください"
+    models:
+      authorization: "認証情報"
+      message: "メッセージ"
+      user: "ユーザー"
+  errors:
+    locale:
+      invalid_type: "は文字列またはシンボルである必要があります"
+      invalid_value: "は有効なロケールではありません"
+      unsupported_locale: "サポートされていない言語です"
+    messages:
+      accepted: "を受諾してください"
+      blank: "を入力してください"
+      confirmation: "と%{attribute}の入力が一致しません"
+      even: "は偶数にしてください"
+      exclusion: "は予約されています"
+      greater_than: "は%{count}より大きい値にしてください"
+      inclusion: "は一覧にありません"
+      invalid: "は不正な値です"
+      invalid_format: "は正しい形式で入力してください"
+      less_than: "は%{count}より小さい値にしてください"
+      not_a_number: "は数値で入力してください"
+      odd: "は奇数にしてください"
+      present: "は空欄でなければいけません"
+      taken: "は既に使用されています"
+      too_long: "は%{count}文字以内で入力してください"
+      too_short: "は%{count}文字以上で入力してください"
+  helpers:
+    page_entries_info:
+      more_pages:
+        display_entries: "全 <b>%{total}</b> 件中、<b>%{first}–%{last}</b> を表示中"
+      one_page:
+        display_entries:
+          one: "表示中 <b>1</b> 件の %{entry_name}"
+          other: "全 <b>%{count}</b> 件の %{entry_name} を表示中"
+          zero: "%{entry_name}が見つかりません"
+  layouts:
+    configuration_menu:
+      account_settings: "アカウント設定"
+      dashboard: "ダッシュボード"
+      profile: "プロフィール"
+      settings: "設定"
+      sign_out: "ログアウト"
+      two_factor_authentication: "二要素認証"
+  messages:
+    email_confirmation_required: "投稿するにはメールアドレスの確認が必要です。"
+    errors:
+      generic: "エラーが発生しました: %{error_message}"
+      not_owned: "他のユーザのメッセージは削除できません。"
+    form:
+      comment_label: "コメント"
+      post: "投稿"
+  two_factor_settings:
+    backup_codes_already_seen: "バックアップコードは既に表示済みです。"
+    could_not_disable: "二要素認証を無効化できませんでした。"
+    disable: "二要素認証を無効にする"
+    disable_confirm: "本当に二要素認証を無効化しますか？"
+    disabled: "二要素認証を無効化しました。"
+    enable: "二要素認証を有効にする"
+    enable_first: "まず二要素認証を有効にしてください。"
+    enabled: "二要素認証を有効化しました。バックアップコードを必ず控えてください。"
+    enabled_html: "二要素認証は<span class=\"font-semibold text-green-600\">有効</span>です。"
+    incorrect_code: "認証コードが正しくありません"
+    incorrect_password: "パスワードが正しくありません"
+    not_enabled_html: "二要素認証は<span class=\"font-semibold text-red-600\">無効</span>です。"
+    title: "二要素認証"
+  users:
+    edit:
+      preferred_language_help: "このアプリケーションの表示言語を選択してください。未設定の場合はブラウザの設定に従います。"
+      profile: "プロフィール"
+      update: "更新"
+      use_browser_language: "ブラウザの言語設定を使用"
+      username: "ユーザー名"
+    show:
+      dashboard: "ダッシュボード"
+      welcome: "%{username}さん、ようこそ！"
+    two_factor_authentication:
+      disable: "二要素認証を無効にする"
+      disable_confirm: "本当に二要素認証を無効化しますか？"
+      enable: "二要素認証を有効にする"
+      enabled_html: "二要素認証は<span class=\"font-semibold text-green-600\">有効</span>です。"
+      not_enabled_html: "二要素認証は<span class=\"font-semibold text-red-600\">無効</span>です。"
+      title: "二要素認証"
+    update:
+      failure: "プロフィールの更新に失敗しました。時間を置いて再度お試しください。"
+      success: "プロフィールを更新しました。"
+  views:
+    pagination:
+      first: "&laquo;"
+      last: "&raquo;"
+      next: "&rsaquo;"
+      previous: "&lsaquo;"
+      truncate: "&hellip;"

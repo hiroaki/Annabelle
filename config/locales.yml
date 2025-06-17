@@ -1,0 +1,19 @@
+# ロケール設定ファイル
+# 利用可能なロケールとそのメタデータを外部化
+
+locales:
+  default: en
+  available:
+    - en
+    - ja
+  
+  # ロケールのメタデータ（将来の拡張用）
+  metadata:
+    en:
+      name: "English"
+      native_name: "English"
+      direction: ltr
+    ja:
+      name: "Japanese"
+      native_name: "日本語"
+      direction: ltr

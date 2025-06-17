@@ -17,3 +17,14 @@
     @apply bg-red-100;
   }
 }
+
+/* iPhone の Safari はフォーム入力欄のフォントサイズが 16px 未満の場合、
+  それをフォーカスすると画面がズームしてしまいます。ここで一括指定しています。
+  */
+@layer base {
+  input,
+  textarea,
+  select {
+    @apply text-base;
+  }
+}

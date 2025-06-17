@@ -23,6 +23,31 @@ module Annabelle
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Secrets configured for ActiveRecord encrypted attributes
+    config.active_record.encryption.primary_key = ENV["ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY"]
+    config.active_record.encryption.deterministic_key = ENV["ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY"]
+    config.active_record.encryption.key_derivation_salt = ENV["ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT"]
+
+    # activerecord-session_store (gem) settings
+    ActiveRecord::SessionStore::Session.serializer = :json
+
+    # rails-i18n (gem) settings
+    # デフォルトは既存の設定を保持し、初期化時に動的に設定
+    config.i18n.available_locales = [:en, :ja]
+    config.i18n.default_locale = :en
+
+    # Use environment variable to select image processing backend (mini_magick or vips)
+    valid_processors = [:mini_magick, :vips]
+    processor = ENV.fetch("ANNABELLE_VARIANT_PROCESSOR", "mini_magick").to_sym
+    unless valid_processors.include?(processor)
+      warn "[Annabelle] ANNABELLE_VARIANT_PROCESSOR='#{processor}' is invalid. Falling back to :mini_magick."
+      processor = :mini_magick
+    end
+    config.active_storage.variant_processor = processor
+
+    # My experimental feature
+    config.x.auto_login = config_for(Rails.root.join('config/x/auto_login.yml'))
   end
 
   # Set default_url_options For Entire Application

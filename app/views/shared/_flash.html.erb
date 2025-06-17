@@ -1,0 +1,14 @@
+<%
+  flash_styles = {
+    alert:  'text-red-700 bg-red-100',
+    notice: 'text-blue-700 bg-blue-100'
+  }
+%>
+<% flash.each do |type, message| %>
+  <% style = flash_styles[type.to_sym] || 'text-yellow-700 bg-yellow-100' %>
+  <%= content_tag :div,
+        message,
+        class: "p-4 mb-4 text-sm #{style} rounded-lg",
+        role: 'alert',
+        **data_with_testid('flash-message', controller: 'dismissable') %>
+<% end %>

@@ -1,21 +1,34 @@
 <div
-  class="mb-2 container min-w-0 p-4 bg-white rounded-lg shadow-xs overflow-scroll"
+  class="mb-2 w-full min-w-0 p-4 bg-white rounded-lg shadow-xs overflow-auto scrollbar-gutter-stable"
   data-message-id="<%= message.id %>"
+  data-owner-id="<%= message.user.id %>"
+  data-controller="message-ownership"
   <%= 'data-new-message="true"'.html_safe if defined?(as_new) && !!as_new %><%# see also tailwind definition %>
 >
-  <div class="text-xs pb-2">
-    <%= link_to "&#x1f5d1;".html_safe, message_path(message), data: { turbo_method: :delete, turbo_confirm: 'Sure?' } %>
-    <%= message.created_at.in_time_zone('Asia/Tokyo').strftime('%Y-%m-%d %H:%M:%S') %>
+  <div class="text-gray-400 text-xs pb-2">
+    <%=
+      link_to("&#x1f5d1;".html_safe, message_path(message),
+        class: 'hidden',
+        **data_with_testid("delete-message-#{message.id}",{
+          turbo_method: :delete,
+          turbo_confirm: 'Sure?',
+          message_ownership_target: 'owner',
+        })
+      )
+    %>
+    <span data-message-ownership-target="nonOwner" class="hidden">&#x270e;</span>
+    <span class="mx-1"><%= message.created_at.in_time_zone('Asia/Tokyo').strftime('%Y-%m-%d %H:%M:%S') %></span>
+    <span><%= message.user.username %></span>
   </div>
 
-  <div class="container">
-    <%= message.content %>
-  </div>
+  <%= content_tag :div, simple_format(message.content),
+    class: "container text-nowrap",
+    **data_with_testid("message-content-#{message.id}") %>
 
-  <div class="container">
+  <div class="container flex">
     <% if message.attachements.attached? %>
       <% message.attachements.each do |att| %>
-        <div class="container">
+        <div class="container flex-shrink-0 w-auto mx-2">
           <% if att.representable? %>
             <div class="h-40 w-40 bg-gray-200 flex" data-action="click->messages#changePreview">
               <% if ['video/quicktime', 'video/mp4'].include?(att.content_type) %>

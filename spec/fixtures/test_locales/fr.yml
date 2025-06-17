@@ -1,0 +1,10 @@
+# elsifブロック用：ファイル名と中身のlocaleが異なる
+en:
+  hello: Hello
+  user:
+    name: Name
+    email: Email
+  deeply:
+    nested:
+      structure:
+        key: value
