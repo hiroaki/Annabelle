@@ -6,8 +6,6 @@
 
 `Dockerfile.vips` は、Annabelle アプリケーションが `libvips` 画像処理ライブラリのある環境で**動作テストを行うため**に用意されています。これにより、Active Storage の画像処理バックエンドとして `vips` を使った動作確認や利用が可能になります。`vips` は特定の画像処理で ImageMagick より高速かつ効率的な場合があります。
 
----
-
 ## How to use / 使い方
 
 Run these commands from the project’s top directory.
@@ -18,7 +16,7 @@ Run these commands from the project’s top directory.
 
 (1) Docker イメージをビルドします:  
 
-```
+```shell
 $ docker build -f docker/Dockerfile.vips -t annabelle-vips .
 ```
 
@@ -26,15 +24,21 @@ $ docker build -f docker/Dockerfile.vips -t annabelle-vips .
 
 (2) コンテナを起動し、vips バックエンドで Rails を起動します:
 
-```
+```shell
 $ docker run --rm -it -p 13000:3000 \
   -e ANNABELLE_VARIANT_PROCESSOR=vips annabelle-vips
 ```
 
-This will make the application available at [http://localhost:13000](http://localhost:13000).
+This will make the application available at [http://localhost:13000](http://localhost:13000). The login credentials are described in entrypoint.sh, so please refer to that file.
 
-この操作でアプリケーションは [http://localhost:13000](http://localhost:13000) で利用可能になります。
+この操作でアプリケーションは [http://localhost:13000](http://localhost:13000) で利用可能になります。ログイン情報は entrypoint.sh の中に記述がありますので、参照してください。
 
-You can manually upload a video file to confirm that it appears in the message and its preview is displayed correctly.
+Try uploading a video file to make sure it appears in the message and its preview displays correctly.
 
 手動で動画ファイルをアップロードし、それがメッセージ内に表示されプレビューできることを確認してください。
+
+## Issue / 課題
+
+In the current version, the Chrome browser is installed in the same image as the application, but we plan to prepare a separate container image and use it with Docker Compose.
+
+現在のバージョンでは Chrome ブラウザをアプリケーションと同じイメージにインストールしてますが、別のコンテナ・イメージを用意し、 Docker Compose で使うようにする予定です。
