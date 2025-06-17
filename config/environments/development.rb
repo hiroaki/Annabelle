@@ -82,4 +82,9 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # Capybara によるリモートブラウザからのアクセスがコンテナの hosts 情報でアクセスしてくるため、
+  # その hosts を明示的に設定するか、または clear しないと、アクセスがブロックされます。
+  config.hosts.clear
+  # config.hosts << "web"
 end
