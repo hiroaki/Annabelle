@@ -17,6 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Generate Active Record encryption keys
+        run: |
+          echo "ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=$(openssl rand -hex 32)" >> $GITHUB_ENV
+          echo "ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=$(openssl rand -hex 32)" >> $GITHUB_ENV
+          echo "ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=$(openssl rand -hex 32)" >> $GITHUB_ENV
+
       - name: Read Ruby version
         run: echo "RUBY_VERSION=$(cat .ruby-version)" >> $GITHUB_ENV
 
