@@ -13,7 +13,7 @@ jobs:
     env:
       RAILS_ENV: test
 
-    steps:
+steps:
       - uses: actions/checkout@v4
 
       - name: Generate Active Record encryption keys
@@ -43,12 +43,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y imagemagick sqlite3 libsqlite3-dev
 
-      - name: Install Google Chrome
-        run: |
-          wget -qO- https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor | sudo tee /etc/apt/keyrings/google-chrome.asc > /dev/null
-          echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-chrome.asc] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
-          sudo apt-get update # Chromeリポジトリ追加後の更新
-          sudo apt-get install -y google-chrome-stable
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1.7.3
 
       - name: Set up database
         run: |
