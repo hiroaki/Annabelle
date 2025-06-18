@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  rspec:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      RAILS_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate Active Record encryption keys
+        run: |
+          echo "ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=$(openssl rand -hex 32)" >> $GITHUB_ENV
+          echo "ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=$(openssl rand -hex 32)" >> $GITHUB_ENV
+          echo "ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=$(openssl rand -hex 32)" >> $GITHUB_ENV
+
+      - name: Read Ruby version
+        run: echo "RUBY_VERSION=$(cat .ruby-version)" >> $GITHUB_ENV
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true
+
+      - name: Install tools (ImageMagick, SQLite3, etc.)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick sqlite3 libsqlite3-dev
+
+      - name: Install Google Chrome
+        run: |
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Set up database
+        run: |
+          bin/rails db:create
+          bin/rails db:schema:load
+          bin/rails db:seed
+
+      - name: Precompile assets
+        run: bin/rails assets:precompile
+
+      - name: Run RSpec tests
+        run: bundle exec rspec
+        timeout-minutes: 5
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+
+      - name: Coveralls GitHub Action
+        uses: coverallsapp/github-action@v2.3.6
