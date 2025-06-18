@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/hiroaki/Annabelle/badge.svg?branch=coveralls)](https://coveralls.io/github/hiroaki/Annabelle?branch=coveralls)
+
 # Annabelle アナベル
 
 Annabelle is a simple message board developed as part of my personal Ruby on Rails training. Its purpose is to enable file and message exchange between PCs and smartphones on a local area network (LAN). As it is still under development and includes experimental implementations, it is not recommended for use as a public site at this time. (The goal is to eventually make it suitable for public deployment.)
