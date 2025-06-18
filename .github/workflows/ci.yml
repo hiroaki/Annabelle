@@ -13,7 +13,7 @@ jobs:
     env:
       RAILS_ENV: test
 
-steps:
+    steps:
       - uses: actions/checkout@v4
 
       - name: Generate Active Record encryption keys
