@@ -7,8 +7,9 @@ on:
     branches: [ develop ]
 
 jobs:
-  test:
+  rspec:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     env:
       RAILS_ENV: test
@@ -30,11 +31,10 @@ jobs:
           ruby-version: ${{ env.RUBY_VERSION }}
           bundler-cache: true
 
-      - name: Install ImageMagick
-        run: sudo apt-get update && sudo apt-get install -y imagemagick
-
-      - name: Install SQLite3
-        run: sudo apt-get install -y sqlite3 libsqlite3-dev
+      - name: Install tools (ImageMagick, SQLite3, etc.)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick sqlite3 libsqlite3-dev
 
       - name: Install Google Chrome
         run: |
@@ -54,6 +54,7 @@ jobs:
 
       - name: Run RSpec tests
         run: bundle exec rspec
+        timeout-minutes: 5
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
