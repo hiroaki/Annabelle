@@ -7,7 +7,7 @@ on:
     branches: [ develop ]
 
 jobs:
-  test:
+  rspec:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
