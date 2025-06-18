@@ -47,7 +47,7 @@ jobs:
         uses: browser-actions/setup-chrome@v1.7.3
         with:
           chrome-version: stable
-          # install-chromedriver: true
+          install-chromedriver: true
 
       - name: Set up database
         run: |
