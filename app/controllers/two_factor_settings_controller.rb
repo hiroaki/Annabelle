@@ -38,7 +38,7 @@ class TwoFactorSettingsController < ApplicationController
 
     if current_user.two_factor_backup_codes_generated?
       flash[:alert] = I18n.t('two_factor_settings.backup_codes_already_seen')
-      return redirect_to edit_user_registration_path
+      return redirect_to two_factor_authentication_user_path(current_user)
     end
 
     @backup_codes = current_user.generate_otp_backup_codes!
@@ -49,7 +49,7 @@ class TwoFactorSettingsController < ApplicationController
   def destroy
     if current_user.disable_two_factor!
       flash[:notice] = I18n.t('two_factor_settings.disabled')
-      redirect_to edit_user_registration_path
+      redirect_to two_factor_authentication_user_path(current_user)
     else
       flash[:alert] = I18n.t('two_factor_settings.could_not_disable')
       redirect_back fallback_location: root_path
