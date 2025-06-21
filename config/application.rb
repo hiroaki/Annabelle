@@ -49,11 +49,4 @@ module Annabelle
     # My experimental feature
     config.x.auto_login = config_for(Rails.root.join('config/x/auto_login.yml'))
   end
-
-  # Set default_url_options For Entire Application
-  # https://github.com/jbranchaud/til/blob/master/rails/set-default-url-options-for-entire-application.md
-  Rails.application.default_url_options = {
-    host: ENV['ANNABELLE_HOST'].presence || 'localhost',
-    port: ENV['ANNABELLE_PORT'].presence,
-  }
 end
