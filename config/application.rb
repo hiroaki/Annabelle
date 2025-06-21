@@ -48,5 +48,16 @@ module Annabelle
 
     # My experimental feature
     config.x.auto_login = config_for(Rails.root.join('config/x/auto_login.yml'))
+
+    # Active Job の中でテンプレートを render する際に URL ヘルパーが使えるようにします。
+    # action_mailer 用の設定を複製し、両者で同じ URL になるようにしています。
+    #
+    # Job における default_url_options について（このやり方は期待通り働かず）：
+    # https://github.com/rails/rails/issues/29992#issuecomment-318819265
+    # その他参考：
+    # https://github.com/rails/rails/issues/39566
+    config.after_initialize do
+      Rails.application.routes.default_url_options = Rails.application.config.action_mailer.default_url_options.dup
+    end
   end
 end
