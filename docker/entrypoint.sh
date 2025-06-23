@@ -2,12 +2,11 @@
 set -e
 
 mkdir -p log tmp
-bundle exec rails db:migrate
-bundle exec rails db:seed
-bundle exec rails tailwindcss:build
-bundle exec rails assets:precompile
 
-# This is in the development environment
-bundle exec rails runner "User.admin_user.update!(password: 'password123')"
+if [ -z "$RAILS_ENV" ] || [ "$RAILS_ENV" = "development" ]; then
+  bundle exec rails db:migrate
+  bundle exec rails db:seed
+  bundle exec rails tailwindcss:build
+fi
 
 exec "$@"

@@ -42,95 +42,6 @@ end
 
 Rails.application.load_seed if Rails.env.test?
 
-#--
-# Capybara の設定ここから
-#
-require 'capybara/rails'
-require 'capybara/cuprite'
-
-# Custom Capybara driver for Chrome/Chromium with Docker support
-# This driver is configured to work in both local and Docker environments.
-# For Docker environments, set DOCKER environment variable to true.
-# 
-# Documentation reference:
-# https://github.com/rubycdp/ferrum?tab=readme-ov-file#customization
-Capybara.register_driver(:cuprite_custom) do |app|
-  lang = ENV['CAPYBARA_LANG'] || 'en'
-  
-  # Base browser options with language setting
-  browser_options = { 'accept-lang' => lang }
-  
-  # Docker-specific browser options for containerized environments
-  if ENV['DOCKER'].present?
-    browser_options.merge!({
-      'no-sandbox' => nil,           # Required for Docker containers
-      'disable-dev-shm-usage' => nil, # Overcome limited resource problems
-      'disable-gpu' => nil,          # Disable GPU hardware acceleration
-      'headless' => nil              # Run in headless mode for Docker
-    })
-  end
-
-  options = {
-    js_errors: true,
-    window_size: [1200, 800],
-    headless: ENV['DOCKER'].present? ? true : %w[0 false].exclude?(ENV['HEADLESS']),
-    slowmo: ENV['SLOWMO']&.to_f,
-    inspector: !ENV['DOCKER'].present?, # Disable inspector in Docker
-    browser_options: browser_options,
-    process_timeout: 120,
-    window_open_timeout: 60,
-    pending_connection_errors: false
-  }
-
-  # Set browser path for Docker environment (Chromium)
-  if ENV['DOCKER'].present?
-    options[:browser_path] = '/usr/bin/chromium'
-  end
-
-  puts "Capybara::Cuprite::Driver options: #{options}" if ENV['DEBUG_CAPYBARA']
-
-  Capybara::Cuprite::Driver.new(app, options)
-end
-
-# Configure Capybara for different environments
-Capybara.configure do |config|
-  config.test_id = 'data-testid'
-  config.default_max_wait_time = 10
-  config.default_normalize_ws = true
-  
-  # Docker environment specific configuration
-  if ENV['DOCKER'].present?
-    config.server_host = "0.0.0.0"
-    config.server_port = 3000
-    config.app_host = "http://web:3000" if ENV['COMPOSE_SERVICE_NAME'] == 'web'
-  else
-    # Local development - use a different port to avoid conflicts
-    config.server_port = 3001
-  end
-end
-
-# Set the JavaScript driver
-Capybara.javascript_driver = :cuprite_custom
-
-# Debug information for Docker environments
-if ENV['DOCKER'].present? && ENV['DEBUG_CAPYBARA']
-  puts "=== Capybara Configuration ==="
-  puts "Capybara.javascript_driver: #{Capybara.javascript_driver}"
-  puts "Capybara.server_host: #{Capybara.server_host}"
-  puts "Capybara.server_port: #{Capybara.server_port}"
-  puts "Capybara.app_host: #{Capybara.app_host}"
-  puts "=============================="
-end
-
-# TODO: Custom selector for test_id attribute
-# Capybara.add_selector(:test_id) do
-#   css { |value| "[data-testid='#{value}']" }
-# end
-# Usage: find(:test_id, "foo-bar")
-#
-# Capybara の設定ここまで
-#--
-
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
@@ -190,14 +101,13 @@ RSpec.configure do |config|
   # Capybara 用の自作ヘルパー
   config.include CapybaraHelpers, type: :system
 
-  # I18n に関するメッセージを組み立てるための自作ヘルパー
-  config.include ExpectErrorMessageHelper
-
-  # system spec の設定
-  config.before(:each, type: :system) do |example|
+  config.before(:each, type: :system) do |_example|
     driven_by(:cuprite_custom)
     ActiveJob::Base.queue_adapter = :inline
   end
+
+  # I18n に関するメッセージを組み立てるための自作ヘルパー
+  config.include ExpectErrorMessageHelper
 
   # ロケール設定
   config.before(:each) do
@@ -210,21 +120,4 @@ RSpec.configure do |config|
     OmniAuth.config.test_mode = true
     OmniAuth.config.mock_auth[:github] = nil
   end
-
-  # Docker環境でのCapybaraセッション管理（一時的に無効化）
-  # if ENV['CAPYBARA_APP_HOST'].present?
-  #   config.before(:each, type: :system) do |example|
-  #     # 既存のセッションをクリア
-  #     Capybara.reset_sessions!
-  #   end
-  #   
-  #   config.after(:each, type: :system) do |example|
-  #     # テスト後にセッションをクリア
-  #     Capybara.reset_sessions!
-  #   end
-  # end
-
-  # config.before(:each, type: :job) do
-  #   ActiveJob::Base.queue_adapter = :test
-  # end
 end
