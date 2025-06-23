@@ -1,3 +1,6 @@
+# This compose file is only for running rspec in a Docker environment.
+# There are no special settings required. Just run "up" to execute.
+
 services:
   web:
     build:
