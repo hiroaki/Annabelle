@@ -20,18 +20,18 @@ Run these commands from the project’s top directory.
 $ docker build -f docker/Dockerfile.vips -t annabelle-vips .
 ```
 
-(2) Run the container and start Rails with the vips backend:
+(2) Run the container starts Rails:
 
-(2) コンテナを起動し、vips バックエンドで Rails を起動します:
+(2) コンテナを起動することで Rails が起動します:
 
 ```shell
 $ docker run --rm -it -p 13000:3000 \
   -e ANNABELLE_VARIANT_PROCESSOR=vips annabelle-vips
 ```
 
-This will make the application available at [http://localhost:13000](http://localhost:13000). The login credentials are described in entrypoint.sh, so please refer to that file.
+This will make the application available at [http://localhost:13000](http://localhost:13000).
 
-この操作でアプリケーションは [http://localhost:13000](http://localhost:13000) で利用可能になります。ログイン情報は entrypoint.sh の中に記述がありますので、参照してください。
+この操作でアプリケーションは [http://localhost:13000](http://localhost:13000) で利用可能になります。
 
 Try uploading a video file to make sure it appears in the message and its preview displays correctly.
 
