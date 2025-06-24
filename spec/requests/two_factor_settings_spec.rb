@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe TwoFactorSettingsController, type: :request do
   let(:user) { FactoryBot.create(:user, password: 'password123') }
 
-  describe 'GET #new' do
+  describe 'GET /two_factor_settings/new' do
     context 'when user is not signed in' do
       it 'redirects to sign in page' do
         get new_two_factor_settings_path
@@ -17,7 +17,7 @@ RSpec.describe TwoFactorSettingsController, type: :request do
       context 'when 2FA is already enabled' do
         before { user.update(otp_required_for_login: true) }
 
-        it 'redirects to user page with alert' do
+        it 'redirects to dashboard with alert' do
           get new_two_factor_settings_path
           expect(response).to redirect_to(dashboard_path)
           expect(flash[:alert]).to eq(I18n.t('two_factor_settings.already_enabled'))
@@ -33,9 +33,9 @@ RSpec.describe TwoFactorSettingsController, type: :request do
     end
   end
 
-  describe 'GET #edit' do
+  describe 'GET /two_factor_settings/edit' do
     context 'when not signed in' do
-      it 'redirects to login page' do
+      it 'redirects to sign in page' do
         get edit_two_factor_settings_path
         expect(response).to redirect_to(new_user_session_path)
       end
@@ -62,7 +62,7 @@ RSpec.describe TwoFactorSettingsController, type: :request do
             allow_any_instance_of(User).to receive(:two_factor_backup_codes_generated?).and_return(true)
           end
 
-          it 'redirects to registration edit with alert' do
+          it 'redirects to two factor authentication page with alert' do
             get edit_two_factor_settings_path
             expect(response).to redirect_to(two_factor_authentication_path)
             expect(flash[:alert]).to eq(I18n.t('two_factor_settings.backup_codes_already_seen'))
@@ -79,7 +79,6 @@ RSpec.describe TwoFactorSettingsController, type: :request do
           it 'generates backup codes and renders edit' do
             get edit_two_factor_settings_path
             expect(response).to have_http_status(:ok)
-            # バックアップコードがレスポンス本文に含まれていることを確認
             expect(response.body).to include('code1')
             expect(response.body).to include('code2')
           end
@@ -88,7 +87,7 @@ RSpec.describe TwoFactorSettingsController, type: :request do
     end
   end
 
-  describe 'POST #create' do
+  describe 'POST /two_factor_settings' do
     before { sign_in user }
 
     let(:valid_params) do
@@ -140,7 +139,7 @@ RSpec.describe TwoFactorSettingsController, type: :request do
     end
   end
 
-  describe 'DELETE #destroy' do
+  describe 'DELETE /two_factor_settings' do
     before { sign_in user }
 
     context 'when disable_two_factor! succeeds' do
@@ -148,7 +147,7 @@ RSpec.describe TwoFactorSettingsController, type: :request do
         allow_any_instance_of(User).to receive(:disable_two_factor!).and_return(true)
       end
 
-      it 'disables 2FA and redirects with notice' do
+      it 'disables 2FA and redirects to authentication page with notice' do
         delete two_factor_settings_path
         expect(response).to redirect_to(two_factor_authentication_path)
         expect(flash[:notice]).to eq(I18n.t('two_factor_settings.disabled'))
@@ -160,7 +159,7 @@ RSpec.describe TwoFactorSettingsController, type: :request do
         allow_any_instance_of(User).to receive(:disable_two_factor!).and_return(false)
       end
 
-      it 'redirects back with alert' do
+      it 'redirects to root with alert' do
         delete two_factor_settings_path
         expect(response).to redirect_to(root_path)
         expect(flash[:alert]).to eq(I18n.t('two_factor_settings.could_not_disable'))

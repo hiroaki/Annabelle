@@ -110,7 +110,7 @@ RSpec.describe CurrentUserPresenter, type: :presenter do
         allow(view_context).to receive(:user_signed_in?).and_return(true)
       end
 
-      it 'generates user links with correct parameters' do
+      it 'generates user display and sign out links with correct attributes' do
         expect(view_context).to receive(:link_to).with(
           user.username,
           '/dashboard',
@@ -139,7 +139,7 @@ RSpec.describe CurrentUserPresenter, type: :presenter do
         expect(result).to eq('<div>User links</div>')
       end
 
-      it 'includes data-testid attributes' do
+      it 'includes data-testid attributes for display and sign out links' do
         expect(view_context).to receive(:data_with_testid)
           .with('current-user-display')
           .and_return({ data: { testid: 'current-user-display' } })

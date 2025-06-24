@@ -143,10 +143,9 @@ RSpec.describe UsersController, type: :request do
     end
 
     describe "locale-specific scenarios" do
-      it "redirects to default URL when changing to English from Japanese URL" do
+      it "redirects to English URL when changing to English from Japanese URL" do
         user.update(preferred_language: "ja")
         patch update_profile_path(locale: I18n.locale), params: { user: { preferred_language: "en" } }
-        
         expect(response).to have_http_status(:redirect)
         expect(response.location).to match(%r{/en/profile/edit$})
         expect(user.reload.preferred_language).to eq("en")
@@ -155,17 +154,15 @@ RSpec.describe UsersController, type: :request do
       it "redirects to Japanese URL when changing to Japanese from English URL" do
         user.update(preferred_language: "en")
         patch update_profile_path(locale: I18n.locale), params: { user: { preferred_language: "ja" } }
-        
         expect(response).to have_http_status(:redirect)
         expect(response.location).to match(%r{/ja/profile/edit$})
         expect(user.reload.preferred_language).to eq("ja")
       end
 
-      it "handles empty string selection based on browser language" do
+      it "redirects based on browser language when empty string is selected" do
         patch update_profile_path(locale: I18n.locale), 
               params: { user: { preferred_language: "" } },
               headers: { 'HTTP_ACCEPT_LANGUAGE' => 'ja,en-US;q=0.9,en;q=0.8' }
-        
         expect(response).to have_http_status(:redirect)
         expect(response.location).to match(%r{/ja/profile/edit$})
         expect(user.reload.preferred_language).to eq("")
