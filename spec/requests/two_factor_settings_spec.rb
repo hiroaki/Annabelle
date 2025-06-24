@@ -19,7 +19,7 @@ RSpec.describe TwoFactorSettingsController, type: :request do
 
         it 'redirects to user page with alert' do
           get new_two_factor_settings_path
-          expect(response).to redirect_to(user_path(user))
+          expect(response).to redirect_to(dashboard_path)
           expect(flash[:alert]).to eq(I18n.t('two_factor_settings.already_enabled'))
         end
       end

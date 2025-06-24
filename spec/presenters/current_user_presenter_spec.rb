@@ -113,13 +113,13 @@ RSpec.describe CurrentUserPresenter, type: :presenter do
       it 'generates user links with correct parameters' do
         expect(view_context).to receive(:link_to).with(
           user.username,
-          '/users/1',
+          '/dashboard',
           hash_including(
             class: 'text-gray-400',
             id: 'user-name-display',
             data: { testid: 'current-user-display' }
           )
-        ).and_return('<a href="/users/1">testuser</a>')
+        ).and_return('<a href="/dashboard">testuser</a>')
 
         expect(view_context).to receive(:link_to).with(
           I18n.t('layouts.configuration_menu.sign_out'),
