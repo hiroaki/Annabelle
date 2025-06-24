@@ -12,7 +12,7 @@ RSpec.describe CurrentUserPresenter, type: :presenter do
 
     # 基本的なヘルパーメソッドをモック化
     allow(view_context).to receive(:user_signed_in?).and_return(true)
-    allow(view_context).to receive(:user_path).with(user).and_return('/users/1')
+    allow(view_context).to receive(:dashboard_path).and_return('/dashboard')
     allow(view_context).to receive(:destroy_user_session_path).and_return('/users/sign_out')
 
     # data_with_testidヘルパーの動作をモック化（非production環境想定）
