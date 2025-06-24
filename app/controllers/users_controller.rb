@@ -35,7 +35,7 @@ class UsersController < ApplicationController
         redirect_to target_url
       else
         # 言語設定が変更されていない場合は編集画面に戻る
-        redirect_to edit_user_path(@user)
+        redirect_to edit_profile_path
       end
     else
       render :edit
@@ -68,13 +68,6 @@ class UsersController < ApplicationController
   end
 
   def build_redirect_url(effective_locale)
-    # デフォルトロケール（en）かどうかで判定
-    if effective_locale.to_s == I18n.default_locale.to_s
-      # デフォルトロケール（en）の場合は明示的にロケールを指定
-      edit_user_path(@user, locale: effective_locale)
-    else
-      # 非デフォルトロケールの場合は /ja/users/1/edit のように生成
-      edit_user_path(@user, locale: effective_locale)
-    end
+    edit_profile_path(locale: effective_locale)
   end
 end
