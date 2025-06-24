@@ -9,14 +9,14 @@ RSpec.describe UsersController, type: :request do
 
   describe "GET /users/:id" do
     it "returns http success" do
-      get user_path(user)
+      get dashboard_path
       expect(response).to have_http_status(:success)
     end
   end
 
   describe "GET /users/:id/edit" do
     it "returns http success" do
-      get edit_user_path(user)
+      get edit_profile_path
       expect(response).to have_http_status(:success)
     end
   end
@@ -24,8 +24,8 @@ RSpec.describe UsersController, type: :request do
   describe "PATCH /users/:id" do
     context "with valid params" do
       it "updates the user and redirects to edit page" do
-        patch user_path(user), params: { user: { username: "newname" } }
-        expect(response).to redirect_to(edit_user_path(user))
+        patch dashboard_path, params: { user: { username: "newname" } }
+        expect(response).to redirect_to(edit_profile_path)
         follow_redirect!
         expect(response.body).to include("Your profile has been updated successfully")
         expect(user.reload.username).to eq("newname")
@@ -34,7 +34,7 @@ RSpec.describe UsersController, type: :request do
 
     context "with invalid params" do
       it "renders edit template" do
-        patch user_path(user), params: { user: { username: "" } }
+        patch dashboard_path, params: { user: { username: "" } }
         expect(response).to have_http_status(:ok)
         expect(response.body).to include("Username can&#39;t be blank")
       end
@@ -42,7 +42,7 @@ RSpec.describe UsersController, type: :request do
 
     context "when accessing with locale in URL" do
       it "displays page in requested locale without changing user preference" do
-        get edit_user_path(user, locale: :ja)
+        get edit_profile_path(locale: :ja)
         expect(I18n.locale).to eq(:ja)
         expect(user.reload.preferred_language).to be_blank
         expect(response).to have_http_status(:success)
@@ -51,14 +51,14 @@ RSpec.describe UsersController, type: :request do
 
     context "when changing preferred language via form" do
       it "updates the preferred language and redirects to appropriate locale URL" do
-        patch user_path(user), params: { user: { preferred_language: "ja" } }
-        expect(response).to redirect_to("/ja/users/#{user.id}/edit")
+        patch dashboard_path, params: { user: { preferred_language: "ja" } }
+        expect(response).to redirect_to("/ja/profile/edit")
         expect(user.reload.preferred_language).to eq("ja")
       end
 
       it "redirects to default URL when setting to English" do
-        patch user_path(user), params: { user: { preferred_language: "en" } }
-        expect(response).to redirect_to("/en/users/#{user.id}/edit")
+        patch dashboard_path, params: { user: { preferred_language: "en" } }
+        expect(response).to redirect_to("/en/profile/edit")
         expect(user.reload.preferred_language).to eq("en")
       end
     end
@@ -66,15 +66,15 @@ RSpec.describe UsersController, type: :request do
     context "when language setting doesn't change" do
       it "redirects to edit page without locale change" do
         user.update(preferred_language: "en")
-        patch user_path(user), params: { user: { preferred_language: "en" } }
-        expect(response).to redirect_to(edit_user_path(user))
+        patch dashboard_path, params: { user: { preferred_language: "en" } }
+        expect(response).to redirect_to(edit_profile_path)
         expect(user.reload.preferred_language).to eq("en")
       end
     end
 
     context "when changing preferred language to an unsupported locale" do
       it "does not change the preferred language and shows an error" do
-        patch user_path(user), params: { user: { preferred_language: "unsupported" } }
+        patch dashboard_path, params: { user: { preferred_language: "unsupported" } }
         expect(response).to have_http_status(:ok)
         expect(user.reload.preferred_language).not_to eq("unsupported")
         expect(response.body).to include("Display Language is not a valid locale")
@@ -105,7 +105,7 @@ RSpec.describe UsersController, type: :request do
             user.update(preferred_language: user_setting)
             
             # HTTPヘッダーを設定してリクエスト
-            patch user_path(user), 
+            patch dashboard_path, 
                   params: { user: { preferred_language: form_selection } }, 
                   headers: { 'HTTP_ACCEPT_LANGUAGE' => 'ja,en-US;q=0.9,en;q=0.8' }
             
@@ -137,7 +137,7 @@ RSpec.describe UsersController, type: :request do
             user.update(preferred_language: user_setting)
             
             # HTTPヘッダーを設定してリクエスト  
-            patch user_path(user), 
+            patch dashboard_path, 
                   params: { user: { preferred_language: form_selection } }, 
                   headers: { 'HTTP_ACCEPT_LANGUAGE' => 'en-US,en;q=0.9' }
             
@@ -156,7 +156,7 @@ RSpec.describe UsersController, type: :request do
     describe "locale-specific scenarios" do
       it "redirects to default URL when changing to English from Japanese URL" do
         user.update(preferred_language: "ja")
-        patch user_path(user, locale: :ja), params: { user: { preferred_language: "en" } }
+        patch dashboard_path, params: { user: { preferred_language: "en" } }
         
         expect(response).to have_http_status(:redirect)
         expect(response.location).to match(%r{/en/users/\d+/edit$})
@@ -165,7 +165,7 @@ RSpec.describe UsersController, type: :request do
 
       it "redirects to Japanese URL when changing to Japanese from English URL" do
         user.update(preferred_language: "en")
-        patch user_path(user), params: { user: { preferred_language: "ja" } }
+        patch dashboard_path, params: { user: { preferred_language: "ja" } }
         
         expect(response).to have_http_status(:redirect)
         expect(response.location).to match(%r{/ja/users/\d+/edit$})
@@ -173,7 +173,7 @@ RSpec.describe UsersController, type: :request do
       end
 
       it "handles empty string selection based on browser language" do
-        patch user_path(user), 
+        patch dashboard_path, 
               params: { user: { preferred_language: "" } },
               headers: { 'HTTP_ACCEPT_LANGUAGE' => 'ja,en-US;q=0.9,en;q=0.8' }
         

@@ -64,7 +64,7 @@ RSpec.describe TwoFactorSettingsController, type: :request do
 
           it 'redirects to registration edit with alert' do
             get edit_two_factor_settings_path
-            expect(response).to redirect_to(two_factor_authentication_user_path(user))
+            expect(response).to redirect_to(two_factor_authentication_path)
             expect(flash[:alert]).to eq(I18n.t('two_factor_settings.backup_codes_already_seen'))
           end
         end
@@ -150,7 +150,7 @@ RSpec.describe TwoFactorSettingsController, type: :request do
 
       it 'disables 2FA and redirects with notice' do
         delete two_factor_settings_path
-        expect(response).to redirect_to(two_factor_authentication_user_path(user))
+        expect(response).to redirect_to(two_factor_authentication_path)
         expect(flash[:notice]).to eq(I18n.t('two_factor_settings.disabled'))
       end
     end

@@ -70,17 +70,17 @@ RSpec.describe LocaleHelper do
 
   describe '#localized_path_for' do
     before do
-      allow(Rails.application.routes.url_helpers).to receive(:edit_user_path).with(id: 1).and_return('/users/1/edit')
-      allow(Rails.application.routes.url_helpers).to receive(:edit_user_path).with(id: 1, locale: 'ja').and_return('/ja/users/1/edit')
+      allow(Rails.application.routes.url_helpers).to receive(:edit_profile_path).and_return('/profile/edit')
+      allow(Rails.application.routes.url_helpers).to receive(:edit_profile_path).with(locale: 'ja').and_return('/ja/profile/edit')
     end
     it 'generates path-based URL for non-default locale' do
-      result = localized_path_for(:edit_user_path, 'ja', id: 1)
-      expect(result).to eq('/ja/users/1/edit')
+      result = localized_path_for(:edit_profile_path, 'ja')
+      expect(result).to eq('/ja/profile/edit')
     end
     it 'generates path-based URL for default locale' do
-      allow(Rails.application.routes.url_helpers).to receive(:edit_user_path).with(id: 1, locale: 'en').and_return('/en/users/1/edit')
-      result = localized_path_for(:edit_user_path, 'en', id: 1)
-      expect(result).to eq('/en/users/1/edit')
+      allow(Rails.application.routes.url_helpers).to receive(:edit_profile_path).with(locale: 'en').and_return('/en/profile/edit')
+      result = localized_path_for(:edit_profile_path, 'en')
+      expect(result).to eq('/en/profile/edit')
     end
   end
 
