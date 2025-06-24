@@ -1,9 +1,6 @@
 <%
-  # ログインしている（いない）ユーザの情報を View で扱うためのプレゼンター。
+  # ユーザの情報を View で扱うためのプレゼンター。
   current_user_presenter = CurrentUserPresenter.new(self, current_user)
-
-  # 設定画面用のレイアウトにするか否か
-  in_configuration = (controller_name == 'registrations' || controller_name == 'users') && user_signed_in?
 %>
 <!DOCTYPE html>
 <html>
@@ -39,7 +36,7 @@
       </div>
     </header>
 
-    <% if in_configuration %>
+    <% if in_configuration_layout? %>
       <div class="flex flex-1">
         <nav class="px-2">
           <%= render 'layouts/configuration_menu' %>
