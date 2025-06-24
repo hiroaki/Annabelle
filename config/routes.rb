@@ -26,11 +26,16 @@ Rails.application.routes.draw do
 
     resource :two_factor_settings, except: [:show, :update]
 
-    resources :users, only: [:show, :edit, :update] do
-      member do
-        get "two_factor_authentication"
-      end
-    end
+    # resources :users, only: [:show, :edit, :update] do
+    #   member do
+    #     get "two_factor_authentication"
+    #   end
+    # end
+    resources :users, only: []
+    get '/dashboard', to: 'users#show', as: :dashboard
+    get '/profile/edit', to: 'users#edit', as: :edit_profile
+    patch '/profile', to: 'users#update', as: :update_profile
+    get '/profile/two_factor_authentication', to: 'users#two_factor_authentication', as: :two_factor_authentication
 
     resources :messages, only: [:index, :create, :destroy]
 

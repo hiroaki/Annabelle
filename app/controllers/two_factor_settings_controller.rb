@@ -5,7 +5,7 @@ class TwoFactorSettingsController < ApplicationController
   def new
     if current_user.otp_required_for_login
       flash[:alert] = I18n.t('two_factor_settings.already_enabled')
-      return redirect_to user_path(current_user)
+      return redirect_to dashboard_path
     end
 
     current_user.generate_two_factor_secret_if_missing!
@@ -38,7 +38,7 @@ class TwoFactorSettingsController < ApplicationController
 
     if current_user.two_factor_backup_codes_generated?
       flash[:alert] = I18n.t('two_factor_settings.backup_codes_already_seen')
-      return redirect_to two_factor_authentication_user_path(current_user)
+      return redirect_to two_factor_authentication_path
     end
 
     @backup_codes = current_user.generate_otp_backup_codes!
@@ -49,7 +49,7 @@ class TwoFactorSettingsController < ApplicationController
   def destroy
     if current_user.disable_two_factor!
       flash[:notice] = I18n.t('two_factor_settings.disabled')
-      redirect_to two_factor_authentication_user_path(current_user)
+      redirect_to two_factor_authentication_path
     else
       flash[:alert] = I18n.t('two_factor_settings.could_not_disable')
       redirect_back fallback_location: root_path

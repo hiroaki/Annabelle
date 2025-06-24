@@ -12,7 +12,7 @@ RSpec.describe CurrentUserPresenter, type: :presenter do
 
     # 基本的なヘルパーメソッドをモック化
     allow(view_context).to receive(:user_signed_in?).and_return(true)
-    allow(view_context).to receive(:user_path).with(user).and_return('/users/1')
+    allow(view_context).to receive(:dashboard_path).and_return('/dashboard')
     allow(view_context).to receive(:destroy_user_session_path).and_return('/users/sign_out')
 
     # data_with_testidヘルパーの動作をモック化（非production環境想定）
@@ -110,16 +110,16 @@ RSpec.describe CurrentUserPresenter, type: :presenter do
         allow(view_context).to receive(:user_signed_in?).and_return(true)
       end
 
-      it 'generates user links with correct parameters' do
+      it 'generates user display and sign out links with correct attributes' do
         expect(view_context).to receive(:link_to).with(
           user.username,
-          '/users/1',
+          '/dashboard',
           hash_including(
             class: 'text-gray-400',
             id: 'user-name-display',
             data: { testid: 'current-user-display' }
           )
-        ).and_return('<a href="/users/1">testuser</a>')
+        ).and_return('<a href="/dashboard">testuser</a>')
 
         expect(view_context).to receive(:link_to).with(
           I18n.t('layouts.configuration_menu.sign_out'),
@@ -139,7 +139,7 @@ RSpec.describe CurrentUserPresenter, type: :presenter do
         expect(result).to eq('<div>User links</div>')
       end
 
-      it 'includes data-testid attributes' do
+      it 'includes data-testid attributes for display and sign out links' do
         expect(view_context).to receive(:data_with_testid)
           .with('current-user-display')
           .and_return({ data: { testid: 'current-user-display' } })
