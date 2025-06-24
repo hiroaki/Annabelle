@@ -3,7 +3,7 @@
 ja:
   devise:
     confirmations:
-      confirmed: "アカウントを登録しました。"
+      confirmed: "メールアドレスの確認が完了しました。"
       resend_confirmation_instructions: "確認メールを再送信"
       send_instructions: "アカウントの有効化について数分以内にメールでご連絡します。"
       send_paranoid_instructions: "あなたのメールアドレスが登録済みの場合、本人確認用のメールが数分以内に送信されます。"
@@ -11,7 +11,7 @@ ja:
       already_authenticated: "すでにログインしています。"
       inactive: "アカウントが有効化されていません。メールに記載された手順にしたがって、アカウントを有効化してください。"
       invalid: "%{authentication_keys} もしくはパスワードが不正です。"
-      last_attempt: "あなたのアカウントが凍結される前に、複数回の操作がおこなわれています。"
+      last_attempt: "アカウントがロックされるまであと1回試行できます。"
       locked: "あなたのアカウントは凍結されています。"
       not_found_in_database: "%{authentication_keys} もしくはパスワードが不正です。"
       timeout: "セッションがタイムアウトしました。もう一度ログインしてください。"
@@ -32,8 +32,8 @@ ja:
       failure: "%{kind}での認証に失敗しました。もう一度お試しください。"
       failure_fallback: "認証エラーが発生しました。もう一度お試しください。"
       provider:
-        already_linked: "既に別の %{provider} アカウントと連携されています。変更はキャンセルされました。"
-        linked: "%{provider} との連携が成功しました。"
+        already_linked: "この%{provider}アカウントは既に他のアカウントと連携されています。変更はキャンセルされました。"
+        linked: "%{provider}との連携に成功しました。"
       success: "%{provider}アカウントによる認証に成功しました。"
       unknown_provider: "外部サービス"
     passwords:
@@ -43,7 +43,7 @@ ja:
       forgot_your_password: "パスワードをお忘れですか？"
       minimum_characters: "最低%{count}文字"
       new_password: "新しいパスワード"
-      no_token: "このページにはアクセスできません。パスワード再設定メールのリンクからアクセスされた場合には、URL をご確認ください。"
+      no_token: "パスワード再設定メールからアクセスしてください。もしメールからアクセスした場合は、URLが正しいかご確認ください。"
       send_instructions: "パスワードの再設定について数分以内にメールでご連絡いたします。"
       send_paranoid_instructions: "あなたのメールアドレスが登録済みの場合、パスワード再設定用のメールが数分以内に送信されます。"
       send_reset_password_instructions: "パスワード再設定用メールを送信"
@@ -56,7 +56,7 @@ ja:
       confirm_new_password: "新しいパスワード（確認）"
       current_password: "現在のパスワード"
       currently_waiting_confirmation: "確認待ちのメールアドレス: %{email}"
-      destroyed: "アカウントを削除しました。またのご利用をお待ちしております。"
+      destroyed: "アカウントは正常に削除されました。ご利用ありがとうございました。"
       email: "メールアドレス"
       link_oauth: "%{provider}アカウントと連携"
       minimum_characters: "(最低 %{count} 文字)"
@@ -65,7 +65,7 @@ ja:
       signed_up: "アカウント登録が完了しました。"
       signed_up_but_inactive: "ログインするためには、アカウントを有効化してください。"
       signed_up_but_locked: "アカウントが凍結されているためログインできません。"
-      signed_up_but_unconfirmed: "本人確認用のメールを送信しました。メール内のリンクからアカウントを有効化させてください。"
+      signed_up_but_unconfirmed: "確認用のメールを送信しました。メール内のリンクからアカウントを有効化してください。"
       unlink_confirm: "本当に%{provider}認証を無効化しますか？"
       unlink_oauth:
         failure: "%{provider_name} 認証の解除に失敗しました。"
@@ -89,10 +89,10 @@ ja:
       remember_me: "ログイン状態を保持する"
       signed_in: "ログインしました。"
       signed_out: "ログアウトしました。"
-      two_factor_authentication: "二段階認証"
+      two_factor_authentication: "二要素認証"
       two_factor_settings:
-        title: "二段階認証"
-        enabled: "このアカウントには二段階認証が有効になっています。"
+        title: "二要素認証"
+        enabled: "このアカウントには二要素認証が有効になっています。"
         scan_qr_title: "QRコードをスキャン"
         scan_qr_instruction: "下記のQRコードをGoogle AuthenticatorやAuthyなどのOTP対応アプリでスキャンしてください。"
         manual_entry_instruction: "スキャンできない場合は、次のコードを手動で入力してください:"
@@ -100,7 +100,7 @@ ja:
         confirm_otp_instruction: "認証アプリが正しく動作するか、生成されたコードを入力して確認してください。"
         otp_code_label: "認証コード"
         current_password_label: "現在のパスワードを入力"
-        confirm_and_enable: "確認して二段階認証を有効化"
+        confirm_and_enable: "確認して二要素認証を有効化"
         backup_codes_title: "バックアップコード"
         backup_codes_instruction: "認証アプリにアクセスできなくなった場合に備えて、これらのバックアップコードを安全な場所に保管してください。"
     shared:
