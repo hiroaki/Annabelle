@@ -81,8 +81,8 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   # ロケールを決定する（params, session, サービスの順で優先）
   def fetch_oauth_locale(user = nil)
     params[:locale] || session[:omniauth_login_locale] ||
-      OAuthLocaleService.new(self, user).determine_oauth_locale[:locale] ||
-      LocaleService.new(self, user).determine_effective_locale ||
+      OAuthLocaleService.new(self, user).determine_oauth_locale ||
+      LocaleService.determine_locale(params, request, user) ||
       I18n.default_locale
   end
 
