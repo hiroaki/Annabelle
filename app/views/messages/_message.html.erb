@@ -2,7 +2,7 @@
   class="mb-2 w-full min-w-0 p-4 bg-white rounded-lg shadow-xs overflow-auto scrollbar-gutter-stable"
   data-message-id="<%= message.id %>"
   data-owner-id="<%= message.user.id %>"
-  data-controller="message-ownership"
+  data-controller="message-ownership new-message-highlighter"
   <%= 'data-new-message="true"'.html_safe if defined?(as_new) && !!as_new %><%# see also tailwind definition %>
 >
   <div class="text-gray-400 text-xs pb-2">
