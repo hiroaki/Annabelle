@@ -1,42 +1,49 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
-  skip_before_action :set_locale
   skip_before_action :verify_authenticity_token, only: :github
 
   def github
     auth = request.env["omniauth.auth"]
+
     if user_signed_in?
-      link_provider_or_alert(auth)
+      user = current_user
+      I18n.locale = fetch_oauth_locale(user)
+      locale = I18n.locale
+      link_provider_or_alert(auth, user, locale)
     else
-      authenticate_or_register(auth)
+      user = User.from_omniauth(auth)
+      I18n.locale = fetch_oauth_locale(user)
+      locale = I18n.locale
+      authenticate_or_register(auth, user, locale)
     end
   end
 
   def failure
+    I18n.locale = fetch_oauth_locale
     provider = extract_provider_name_for_error
     alert = generate_failure_message(provider)
-    redirect_to determine_redirect_path(:auth_failure), alert: alert
+    locale = I18n.locale
+    redirect_to determine_redirect_path(:auth_failure, locale), alert: alert
   end
 
   private
 
   # プロバイダーをユーザーにリンクする、または既にリンクしている場合はアラートを表示
-  def link_provider_or_alert(auth)
+  def link_provider_or_alert(auth, user, locale)
     provider_name = provider_display_name(auth)
 
-    if current_user.linked_with?(auth.provider) && current_user.provider_uid(auth.provider) != auth.uid
+    if user.linked_with?(auth.provider) && user.provider_uid(auth.provider) != auth.uid
       flash[:alert] = I18n.t("devise.omniauth_callbacks.provider.already_linked", provider: provider_name)
     else
-      current_user.link_with(auth.provider, auth.uid)
+      user.link_with(auth.provider, auth.uid)
       flash[:notice] = I18n.t("devise.omniauth_callbacks.provider.linked", provider: provider_name)
     end
 
-    redirect_to determine_redirect_path(:link_provider, current_user)
+    redirect_to determine_redirect_path(:link_provider, locale)
   end
 
   # 認証情報からユーザーを認証または登録する
   # @param [OmniAuth::AuthHash] auth 認証情報
-  def authenticate_or_register(auth)
-    user = User.from_omniauth(auth)
+  def authenticate_or_register(auth, user, locale)
     provider_name = provider_display_name(auth)
 
     if user&.persisted?
@@ -44,62 +51,45 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
       # ユーザーが新規作成されたか既存ユーザーかによってリダイレクト先を変更
       action = user.saved_change_to_id? ? :new_user : :existing_user
-      redirect_to determine_redirect_path(action, user)
+      redirect_to determine_redirect_path(action, locale)
 
       flash[:notice] = I18n.t("devise.omniauth_callbacks.success", provider: provider_name) if is_navigational_format?
     else
       session["devise.github_data"] = auth.except(:extra)
-      redirect_to determine_redirect_path(:registration_failure),
+      redirect_to determine_redirect_path(:registration_failure, locale),
                   alert: I18n.t("devise.omniauth_callbacks.failure", kind: provider_name)
     end
   end
 
   # リダイレクト先
-  def determine_redirect_path(action, user = nil)
+  def determine_redirect_path(action, locale)
+    locale ||= I18n.default_locale
     case action
     when :link_provider, :new_user
-      localized_path(:edit_user_registration, user)
+      edit_user_registration_path(locale: locale)
     when :existing_user
-      localized_path(:root, user)
+      root_path(locale: locale)
     when :registration_failure
-      localized_path(:new_user_registration, user)
+      new_user_registration_path(locale: locale)
     when :auth_failure
-      localized_path(:new_user_session, user)
+      new_user_session_path(locale: locale)
     else
-      localized_path(:root, user)
+      root_path(locale: locale)
     end
   end
 
-  # パスにロケールを適用する
-  def localized_path(path_name, user = nil)
-    locale = oauth_locale_for(user)
-
-    case path_name
-    when :edit_user_registration
-      edit_user_registration_path(locale: locale)
-    when :new_user_registration
-      new_user_registration_path(locale: locale)
-    when :new_user_session
-      new_user_session_path(locale: locale)
-    when :root
-      root_path(locale: locale)
-    else
-      root_path(locale: locale)
-    end
+  # ロケールを決定する（params, session, サービスの順で優先）
+  def fetch_oauth_locale(user = nil)
+    params[:locale] || session[:omniauth_login_locale] ||
+      OAuthLocaleService.new(self, user).determine_oauth_locale[:locale] ||
+      LocaleService.new(self, user).determine_effective_locale ||
+      I18n.default_locale
   end
 
   # プロバイダー名を取得
   def provider_display_name(auth_or_provider)
     provider = auth_or_provider.is_a?(String) ? auth_or_provider : auth_or_provider&.provider
     OmniAuth::Utils.camelize(provider.to_s)
-  end
-
-  # ロケールを決定する
-  def oauth_locale_for(user = nil)
-    user ||= current_user
-    # OAuthLocaleServiceを優先し、結果がなければLocaleServiceにフォールバック
-    OAuthLocaleService.new(self, user).determine_oauth_locale[:locale] ||
-      LocaleService.new(self, user).determine_effective_locale
   end
 
   # エラー時のプロバイダー名を抽出
