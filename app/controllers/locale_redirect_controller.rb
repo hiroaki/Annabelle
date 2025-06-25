@@ -4,7 +4,7 @@ class LocaleRedirectController < ApplicationController
 
   # ルートパス (/) へのアクセス時に適切なロケール付きURLにリダイレクト
   def root
-    effective_locale = LocaleService.determine_locale(params, request, current_user)
+    effective_locale = LocaleUtils.determine_locale(params, request, current_user)
     I18n.locale = effective_locale
     redirect_params = { locale: effective_locale }
     redirect_params.merge!(request.query_parameters) if request.query_parameters.present?

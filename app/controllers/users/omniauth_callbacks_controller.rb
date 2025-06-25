@@ -84,7 +84,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def fetch_oauth_locale(user = nil)
     params[:locale] || session[:omniauth_login_locale] ||
       OAuthLocaleService.new(self, user).determine_oauth_locale ||
-      LocaleService.determine_locale(params, request, user) ||
+      LocaleUtils.determine_locale(params, request, user) ||
       I18n.default_locale
   end
 

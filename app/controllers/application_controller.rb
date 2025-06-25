@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
 
   # ロケールを設定（1リクエスト1回のみ）
   def set_locale
-    I18n.locale = LocaleService.determine_locale(params, request, current_user)
+    I18n.locale = LocaleUtils.determine_locale(params, request, current_user)
   end
 
   private

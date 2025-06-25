@@ -20,7 +20,7 @@ module Users::AuthenticateWithOtpTwoFactor
 
   def prompt_for_otp_two_factor(user)
     @user = user
-    I18n.locale = LocaleService.determine_locale(params, request, user)
+    I18n.locale = LocaleUtils.determine_locale(params, request, user)
     session[:otp_user_id] = user.id
     render 'devise/sessions/two_factor', status: :see_other
   end
@@ -30,12 +30,12 @@ module Users::AuthenticateWithOtpTwoFactor
       session.delete(:otp_user_id)
       remember_me(user) if user_params[:remember_me] == '1'
       user.save!
-      I18n.locale = LocaleService.determine_locale(params, request, user)
+      I18n.locale = LocaleUtils.determine_locale(params, request, user)
       set_flash_message!(:notice, :signed_in)
       sign_in(user, event: :authentication)
       respond_with resource, location: after_sign_in_path_for(resource)
     else
-      I18n.locale = LocaleService.determine_locale(params, request, user)
+      I18n.locale = LocaleUtils.determine_locale(params, request, user)
       flash.now[:alert] = I18n.t('devise.sessions.invalid_otp')
       prompt_for_otp_two_factor(user)
     end
