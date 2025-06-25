@@ -46,7 +46,7 @@
 
             <div class="mb-4">
               <%= form.label :password, t('devise.sessions.two_factor_settings.current_password_label'), class: "block font-medium text-gray-700" %>
-              <%= form.password_field :password, class: "mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500", **data_with_testid('current-password-input') %>
+              <%= form.password_field :password, autocomplete: "current-password", class: "mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500", **data_with_testid('current-password-input') %>
             </div>
 
             <div>
