@@ -70,6 +70,17 @@ RSpec.describe 'OmniauthCallbacks', type: :request do
         expect(flash[:alert]).to eq(I18n.t('devise.omniauth_callbacks.failure', kind: 'GitHub'))
       end
     end
+
+    describe '既存ユーザーがOmniAuthでサインインした場合' do
+      it 'root_pathにリダイレクトされる' do
+        existing_user = create(:user, :confirmed)
+        allow(User).to receive(:from_omniauth).and_return(existing_user)
+        allow(existing_user).to receive(:persisted?).and_return(true)
+        allow(existing_user).to receive(:saved_change_to_id?).and_return(false)
+        get user_github_omniauth_callback_path
+        expect(response).to redirect_to(root_path(locale: 'en'))
+      end
+    end
   end
 
   describe 'GET /users/auth/failure' do
@@ -85,6 +96,22 @@ RSpec.describe 'OmniauthCallbacks', type: :request do
       # failureアクションの正常な動作を確認
       get '/users/auth/failure'
       expect(response).to redirect_to(new_user_session_path(locale: 'en'))
+    end
+
+    it 'extracts provider name from error_strategy' do
+      strategy = double('strategy', name: 'github')
+      get '/users/auth/failure', env: { "omniauth.error.strategy" => strategy }
+      expect(flash[:alert]).to include('GitHub')
+    end
+
+    it 'falls back to failure_fallback when interpolation is missing' do
+      allow(I18n).to receive(:t).and_call_original
+      error = I18n::MissingInterpolationArgument.new(:kind, {}, "translation string")
+      allow(I18n).to receive(:t).with("devise.omniauth_callbacks.failure", kind: anything).and_raise(error)
+      allow(I18n).to receive(:t).with("devise.omniauth_callbacks.failure_fallback").and_return("fallback message")
+      get '/users/auth/failure'
+      follow_redirect!
+      expect(flash[:alert]).to eq("fallback message")
     end
   end
 end
