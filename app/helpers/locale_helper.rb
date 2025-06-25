@@ -1,53 +1,81 @@
-# ロケール関連のヘルパーモジュール（統合版）
-# パス・URL操作、ロケール判定、OAuth処理などを統一的に提供
+# ロケール操作・パス生成・OAuth用パラメータなどを提供するヘルパー
 module LocaleHelper
-  include LocalePathUtils
-
-  # ロケールリダイレクトをスキップすべきパスかどうかを判定
+  # ロケールリダイレクトをスキップすべきパスか判定
   def skip_locale_redirect?(path)
-    # ヘルスチェック、ロケール切り替え、OmniAuth、APIエンドポイントなどはスキップ
-    skip_paths = ['/up', '/locale', '/users/auth']
-    skip_paths.any? { |skip_path| path.start_with?(skip_path) }
+    locales = I18n.available_locales.map(&:to_s)
+    return false if path =~ %r{^/(#{locales.join('|')})(/|$)}
+    true
   end
 
-  # OAuth改善 - OAuth認証開始時のロケール処理
+  # OAuth認証開始時のロケールパラメータ生成とセッション保存
   def prepare_oauth_locale_params(params, session)
     oauth_params = {}
-
-    # 1. 現在のロケールを優先（パスベース戦略に対応）
-    candidate_locale = params[:locale] || I18n.locale.to_s
-    current_effective_locale = LocaleValidator.valid_locale?(candidate_locale) ? candidate_locale : I18n.locale.to_s
-
-    # 2. デフォルトロケール以外の場合のみパラメータを追加
-    if current_effective_locale != I18n.default_locale.to_s && LocaleValidator.valid_locale?(current_effective_locale)
-      oauth_params[:lang] = current_effective_locale
-    # 3. 下位互換性のため、既存のlangパラメータも考慮
+    candidate = params[:locale] || I18n.locale.to_s
+    effective = LocaleValidator.valid_locale?(candidate) ? candidate : I18n.locale.to_s
+    if effective != I18n.default_locale.to_s && LocaleValidator.valid_locale?(effective)
+      oauth_params[:lang] = effective
     elsif params[:lang].present? && LocaleValidator.valid_locale?(params[:lang])
       oauth_params[:lang] = params[:lang]
     end
-
-    # OAuth認証開始前にセッションにロケールを保存（有効なロケールのみ）
-    if LocaleValidator.valid_locale?(current_effective_locale)
-      session[:oauth_locale] = current_effective_locale
+    if LocaleValidator.valid_locale?(effective)
+      session[:oauth_locale] = effective
       session[:oauth_locale_timestamp] = Time.current.to_i
     end
-
     oauth_params
   end
 
-  # ロケール付きパスの生成（旧LocaleUrlHelperから統合）
+  # 指定パスシンボルのロケール付きURLを生成
   def localized_path_for(path_symbol, locale = nil, **options)
     locale ||= I18n.locale
-
-    # すべてのロケールでプレフィックスを付与
     Rails.application.routes.url_helpers.send(path_symbol, **options.merge(locale: locale))
   end
 
-  # リンクのベースCSSクラスを生成（旧LocaleUrlHelperから統合）
+  # リンクのCSSクラス（選択中ロケールで強調）
   def base_link_classes(locale, additional_classes = nil)
     classes = ["hover:text-slate-600"]
     classes << (I18n.locale == locale.to_sym ? 'font-bold' : '')
     classes << additional_classes if additional_classes.present?
     classes.compact.join(' ')
+  end
+
+  # パスのロケール部分を指定ロケールに付け替え
+  def current_path_with_locale(path, locale)
+    path_without = remove_locale_prefix(path)
+    add_locale_prefix(path_without, locale)
+  end
+
+  private
+
+  # パスからロケールプレフィックスを除去
+  def remove_locale_prefix(path)
+    return '/' if path.blank? || path == '/'
+    validate_path!(path)
+    LocaleConfiguration.available_locales.each do |locale|
+      locale_str = locale.to_s
+      if path.start_with?("/#{locale_str}/")
+        return path.sub(%r{^/#{locale_str}}, '')
+      elsif path == "/#{locale_str}"
+        return '/'
+      end
+    end
+    path
+  end
+
+  # パスにロケールプレフィックスを付与
+  def add_locale_prefix(path, locale)
+    clean = remove_locale_prefix(path)
+    clean = '/' if clean.blank?
+    "/#{locale}#{clean == '/' ? '' : clean}"
+  end
+
+  # パスの形式バリデーション
+  def validate_path!(path)
+    return if path.blank?
+    unless path.is_a?(String) && path.start_with?('/') &&
+           !path.include?('//') &&
+           !path.match?(/[[:cntrl:]\s]/) &&
+           !path.split('/').include?('..')
+      raise ArgumentError, "Invalid path format: must start with '/', not contain '//', '..', or control characters. Got: #{path.inspect}"
+    end
   end
 end

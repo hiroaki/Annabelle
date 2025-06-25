@@ -47,6 +47,23 @@ RSpec.describe LocaleHelper do
       expect(remove_locale_prefix('')).to eq('/')
       expect(remove_locale_prefix(nil)).to eq('/')
     end
+    it 'raises error for path with double slashes' do
+      expect { remove_locale_prefix('//ja/messages') }.to raise_error(ArgumentError, /Invalid path format/)
+      expect { remove_locale_prefix('/foo//bar') }.to raise_error(ArgumentError, /Invalid path format/)
+    end
+    it 'raises error for path with control characters or spaces' do
+      expect { remove_locale_prefix("/foo\nbar") }.to raise_error(ArgumentError, /Invalid path format/)
+      expect { remove_locale_prefix('/foo bar') }.to raise_error(ArgumentError, /Invalid path format/)
+    end
+    it 'raises error for path with .. traversal' do
+      expect { remove_locale_prefix('/foo/../bar') }.to raise_error(ArgumentError, /Invalid path format/)
+      expect { remove_locale_prefix('/../bar') }.to raise_error(ArgumentError, /Invalid path format/)
+    end
+    it 'raises error for path not starting with slash' do
+      expect { remove_locale_prefix('foo/bar') }.to raise_error(ArgumentError, /Invalid path format/)
+      expect { remove_locale_prefix('') }.not_to raise_error # 空文字は許容
+      expect { remove_locale_prefix(nil) }.not_to raise_error # nilは許容
+    end
   end
 
   describe '#add_locale_prefix' do
@@ -65,6 +82,12 @@ RSpec.describe LocaleHelper do
     it 'replaces existing locale prefix' do
       expect(add_locale_prefix('/en/messages', 'ja')).to eq('/ja/messages')
       expect(add_locale_prefix('/ja/users', 'en')).to eq('/en/users')
+    end
+    it 'handles paths with query parameters' do
+      expect(add_locale_prefix('/messages?page=1', 'ja')).to eq('/ja/messages?page=1')
+    end
+    it 'handles paths with fragments' do
+      expect(add_locale_prefix('/messages#section1', 'ja')).to eq('/ja/messages#section1')
     end
   end
 
@@ -105,14 +128,18 @@ RSpec.describe LocaleHelper do
   end
 
   describe '#skip_locale_redirect?' do
-    it 'returns true for paths that should skip locale redirect' do
+    it 'returns true for paths outside locale scope' do
       expect(skip_locale_redirect?('/up')).to be true
       expect(skip_locale_redirect?('/locale/ja')).to be true
       expect(skip_locale_redirect?('/users/auth/github')).to be true
+      expect(skip_locale_redirect?('/foo')).to be true
     end
-    it 'returns false for normal paths' do
-      expect(skip_locale_redirect?('/messages')).to be false
-      expect(skip_locale_redirect?('/users/sign_in')).to be false
+    it 'returns false for paths inside locale scope' do
+      expect(skip_locale_redirect?('/en/messages')).to be false
+      expect(skip_locale_redirect?('/ja/messages')).to be false
+      expect(skip_locale_redirect?('/en')).to be false
+      expect(skip_locale_redirect?('/ja')).to be false
+      expect(skip_locale_redirect?('/en/users/sign_in')).to be false
     end
   end
 
