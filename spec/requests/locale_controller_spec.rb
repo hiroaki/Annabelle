@@ -4,49 +4,138 @@ RSpec.describe LocaleController, type: :request do
   let(:user) { create(:user) }
 
   describe "GET /locale/:locale" do
-    context "from root path" do
-      it "redirects to root with Japanese locale prefix" do
+    context "when accessed from the root path" do
+      it "redirects to /ja when locale is 'ja'" do
         get locale_path(locale: 'ja')
 
         expect(response).to redirect_to("/ja")
       end
 
-      it "redirects to root with prefix for English (default locale)" do
+      it "redirects to /en when locale is 'en' (default)" do
         get locale_path(locale: 'en')
 
         expect(response).to redirect_to("/en")
       end
     end
 
-    context "from other paths" do
-      it "preserves the current path with Japanese locale prefix when redirect_to is provided" do
-        # redirect_toパラメータで/messagesに移動する場合
+    context "when accessed from another path with redirect_to param" do
+      it "redirects to /ja/messages when redirect_to is provided with locale 'ja'" do
         get locale_path(locale: 'ja', redirect_to: '/messages')
 
         expect(response).to redirect_to("/ja/messages")
       end
 
-      it "handles paths with English (default) locale when redirect_to is provided" do
-        # redirect_toパラメータで/usersに移動する場合
+      it "redirects to /en/users when redirect_to is provided with locale 'en'" do
         get locale_path(locale: 'en', redirect_to: '/users')
 
         expect(response).to redirect_to("/en/users")
       end
     end
 
-    context "with unsupported locale" do
-      it "redirects with alert for unsupported locale" do
+    context "when locale is unsupported" do
+      it "redirects to root with a default alert message" do
         get locale_path(locale: 'xx')
 
         expect(response).to redirect_to(root_path)
         expect(flash[:alert]).to eq("Unsupported locale")
       end
 
-      it "redirects with alert for unsupported locale (user-friendly message)" do
+      it "redirects to root with an i18n alert message" do
         get locale_path(locale: 'xx')
 
         expect(response).to redirect_to(root_path)
         expect(flash[:alert]).to eq(I18n.t('errors.locale.unsupported_locale'))
+      end
+    end
+  end
+
+  # Shared examples for locale auto-detection and redirect
+  shared_examples "common locale redirect tests" do |headers, expected_locale|
+    it "redirects / to the expected locale root" do
+      get "/", headers: headers
+
+      expect(response).to have_http_status(:moved_permanently)
+      expect(response).to redirect_to("/#{expected_locale}")
+    end
+
+    it "redirects / with query params to the expected locale root, preserving params" do
+      get "/?test=value", headers: headers
+
+      expect(response).to have_http_status(:moved_permanently)
+      expect(response.location).to include("/#{expected_locale}")
+      expect(response.location).to include("test=value")
+    end
+
+    it "redirects to the expected locale root after visiting /locale/ja and then /" do
+      get "/locale/ja"
+      get "/", headers: headers
+
+      expect(response).to have_http_status(:moved_permanently)
+      expect(response).to redirect_to("/#{expected_locale}")
+    end
+  end
+
+  describe "GET /" do
+    context "when Accept-Language header is not present" do
+      include_examples "common locale redirect tests", {}, "en"
+    end
+
+    context "when Accept-Language header prefers Japanese" do
+      include_examples "common locale redirect tests", { "Accept-Language" => "ja,en;q=0.9" }, "ja"
+    end
+  end
+
+  describe "explicit locale required routing" do
+    context "when accessing a valid locale path" do
+      it "returns 200 or 302 for /ja" do
+        get "/ja"
+
+        expect([200, 302]).to include(response.status)
+      end
+
+      it "returns 200 or 302 for /en" do
+        get "/en"
+
+        expect([200, 302]).to include(response.status)
+      end
+    end
+
+    context "when accessing an invalid locale path" do
+      it "returns 404 for /invalid" do
+        get "/invalid"
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
+  describe "OAuth exception routing" do
+    context "when accessing OAuth callback URLs" do
+      it "does not return 404 for /users/auth/github/callback" do
+        get "/users/auth/github/callback"
+
+        expect(response).not_to have_http_status(:not_found)
+      end
+
+      it "does not return 404 for POST /users/auth/github" do
+        post "/users/auth/github"
+
+        expect(response).not_to have_http_status(:not_found)
+      end
+    end
+
+    context "when accessing OAuth failure path" do
+      it "returns a redirect for /users/auth/failure and not 404" do
+        get "/users/auth/failure"
+
+        expect(response).not_to have_http_status(:not_found)
+        expect(response).to have_http_status(:redirect)
+      end
+
+      it "does not raise I18n error for /users/auth/failure" do
+        expect {
+          get "/users/auth/failure"
+        }.not_to raise_error
       end
     end
   end
