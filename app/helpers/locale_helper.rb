@@ -1,12 +1,5 @@
 # ロケール操作・パス生成・OAuth用パラメータなどを提供するヘルパー
 module LocaleHelper
-  # ロケールリダイレクトをスキップすべきパスか判定
-  def skip_locale_redirect?(path)
-    locales = I18n.available_locales.map(&:to_s)
-    return false if path =~ %r{^/(#{locales.join('|')})(/|$)}
-    true
-  end
-
   # OAuth認証開始時のロケールパラメータ生成とセッション保存
   def prepare_oauth_locale_params(params, session)
     oauth_params = {}

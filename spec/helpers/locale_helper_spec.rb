@@ -127,22 +127,6 @@ RSpec.describe LocaleHelper do
     end
   end
 
-  describe '#skip_locale_redirect?' do
-    it 'returns true for paths outside locale scope' do
-      expect(skip_locale_redirect?('/up')).to be true
-      expect(skip_locale_redirect?('/locale/ja')).to be true
-      expect(skip_locale_redirect?('/users/auth/github')).to be true
-      expect(skip_locale_redirect?('/foo')).to be true
-    end
-    it 'returns false for paths inside locale scope' do
-      expect(skip_locale_redirect?('/en/messages')).to be false
-      expect(skip_locale_redirect?('/ja/messages')).to be false
-      expect(skip_locale_redirect?('/en')).to be false
-      expect(skip_locale_redirect?('/ja')).to be false
-      expect(skip_locale_redirect?('/en/users/sign_in')).to be false
-    end
-  end
-
   describe '#prepare_oauth_locale_params' do
     let(:session) { {} }
     let(:current_time) { Time.current }
