@@ -18,7 +18,7 @@ class LocaleController < ApplicationController
     locale = params[:locale].to_s
 
     unless LocaleValidator.valid_locale?(locale)
-      redirect_back(fallback_location: root_path, alert: "Unsupported locale")
+      redirect_back(fallback_location: root_path, alert: I18n.t('errors.locale.unsupported_locale'))
     else
       # リダイレクト先のパス
       # 基本的にはリクエスト元と同じで、パラメータ不足の場合はルート
