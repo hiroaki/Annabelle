@@ -72,6 +72,7 @@ group :test do
   gem "selenium-webdriver"
   gem "shoulda-matchers", "~> 6.0"
   gem "simplecov", require: false
+  gem "simplecov-lcov", require: false
 end
 
 gem "solid_cable", "~> 3.0"
