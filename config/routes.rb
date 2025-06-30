@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   # ルートパスアクセス時の自動ロケール決定・リダイレクト
-  get '/', to: 'locale_redirect#root'
+  get '/', to: 'locale#root'
 
   # OmniAuthコールバックは動的セグメントをサポートしないため、スコープ外に配置
   # OAuth認証は明示的ロケール必須化の例外として扱う

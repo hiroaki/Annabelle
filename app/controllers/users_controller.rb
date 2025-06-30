@@ -52,8 +52,15 @@ class UsersController < ApplicationController
     if new_preferred_language.present?
       new_preferred_language
     else
-      result = locale_service.extract_from_header(request.env['HTTP_ACCEPT_LANGUAGE'])
-      result[:locale] || I18n.default_locale.to_s
+      header = request.env['HTTP_ACCEPT_LANGUAGE']
+      result = nil
+      if header
+        parser = HttpAcceptLanguage::Parser.new(header)
+        available = LocaleConfiguration.available_locales.map(&:to_s)
+        preferred = parser.preferred_language_from(available)
+        result = preferred if LocaleUtils.valid_locale?(preferred)
+      end
+      result || I18n.default_locale.to_s
     end
   end
 
