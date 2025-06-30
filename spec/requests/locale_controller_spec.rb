@@ -32,6 +32,54 @@ RSpec.describe LocaleController, type: :request do
       end
     end
 
+    context "when redirect_to param contains invalid paths" do
+      it "redirects to /ja when redirect_to contains double slashes (// attack)" do
+        expect(Rails.logger).to receive(:warn).with(/Invalid redirect path/)
+
+        get locale_path(locale: 'ja', redirect_to: '//evil.example.com')
+
+        expect(response).to redirect_to("/ja")
+        expect(flash[:alert]).to eq(I18n.t('errors.locale.invalid_redirect_path'))
+      end
+
+      it "redirects to /en when redirect_to contains path traversal (../ attack)" do
+        expect(Rails.logger).to receive(:warn).with(/Invalid redirect path/)
+
+        get locale_path(locale: 'en', redirect_to: '/../../etc/passwd')
+
+        expect(response).to redirect_to("/en")
+        expect(flash[:alert]).to eq(I18n.t('errors.locale.invalid_redirect_path'))
+      end
+
+      it "redirects to /ja when redirect_to contains control characters" do
+        expect(Rails.logger).to receive(:warn).with(/Invalid redirect path/)
+
+        get locale_path(locale: 'ja', redirect_to: "/path\nwith\tcontrol")
+
+        expect(response).to redirect_to("/ja")
+        expect(flash[:alert]).to eq(I18n.t('errors.locale.invalid_redirect_path'))
+      end
+
+      it "redirects to /en when redirect_to is not a string starting with /" do
+        expect(Rails.logger).to receive(:warn).with(/Invalid redirect path/)
+
+        get locale_path(locale: 'en', redirect_to: 'invalid-path')
+
+        expect(response).to redirect_to("/en")
+        expect(flash[:alert]).to eq(I18n.t('errors.locale.invalid_redirect_path'))
+      end
+
+      it "handles exceptions gracefully when current_path_with_locale raises LocalePathValidationError" do
+        allow_any_instance_of(LocaleController).to receive(:current_path_with_locale).and_raise(LocaleHelper::LocalePathValidationError, "Test error")
+        expect(Rails.logger).to receive(:warn).with("Invalid redirect path: Test error")
+
+        get locale_path(locale: 'ja', redirect_to: '/valid/path')
+
+        expect(response).to redirect_to("/ja")
+        expect(flash[:alert]).to eq(I18n.t('errors.locale.invalid_redirect_path'))
+      end
+    end
+
     context "when locale is unsupported" do
       it "redirects to root with a default alert message" do
         get locale_path(locale: 'xx')

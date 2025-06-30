@@ -77,6 +77,7 @@ en:
       invalid_type: "must be a String or Symbol"
       invalid_value: "is not a valid locale"
       unsupported_locale: "Unsupported locale"
+      invalid_redirect_path: "Invalid redirect path specified"
     messages:
       accepted: "must be accepted"
       blank: "can't be blank"
