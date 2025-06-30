@@ -30,7 +30,7 @@
 
           <%= render 'shared/flash' %>
 
-          <%= form_with scope: :two_fa, url: two_factor_settings_path, method: :post, local: true do |form| %>
+          <%= form_with scope: :two_fa, url: two_factor_settings_path, method: :post, local: true, data: { turbo: false } do |form| %>
             <div class="mb-4">
               <%= form.label :code, t('devise.sessions.two_factor_settings.otp_code_label'), class: "block font-medium text-gray-700" %>
               <%= form.text_field(:code,
