@@ -102,7 +102,8 @@ RSpec.describe TwoFactorSettingsController, type: :request do
     context 'when password is incorrect' do
       it 'renders new with alert' do
         post two_factor_settings_path, params: { two_fa: { code: '123456', password: 'wrong' } }
-        expect(response).to have_http_status(:ok)
+        expect(response).to have_http_status(:found)
+        follow_redirect!
         expect(response.body).to include(I18n.t('two_factor_settings.incorrect_password'))
       end
     end
@@ -132,7 +133,8 @@ RSpec.describe TwoFactorSettingsController, type: :request do
 
         it 'renders new with alert' do
           post two_factor_settings_path, params: valid_params
-          expect(response).to have_http_status(:ok)
+          expect(response).to have_http_status(:found)
+          follow_redirect!
           expect(response.body).to include(I18n.t('two_factor_settings.incorrect_code'))
         end
       end
