@@ -48,21 +48,42 @@ RSpec.describe LocaleHelper do
       expect(remove_locale_prefix(nil)).to eq('/')
     end
     it 'raises error for path with double slashes' do
-      expect { remove_locale_prefix('//ja/messages') }.to raise_error(ArgumentError, /Invalid path format/)
-      expect { remove_locale_prefix('/foo//bar') }.to raise_error(ArgumentError, /Invalid path format/)
+      expect { remove_locale_prefix('//ja/messages') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid path format/)
+      expect { remove_locale_prefix('/foo//bar') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid path format/)
     end
     it 'raises error for path with control characters or spaces' do
-      expect { remove_locale_prefix("/foo\nbar") }.to raise_error(ArgumentError, /Invalid path format/)
-      expect { remove_locale_prefix('/foo bar') }.to raise_error(ArgumentError, /Invalid path format/)
+      expect { remove_locale_prefix("/foo\nbar") }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid path format/)
+      expect { remove_locale_prefix('/foo bar') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid path format/)
     end
     it 'raises error for path with .. traversal' do
-      expect { remove_locale_prefix('/foo/../bar') }.to raise_error(ArgumentError, /Invalid path format/)
-      expect { remove_locale_prefix('/../bar') }.to raise_error(ArgumentError, /Invalid path format/)
+      expect { remove_locale_prefix('/foo/../bar') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid path format/)
+      expect { remove_locale_prefix('/../bar') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid path format/)
     end
     it 'raises error for path not starting with slash' do
-      expect { remove_locale_prefix('foo/bar') }.to raise_error(ArgumentError, /Invalid path format/)
+      expect { remove_locale_prefix('foo/bar') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid path format/)
       expect { remove_locale_prefix('') }.not_to raise_error # 空文字は許容
       expect { remove_locale_prefix(nil) }.not_to raise_error # nilは許容
+    end
+    it 'raises error for URL encoded attacks' do
+      # エンコーディングが含まれている場合（デコード失敗またはデコード前後で異なる）
+      expect { remove_locale_prefix('/%2E%2E') }.to raise_error(LocaleHelper::LocalePathValidationError, /(URL encoding detected|Invalid URL encoding)/)
+      expect { remove_locale_prefix('/path%20with%20spaces') }.to raise_error(LocaleHelper::LocalePathValidationError, /(URL encoding detected|Invalid URL encoding)/)
+      expect { remove_locale_prefix('/foo%2F%2Fbar') }.to raise_error(LocaleHelper::LocalePathValidationError, /(URL encoding detected|Invalid URL encoding)/)
+      expect { remove_locale_prefix('/valid%2Epath') }.to raise_error(LocaleHelper::LocalePathValidationError, /(URL encoding detected|Invalid URL encoding)/)
+    end
+    it 'raises error for invalid URL encoding' do
+      # URLデコードで例外が発生するケース
+      expect { remove_locale_prefix('/%XX') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid URL encoding/)
+      expect { remove_locale_prefix('/foo%') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid URL encoding/)
+      expect { remove_locale_prefix('/foo%ZZ') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid URL encoding/)
+    end
+    it 'raises error for non-string paths' do
+      expect { remove_locale_prefix(123) }.to raise_error(LocaleHelper::LocalePathValidationError, /Path must be a String/)
+      expect { remove_locale_prefix(['path']) }.to raise_error(LocaleHelper::LocalePathValidationError, /Path must be a String/)
+    end
+    it 'raises error for overly long paths' do
+      long_path = '/' + 'a' * 2048
+      expect { remove_locale_prefix(long_path) }.to raise_error(LocaleHelper::LocalePathValidationError, /Path too long/)
     end
   end
 
@@ -219,6 +240,19 @@ RSpec.describe LocaleHelper do
         expect(session[:oauth_locale]).to eq('ja')
         expect(session[:oauth_locale_timestamp]).to eq(current_time.to_i)
       end
+    end
+  end
+
+  describe 'Unicode and special character handling' do
+    it 'handles normal Unicode characters correctly' do
+      # 通常のUnicode文字は問題なし
+      expect { remove_locale_prefix('/path_with_unicode_あ') }.not_to raise_error
+      expect { remove_locale_prefix('/café') }.not_to raise_error
+    end
+
+    it 'blocks NULL characters as control characters' do
+      # NULL文字は制御文字として検出される
+      expect { remove_locale_prefix("/path\x00hidden") }.to raise_error(LocaleHelper::LocalePathValidationError, /control characters/)
     end
   end
 end

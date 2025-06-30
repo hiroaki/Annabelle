@@ -1,5 +1,12 @@
 # ロケール操作・パス生成・OAuth用パラメータなどを提供するヘルパー
 module LocaleHelper
+  # ロケールパスのバリデーションエラー専用例外
+  class LocalePathValidationError < StandardError
+    def initialize(message = "Invalid path format")
+      super(message)
+    end
+  end
+
   # OAuth認証開始時のロケールパラメータ生成とセッション保存
   def prepare_oauth_locale_params(params, session)
     oauth_params = {}
@@ -64,11 +71,34 @@ module LocaleHelper
   # パスの形式バリデーション
   def validate_path!(path)
     return if path.blank?
-    unless path.is_a?(String) && path.start_with?('/') &&
+
+    # 基本的な型チェック
+    unless path.is_a?(String)
+      raise LocalePathValidationError, "Path must be a String. Got: #{path.class}"
+    end
+
+    # 長すぎるパスの拒否（DoS対策）
+    if path.length > 2048
+      raise LocalePathValidationError, "Path too long (max 2048 characters). Got: #{path.length} characters"
+    end
+
+    # URLデコードして検証（エンコード攻撃対策）
+    begin
+      decoded_path = URI.decode_www_form_component(path)
+      # デコード後のパスと元のパスが異なる場合は疑わしい（エンコーディングが含まれている）
+      if decoded_path != path
+        raise LocalePathValidationError, "URL encoding detected in path. Original: #{path.inspect}, Decoded: #{decoded_path.inspect}"
+      end
+    rescue => e
+      raise LocalePathValidationError, "Invalid URL encoding in path: #{path.inspect}"
+    end
+
+    # 元のパスの基本チェック
+    unless path.start_with?('/') &&
            !path.include?('//') &&
            !path.match?(/[[:cntrl:]\s]/) &&
            !path.split('/').include?('..')
-      raise ArgumentError, "Invalid path format: must start with '/', not contain '//', '..', or control characters. Got: #{path.inspect}"
+      raise LocalePathValidationError, "Invalid path format: must start with '/', not contain '//', '..', or control characters. Got: #{path.inspect}"
     end
   end
 end

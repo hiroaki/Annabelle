@@ -22,13 +22,16 @@ class LocaleController < ApplicationController
     else
       # リダイレクト先のパス
       # 基本的にはリクエスト元と同じで、パラメータ不足の場合はルート
-      redirect_to_path = root_path
-      if params[:redirect_to].present? && params[:redirect_to].start_with?('/')
-        redirect_to_path = params[:redirect_to]
-      end
+      redirect_to_path = params[:redirect_to].present? ? params[:redirect_to] : root_path
 
       # リダイレクト先の /:locale を "変更先のロケール" に変更してリダイレクト
-      redirect_to current_path_with_locale(redirect_to_path, locale)
+      begin
+        redirect_to current_path_with_locale(redirect_to_path, locale)
+      rescue LocaleHelper::LocalePathValidationError => e
+        # ユーザー入力による予期されるエラー：安全にフォールバック
+        Rails.logger.warn "Invalid redirect path: #{e.message}"
+        redirect_to root_path(locale: locale), alert: I18n.t('errors.locale.invalid_redirect_path')
+      end
     end
   end
 end
