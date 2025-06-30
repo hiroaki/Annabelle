@@ -112,6 +112,7 @@ en:
       sign_out: "Sign out"
       two_factor_authentication: "Two Factor Authentication"
   messages:
+    delete_confirm: "Are you sure you want to delete this message?"
     email_confirmation_required: "You need to confirm your email address before posting."
     errors:
       generic: "An error occurred: %{error_message}"

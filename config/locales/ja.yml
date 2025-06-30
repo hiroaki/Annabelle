@@ -112,6 +112,7 @@ ja:
       sign_out: "ログアウト"
       two_factor_authentication: "二要素認証"
   messages:
+    delete_confirm: "このメッセージを削除してもよろしいですか？"
     email_confirmation_required: "投稿するにはメールアドレスの確認が必要です。"
     errors:
       generic: "エラーが発生しました: %{error_message}"

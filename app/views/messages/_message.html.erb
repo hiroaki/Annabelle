@@ -11,7 +11,7 @@
         class: 'hidden',
         **data_with_testid("delete-message-#{message.id}",{
           turbo_method: :delete,
-          turbo_confirm: 'Sure?',
+          turbo_confirm: t('messages.delete_confirm'),
           message_ownership_target: 'owner',
         })
       )
