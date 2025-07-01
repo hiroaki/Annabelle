@@ -14,8 +14,8 @@ class TwoFactorSettingsController < ApplicationController
   # two_factor_settings POST /two_factor_settings(.:format)
   def create
     unless current_user.valid_password?(params_enabling_2fa[:password])
-      flash.now[:alert] = I18n.t('two_factor_settings.incorrect_password')
-      return render :new
+      flash[:alert] = I18n.t('two_factor_settings.incorrect_password')
+      return redirect_to new_two_factor_settings_path
     end
 
     if current_user.validate_and_consume_otp!(params_enabling_2fa[:code])
@@ -24,8 +24,8 @@ class TwoFactorSettingsController < ApplicationController
       flash[:notice] = I18n.t('two_factor_settings.enabled')
       redirect_to edit_two_factor_settings_path
     else
-      flash.now[:alert] = I18n.t('two_factor_settings.incorrect_code')
-      render :new
+      flash[:alert] = I18n.t('two_factor_settings.incorrect_code')
+      redirect_to new_two_factor_settings_path
     end
   end
 

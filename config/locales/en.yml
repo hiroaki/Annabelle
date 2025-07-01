@@ -122,6 +122,7 @@ en:
       comment_label: "Comment"
       post: "Post"
   two_factor_settings:
+    already_enabled: "Two factor authentication is already enabled."
     backup_codes_already_seen: "You have already seen your backup codes."
     could_not_disable: "Could not disable two factor authentication."
     disable: "Disable Two Factor Authentication"

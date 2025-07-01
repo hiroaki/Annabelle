@@ -122,6 +122,7 @@ ja:
       comment_label: "コメント"
       post: "投稿"
   two_factor_settings:
+    already_enabled: "二要素認証は既に有効になっています。"
     backup_codes_already_seen: "バックアップコードは既に表示済みです。"
     could_not_disable: "二要素認証を無効化できませんでした。"
     disable: "二要素認証を無効にする"
