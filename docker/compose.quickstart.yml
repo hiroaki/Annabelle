@@ -13,7 +13,7 @@
 
 services:
   web:
-    image: ghcr.io/hiroaki/annabelle-vips:v1.4.2
+    image: ghcr.io/hiroaki/annabelle-vips
     ports:
       - "3000:3000"
     env_file: ../.env
