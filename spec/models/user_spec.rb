@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'ostruct'
 
 RSpec.describe User, type: :model do
   describe "バリデーション" do
@@ -126,7 +125,7 @@ RSpec.describe User, type: :model do
       OmniAuth::AuthHash.new(
         provider: "github",
         uid: "12345",
-        info: OpenStruct.new(email: "user@example.com", nickname: "githubuser")
+        info: { email: "user@example.com", nickname: "githubuser" }
       )
     end
 
@@ -182,7 +181,7 @@ RSpec.describe User, type: :model do
 
     context "auth 情報に email がない場合" do
       let(:auth_without_email) do
-        OmniAuth::AuthHash.new(provider: "github", uid: "12345", info: OpenStruct.new(nickname: "githubuser"))
+        OmniAuth::AuthHash.new(provider: "github", uid: "12345", info: { nickname: "githubuser" })
       end
 
       it "ユーザーは作成されないこと" do

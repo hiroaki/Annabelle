@@ -1,4 +1,4 @@
-FROM ruby:3.3.6-slim
+FROM ruby:3.4.4-slim
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -7,10 +7,11 @@ RUN apt-get update && \
       sqlite3 \
       git \
       libpq-dev \
-      imagemagick \
       tzdata \
       ffmpeg \
       curl \
+      libyaml-dev \
+      pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Chromium for headless browser testing (ARM64 compatible)
