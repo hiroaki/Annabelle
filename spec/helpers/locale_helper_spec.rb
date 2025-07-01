@@ -8,19 +8,19 @@ RSpec.describe LocaleHelper do
   end
 
   describe '#current_path_with_locale' do
-    it 'generates path-based locale URL for non-default locale' do
+    it 'generates locale-prefixed URL for non-default locale' do
       result = current_path_with_locale('/messages', 'ja')
       expect(result).to eq('/ja/messages')
     end
-    it 'generates default locale URL with prefix' do
+    it 'generates locale-prefixed URL for default locale' do
       result = current_path_with_locale('/messages', 'en')
       expect(result).to eq('/en/messages')
     end
-    it 'handles path with existing locale prefix' do
+    it 'replaces existing locale prefix' do
       result = current_path_with_locale('/ja/messages', 'en')
       expect(result).to eq('/en/messages')
     end
-    it 'handles root path correctly' do
+    it 'handles root path for non-default locale' do
       result = current_path_with_locale('/', 'ja')
       expect(result).to eq('/ja')
     end
@@ -35,17 +35,55 @@ RSpec.describe LocaleHelper do
       expect(remove_locale_prefix('/ja/messages')).to eq('/messages')
       expect(remove_locale_prefix('/en/users')).to eq('/users')
     end
-    it 'handles locale-only path' do
+    it 'returns root for locale-only path' do
       expect(remove_locale_prefix('/ja')).to eq('/')
       expect(remove_locale_prefix('/en')).to eq('/')
     end
-    it 'handles path without locale prefix' do
+    it 'returns path unchanged if no locale prefix' do
       expect(remove_locale_prefix('/messages')).to eq('/messages')
       expect(remove_locale_prefix('/')).to eq('/')
     end
-    it 'handles blank or nil path' do
+    it 'returns root for blank or nil path' do
       expect(remove_locale_prefix('')).to eq('/')
       expect(remove_locale_prefix(nil)).to eq('/')
+    end
+    it 'raises error for path with double slashes' do
+      expect { remove_locale_prefix('//ja/messages') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid path format/)
+      expect { remove_locale_prefix('/foo//bar') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid path format/)
+    end
+    it 'raises error for path with control characters or spaces' do
+      expect { remove_locale_prefix("/foo\nbar") }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid path format/)
+      expect { remove_locale_prefix('/foo bar') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid path format/)
+    end
+    it 'raises error for path with .. traversal' do
+      expect { remove_locale_prefix('/foo/../bar') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid path format/)
+      expect { remove_locale_prefix('/../bar') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid path format/)
+    end
+    it 'raises error for path not starting with slash' do
+      expect { remove_locale_prefix('foo/bar') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid path format/)
+      expect { remove_locale_prefix('') }.not_to raise_error # 空文字は許容
+      expect { remove_locale_prefix(nil) }.not_to raise_error # nilは許容
+    end
+    it 'raises error for URL encoded attacks' do
+      # エンコーディングが含まれている場合（デコード失敗またはデコード前後で異なる）
+      expect { remove_locale_prefix('/%2E%2E') }.to raise_error(LocaleHelper::LocalePathValidationError, /(URL encoding detected|Invalid URL encoding)/)
+      expect { remove_locale_prefix('/path%20with%20spaces') }.to raise_error(LocaleHelper::LocalePathValidationError, /(URL encoding detected|Invalid URL encoding)/)
+      expect { remove_locale_prefix('/foo%2F%2Fbar') }.to raise_error(LocaleHelper::LocalePathValidationError, /(URL encoding detected|Invalid URL encoding)/)
+      expect { remove_locale_prefix('/valid%2Epath') }.to raise_error(LocaleHelper::LocalePathValidationError, /(URL encoding detected|Invalid URL encoding)/)
+    end
+    it 'raises error for invalid URL encoding' do
+      # URLデコードで例外が発生するケース
+      expect { remove_locale_prefix('/%XX') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid URL encoding/)
+      expect { remove_locale_prefix('/foo%') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid URL encoding/)
+      expect { remove_locale_prefix('/foo%ZZ') }.to raise_error(LocaleHelper::LocalePathValidationError, /Invalid URL encoding/)
+    end
+    it 'raises error for non-string paths' do
+      expect { remove_locale_prefix(123) }.to raise_error(LocaleHelper::LocalePathValidationError, /Path must be a String/)
+      expect { remove_locale_prefix(['path']) }.to raise_error(LocaleHelper::LocalePathValidationError, /Path must be a String/)
+    end
+    it 'raises error for overly long paths' do
+      long_path = '/' + 'a' * 2048
+      expect { remove_locale_prefix(long_path) }.to raise_error(LocaleHelper::LocalePathValidationError, /Path too long/)
     end
   end
 
@@ -62,25 +100,31 @@ RSpec.describe LocaleHelper do
       expect(add_locale_prefix('', 'ja')).to eq('/ja')
       expect(add_locale_prefix(nil, 'ja')).to eq('/ja')
     end
-    it 'removes existing locale before adding new one' do
+    it 'replaces existing locale prefix' do
       expect(add_locale_prefix('/en/messages', 'ja')).to eq('/ja/messages')
       expect(add_locale_prefix('/ja/users', 'en')).to eq('/en/users')
+    end
+    it 'handles paths with query parameters' do
+      expect(add_locale_prefix('/messages?page=1', 'ja')).to eq('/ja/messages?page=1')
+    end
+    it 'handles paths with fragments' do
+      expect(add_locale_prefix('/messages#section1', 'ja')).to eq('/ja/messages#section1')
     end
   end
 
   describe '#localized_path_for' do
     before do
-      allow(Rails.application.routes.url_helpers).to receive(:edit_user_path).with(id: 1).and_return('/users/1/edit')
-      allow(Rails.application.routes.url_helpers).to receive(:edit_user_path).with(id: 1, locale: 'ja').and_return('/ja/users/1/edit')
+      allow(Rails.application.routes.url_helpers).to receive(:edit_profile_path).and_return('/profile/edit')
+      allow(Rails.application.routes.url_helpers).to receive(:edit_profile_path).with(locale: 'ja').and_return('/ja/profile/edit')
     end
-    it 'generates path-based URL for non-default locale' do
-      result = localized_path_for(:edit_user_path, 'ja', id: 1)
-      expect(result).to eq('/ja/users/1/edit')
+    it 'generates locale-prefixed path for non-default locale' do
+      result = localized_path_for(:edit_profile_path, 'ja')
+      expect(result).to eq('/ja/profile/edit')
     end
-    it 'generates path-based URL for default locale' do
-      allow(Rails.application.routes.url_helpers).to receive(:edit_user_path).with(id: 1, locale: 'en').and_return('/en/users/1/edit')
-      result = localized_path_for(:edit_user_path, 'en', id: 1)
-      expect(result).to eq('/en/users/1/edit')
+    it 'generates locale-prefixed path for default locale' do
+      allow(Rails.application.routes.url_helpers).to receive(:edit_profile_path).with(locale: 'en').and_return('/en/profile/edit')
+      result = localized_path_for(:edit_profile_path, 'en')
+      expect(result).to eq('/en/profile/edit')
     end
   end
 
@@ -101,18 +145,6 @@ RSpec.describe LocaleHelper do
     it 'includes additional classes when provided' do
       result = base_link_classes(:ja, 'custom-class')
       expect(result).to include('custom-class')
-    end
-  end
-
-  describe '#skip_locale_redirect?' do
-    it 'returns true for skip paths' do
-      expect(skip_locale_redirect?('/up')).to be true
-      expect(skip_locale_redirect?('/locale/ja')).to be true
-      expect(skip_locale_redirect?('/users/auth/github')).to be true
-    end
-    it 'returns false for normal paths' do
-      expect(skip_locale_redirect?('/messages')).to be false
-      expect(skip_locale_redirect?('/users/sign_in')).to be false
     end
   end
 
@@ -208,6 +240,19 @@ RSpec.describe LocaleHelper do
         expect(session[:oauth_locale]).to eq('ja')
         expect(session[:oauth_locale_timestamp]).to eq(current_time.to_i)
       end
+    end
+  end
+
+  describe 'Unicode and special character handling' do
+    it 'handles normal Unicode characters correctly' do
+      # 通常のUnicode文字は問題なし
+      expect { remove_locale_prefix('/path_with_unicode_あ') }.not_to raise_error
+      expect { remove_locale_prefix('/café') }.not_to raise_error
+    end
+
+    it 'blocks NULL characters as control characters' do
+      # NULL文字は制御文字として検出される
+      expect { remove_locale_prefix("/path\x00hidden") }.to raise_error(LocaleHelper::LocalePathValidationError, /control characters/)
     end
   end
 end

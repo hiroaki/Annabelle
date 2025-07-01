@@ -1,0 +1,46 @@
+# This compose file is for quickly starting the demo environment.
+#
+# Set sensitive environment variables such as secret keys in the .env file,
+# which must not be committed to version control.
+#
+# ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
+# ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
+# ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
+# GITHUB_CLIENT_ID
+# GITHUB_CLIENT_SECRET
+#
+# Other environment variables are set within this compose file.
+
+services:
+  web:
+    image: ghcr.io/hiroaki/annabelle-vips
+    ports:
+      - "3000:3000"
+    env_file: ../.env
+    environment:
+      - ANNABELLE_VARIANT_PROCESSOR=vips
+      - DOCKER=1
+      - SMTP_ADDRESS=smtp
+      - SMTP_PORT=1025
+      - SMTP_DOMAIN=
+      - SMTP_USERNAME=
+      - SMTP_PASSWORD=
+      - APP_HTTP_HOST=127.0.0.1
+      - APP_HTTP_PORT=3000
+      - APP_HTTP_PROTOCOL=http
+    volumes:
+      - 'app-storage:/app/storage'
+    depends_on:
+      - smtp
+    stdin_open: true
+    tty: true
+    # command: /bin/bash -c "/app/bin/rails c"
+
+  smtp:
+    image: sj26/mailcatcher:v0.10.0
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
+volumes:
+  app-storage:

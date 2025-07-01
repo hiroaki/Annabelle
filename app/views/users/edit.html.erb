@@ -1,5 +1,5 @@
 <%= users_frame('users.edit.profile') do %>
-  <%= form_for(@user, html: { method: :put, class: "space-y-6", data: { turbo: false } }) do |f| %>
+  <%= form_for(@user, url: update_profile_path, html: { method: :patch, class: "space-y-6", data: { turbo: false } }) do |f| %>
     <%= render "shared/error_messages", resource: @user %>
 
     <div class="mb-6">

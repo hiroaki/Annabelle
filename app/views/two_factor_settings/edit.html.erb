@@ -1,31 +1,30 @@
-<turbo-frame id="devise">
-  <div class="container p-4">
+<turbo-frame id="tfa-settings">
+<div class="container p-4">
+  <%= content_tag :h2, t('devise.sessions.two_factor_settings.title'), class: 'text-2xl font-bold mb-4', **data_with_testid('two-factor-enabled-message') %>
 
-    <%= content_tag :h2, t('devise.sessions.two_factor_settings.title'), class: 'text-2xl font-bold mb-4', **data_with_testid('two-factor-enabled-message') %>
+  <%= render 'shared/flash' %>
 
-    <%= render 'shared/flash' %>
+  <p class="text-sm text-gray-500 mb-4">
+    <%= t('devise.sessions.two_factor_settings.enabled') %>
+  </p>
 
-    <p class="text-sm text-gray-500 mb-4">
-      <%= t('devise.sessions.two_factor_settings.enabled') %>
-    </p>
-
-    <div class="space-y-6">
-      <!-- Backup Codes Card -->
-      <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div class="px-4 py-2 border-b border-gray-200">
-          <%= content_tag :h3, t('devise.sessions.two_factor_settings.backup_codes_title'), class: 'text-lg font-semibold text-gray-900', **data_with_testid('backup-codes-title') %>
-          <p class="text-sm text-gray-500">
-            <%= t('devise.sessions.two_factor_settings.backup_codes_instruction') %>
-          </p>
-        </div>
-        <div class="p-4 text-gray-700">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <% @backup_codes.each do |code| %>
-              <%= content_tag :div, code, class: 'font-mono font-bold text-gray-900', **data_with_testid('backup-code') %>
-            <% end %>
-          </div>
+  <div class="space-y-6">
+    <!-- Backup Codes Card -->
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
+      <div class="px-4 py-2 border-b border-gray-200">
+        <%= content_tag :h3, t('devise.sessions.two_factor_settings.backup_codes_title'), class: 'text-lg font-semibold text-gray-900', **data_with_testid('backup-codes-title') %>
+        <p class="text-sm text-gray-500">
+          <%= t('devise.sessions.two_factor_settings.backup_codes_instruction') %>
+        </p>
+      </div>
+      <div class="p-4 text-gray-700">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <% @backup_codes.each do |code| %>
+            <%= content_tag :div, code, class: 'font-mono font-bold text-gray-900', **data_with_testid('backup-code') %>
+          <% end %>
         </div>
       </div>
     </div>
   </div>
+</div>
 </turbo-frame>

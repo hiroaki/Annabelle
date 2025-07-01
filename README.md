@@ -60,9 +60,9 @@ This implementation was based on an article by James Ridgway, which was extremel
 
 ### Image Processing Library / 画像処理ライブラリ
 
-This project uses ImageMagick (via mini_magick gem) for Active Storage image and video processing by default, for better compatibility with older operating systems and environments. If you prefer to use libvips instead, set the environment variable `ANNABELLE_VARIANT_PROCESSOR` to `vips` before starting the application.
+This project uses the image_processing gem for Active Storage image and video processing, which uses ImageMagick by default for better compatibility with older operating systems and environments. You must have ImageMagick installed on your system. If you prefer to use libvips instead, install libvips and set the environment variable `ANNABELLE_VARIANT_PROCESSOR` to `vips` before starting the application.
 
-このプロジェクトでは、古い OS や環境との互換性向上のため、Active Storage の画像・動画処理にデフォルトで ImageMagick（mini_magick gem 経由）を使用しています。libvips を利用したい場合は、アプリケーション起動前に環境変数 `ANNABELLE_VARIANT_PROCESSOR` を `vips` に設定してください。
+このプロジェクトでは、Active Storage の画像・動画処理に image_processing gem を使用しており、古い OS や環境との互換性向上のため、デフォルトで ImageMagick を使用しています。システムに ImageMagick がインストールされている必要があります。libvips を利用したい場合は、libvips をインストールして、アプリケーション起動前に環境変数 `ANNABELLE_VARIANT_PROCESSOR` を `vips` に設定してください。
 
 ### SMTP Server / SMTP サーバ
 
@@ -94,21 +94,22 @@ GitHub OAuth 認証を利用する場合は、プロジェクト用の GitHub OA
 
 First, run the database migrations and seed the database:
 
-最初に、`bin/rails db:migrate` と `bin/rails db:seed` を実行してください。
+最初に、データベースをセットアップしてください：
 
 ```
+$ bin/rails db:create
 $ bin/rails db:migrate
 $ bin/rails db:seed
 ```
 
 This process will create an administrator user in the `users` table. Please change the administrator's password as follows:
 
-この処理で `users` テーブルに管理者ユーザが作成されます。管理者ユーザのパスワードは以下の手順で変更してください。
+この処理で `users` テーブルに管理者ユーザが作成されます。管理者ユーザのパスワードは次の手順で変更してください：
 
 ```
 $ bin/rails c
 > user = User.admin_user
-> user.password = 'foo bar baz'
+> user.password = 'xZgnjs_955nyUX1ijzQo'
 > user.save!
 ```
 
@@ -125,6 +126,12 @@ Set the necessary environment variables to run the application.
 If you are using dotenv, you can rename the sample file `dot.env.skel` to `.env` as a starting point. (Note: while this app does not require a .env file, using dotenv is a convenient way to manage environment variables.)
 
 dotenv を利用する場合は、サンプルファイル `dot.env.skel` を `.env` にリネームして利用してください。（本アプリでは `.env` ファイルは必須ではありませんが、環境変数の管理には dotenv を利用すると便利です。）
+
+**Important:**
+Many of the environment variables described below contain sensitive information (such as passwords, encryption keys, and API secrets). Never commit them to your repository or share them publicly.
+
+**重要:**
+以下で設定する多くの環境変数はパスワードや暗号化キー、APIシークレットなどの機密情報を含みます。絶対にリポジトリにコミットしたり、外部に漏らさないよう注意してください。
 
 #### SMTP settings / SMTP 設定
 
@@ -154,58 +161,64 @@ APP_HTTP_PROTOCOL=https
 
 #### Active Record Encryption / Active Record 暗号化
 
-Active Record encryption configuration is required for the two-factor authentication implementation. These values can be generated using `bin/rails db:encryption:init`, and you should copy the strings output to the screen and set them to these environment variables.
+Active Record encryption configuration is required for the two-factor authentication implementation. These values can be generated using `bin/rails db:encryption:init`, and you should copy the strings output to the screen and set them to these environment variables:
 
 Active Record 暗号化の設定で、二要素認証の実装のために必要です。これらの値は `bin/rails db:encryption:init` で生成することができ、画面に出力された文字列をコピーして、これらの環境変数に設定してください：
 
 ```
-ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=
-ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=
-ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=
+ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=...
+ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=...
+ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=...
 ```
 
 #### OAuth (GitHub authentication) / OAuth (GitHub 認証)
 
-Set the following variables for GitHub authentication:
+To use GitHub OAuth authentication, you first need to create an OAuth App for your project on GitHub. You will be asked to enter a callback URL path; for development environments, use the following path (replace the hostname and port as appropriate for your environment):
 
-GitHub 認証のため、以下の変数を設定してください：
+GitHub OAuth 認証を利用するには、まず GitHub 上でこのプロジェクト用の OAuth アプリを作成してください。その際にコールバック URL のパスを入力する必要がありますが、開発環境に於いては次のパスになります（ホスト名やポート番号は環境に応じて置き換えてください）：
+
+```
+http://127.0.0.1:3000/users/auth/github/callback
+```
+
+After creating the app, set the following variables using the Client ID and Client Secret provided by GitHub. These credentials allow your application to authenticate users via GitHub:
+
+アプリ作成後、 GitHub から発行される Client ID と Client Secret をこれらの変数に設定してください：
 
 ```
 GITHUB_CLIENT_ID=...
 GITHUB_CLIENT_SECRET=...
 ```
 
-### 3. Run / 実行方法
+### 3. Build Tailwind CSS / Tailwind CSS のビルド
 
-Once everything is configured, start the web server by running:
+This project uses Tailwind for CSS. You need to build the CSS files with the following command:
 
-全ての設定が完了したら、Web サーバを以下のコマンドで起動してください：
+このプロジェクトの CSS には Tailwind を使用しています。 CSS ファイルのビルドが必要なため、次のコマンドを実行してください：
 
 ```
-$ bin/rails s
+$ bin/rails tailwindcss:build
+```
+
+### 4. Run / 実行
+
+Once everything is configured, start the web server by running. Please note that the production environment is not supported at this time. Run the server in development mode.
+
+全ての設定が完了したら、Web サーバを以下のコマンドで起動してください。なお、本プロジェクトは現時点では本番環境に対応していないため、`RAILS_ENV=development` で実行してください：
+
+```
+$ bin/rails s -b 0.0.0.0 -p 3000
 ```
 
 Then, access the homepage via your browser.
 
 その後、ブラウザでトップページにアクセスします。
 
-Please note that the production environment is not supported at this time. Run the server in development mode.
+During development, it is convenient to run `bin/rails tailwindcss:watch` concurrently to build Tailwind CSS. You can also use `bin/dev` to launch multiple processes at once. A sample configuration is provided in `Procfile.dev.skel`, which you can customize as needed.
 
-なお、本プロジェクトは現時点では本番環境に対応していないため、`RAILS_ENV=development` で実行してください。
+開発中は、 Tailwind CSS のビルド用に `bin/rails tailwindcss:watch` を同時に実行しておくと便利です。また、複数のプロセスを同時に起動するために `bin/dev` も利用可能です。雛形として `Procfile.dev.skel` が用意されているので、必要に応じてカスタマイズしてください。
 
-During development, it is useful to run the Tailwind CSS watcher concurrently. Alternatively, you can use `bin/dev` to run multiple processes at once. A sample configuration is provided in `Procfile.dev.skel`, which you can customize as needed.
-
-開発中は、Tailwind 用に `bin/rails tailwindcss:watch` を同時に実行すると便利です。また、複数のプロセスを同時に起動するために `bin/dev` も利用可能です。雛形として `Procfile.dev.skel` が用意されているので、必要に応じてカスタマイズしてください。
-
-If you only want to use this application (not develop it), please run the following command once at the beginning:
-
-（開発するのではなく）単にこのアプリを利用する場合は、最初一回だけ、次のコマンドを実行してください：
-
-```
-$ bin/rails assets:precompile
-```
-
-### 4. Operation / 運用について
+### 5. Operation / 運用について
 
 Session information is stored in the database using [activerecord-session_store](https://github.com/rails/activerecord-session_store). Since old session records will remain unless cleaned up, please make sure to delete them periodically. A rake task is provided for this purpose, which deletes sessions older than 30 days by default. To specify a different threshold, set the number of days via the SESSION_DAYS_TRIM_THRESHOLD environment variable before running the task.
 
@@ -223,13 +236,9 @@ If you wish to use this application as a base for your own extensions, please re
 
 ### Project Structure / プロジェクト構成
 
-This project follows the standard Ruby on Rails directory structure and conventions.
+This project follows the standard Ruby on Rails directory structure and conventions. If you wish to add new features or customize the application, please follow the Rails way for controllers, models, views, and configurations.
 
-本プロジェクトは Ruby on Rails の標準的なディレクトリ構成および慣習に従っています。
-
-If you wish to add new features or customize the application, please follow the Rails way for controllers, models, views, and configurations.
-
-新しい機能の追加やカスタマイズを行う場合は、コントローラ・モデル・ビュー・設定など、Rails の流儀に従って実装してください。
+本プロジェクトは Ruby on Rails の標準的なディレクトリ構成および慣習に従っています。新しい機能の追加やカスタマイズを行う場合は、コントローラ・モデル・ビュー・設定など、Rails の流儀に従って実装してください。
 
 If any custom features that deviate from the standard are added in the future, they will be documented in this section.
 
@@ -271,7 +280,7 @@ Base locale (en) has 95 keys (app-defined only)
 JA locale:
   Total keys: 95
   [Perfect] match with base locale
-$ 
+$
 ```
 
 All locale-related parts were developed through conversations with GitHub Copilot, with the coding based on LLM model outputs. The models primarily used were "GPT-4.1" and "Claude Sonnet 4 (Preview)".
@@ -289,7 +298,7 @@ RSpec tests are provided. Since Capybara uses cuprite as its javascript_driver, 
 RSpec のテストが用意されています。Capybara の javascript_driver に cuprite を使用しているため、テスト実行環境に Google Chrome ブラウザが必要です。
 
 ```
-$ ./bin/rspec
+$ bin/rspec
 ```
 
 When you run rspec, a coverage report will be generated by simplecov as `coverage/index.html`. Please check the results there.
@@ -301,7 +310,7 @@ If you want to observe the browser during system spec debugging, you can disable
 system spec でのデバッグのために、ブラウザでの実行の様子を眺めたい場合があるかもしれません。その場合、rspec の実行時に環境変数 `HEADLESS` に `0` を指定するとヘッドレス・モードを解除しますので、ブラウザを操作している様子を見ることができます。また環境変数 `SLOWMO` に数値を指定すると、操作のステップごとにその秒数のディレイが入ります。コード上で止めたい場所に `binding.pry` などを挟んでおき、次のように実行するとよいでしょう：
 
 ```
-$ HEADLESS=0 SLOWMO=0.5 ./bin/rspec ./spec/system/something_spec.rb:123
+$ HEADLESS=0 SLOWMO=0.5 bin/rspec ./spec/system/something_spec.rb:123
 ```
 
 This idea was inspired by [Upgrading from Selenium to Cuprite](https://janko.io/upgrading-from-selenium-to-cuprite/). Thank you.

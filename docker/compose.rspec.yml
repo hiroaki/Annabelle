@@ -1,0 +1,15 @@
+# This compose file is only for running rspec in a Docker environment.
+# There are no special settings required. Just run "up" to execute.
+
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.vips
+    environment:
+      - ANNABELLE_VARIANT_PROCESSOR=vips
+      - RAILS_ENV=test
+      - DOCKER=1
+    volumes:
+      - ../:/app
+    command: bash -c "bundle exec rails db:create && rails db:schema:load && bundle exec rspec"
