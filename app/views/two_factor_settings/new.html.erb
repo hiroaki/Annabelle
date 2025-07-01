@@ -1,3 +1,4 @@
+<turbo-frame id="tfa-settings">
 <div class="container p-4">
   <%= content_tag :h2, t('devise.sessions.two_factor_settings.title'), class: 'text-2xl font-bold mb-6', **data_with_testid('two-factor-enabled-message') %>
 
@@ -30,7 +31,7 @@
 
           <%= render 'shared/flash' %>
 
-          <%= form_with scope: :two_fa, url: two_factor_settings_path, method: :post, local: true do |form| %>
+          <%= form_with scope: :two_fa, url: two_factor_settings_path, method: :post, data: { turbo_action: :advance } do |form| %>
             <div class="mb-4">
               <%= form.label :code, t('devise.sessions.two_factor_settings.otp_code_label'), class: "block font-medium text-gray-700" %>
               <%= form.text_field(:code,
@@ -58,3 +59,4 @@
     </li>
   </ol>
 </div>
+</turbo-frame>
