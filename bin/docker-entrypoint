@@ -1,8 +1,12 @@
-#!/bin/bash -e
+#!/bin/bash
+set -e
 
-# If running the rails server then create or migrate existing database
-if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
-  ./bin/rails db:prepare
+echo "Preparing database..."
+./bin/rails db:prepare
+
+if [ "$RAILS_ENV" != "production" ] && [ "$RAILS_ENV" != "staging" ]; then
+  mkdir -p log tmp
+  ./bin/rails tailwindcss:build
 fi
 
-exec "${@}"
+exec "$@"
