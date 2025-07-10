@@ -42,3 +42,8 @@
 
 # simplecov (gem) generates this
 coverage
+
+# kamal (gem) deploy configuration for production / staging envrironment
+config/deploy.production.yml
+config/deploy.staging.yml
+
