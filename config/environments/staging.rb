@@ -17,21 +17,11 @@ Rails.application.configure do
   #   protocol: ENV['APP_HTTP_PROTOCOL'] || 'https',
   # }
 
-  # Since these values are set by environment variables,
-  # the description here will be the same in both production and staging environments.
-  # これらの値は環境変数によって設定されるため、
-  # 本番環境でもステージング環境でもここでの記述は同じ内容になります。
-  #
-  # config.action_mailer.delivery_method = :smtp
-  # config.action_mailer.smtp_settings = {
-  #   address:              ENV['SMTP_ADDRESS'] || 'localhost',
-  #   port:                 ENV['SMTP_PORT'] || 1025,
-  #   domain:               ENV['SMTP_DOMAIN'],
-  #   user_name:            ENV['SMTP_USERNAME'],
-  #   password:             ENV['SMTP_PASSWORD'],
-  #   authentication:       :plain,
-  #   enable_starttls_auto: true
-  # }
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: ENV['SMTP_ADDRESS'],
+    port: ENV['SMTP_PORT'],
+  }
 
   # Temporary configuration: Currently, we are trying to see if the deployment can be completed properly with the http configuration.
   # 仮設定：現在はまず http での構成でデプロイがただしく完了できるかを試しています。
