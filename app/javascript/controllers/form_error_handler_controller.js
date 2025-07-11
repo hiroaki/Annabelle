@@ -87,7 +87,8 @@ export default class extends Controller {
     const flashElement = document.createElement('div')
     flashElement.className = 'p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg'
     flashElement.setAttribute('role', 'alert')
-    flashElement.setAttribute('data-controller', 'dismissable')
+    // Note: Not adding dismissable controller here as it would need to be manually triggered
+    // The user can refresh or submit again to clear the message
     flashElement.textContent = message
 
     // Clear existing messages and add the new one
