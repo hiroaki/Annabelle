@@ -1,7 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["errorContainer"]
+  static values = {
+    error413: String,
+    error502: String,
+    error503: String,
+    error504: String,
+    errorNetwork: String
+  }
 
   connect() {
     // Listen for turbo:submit-end event to handle form submission results
@@ -22,59 +28,25 @@ export default class extends Controller {
   }
 
   handleHttpError(status) {
-    let errorMessageKey = this.getErrorMessageKey(status)
+    const errorMessage = this.getErrorMessage(status)
     
-    if (errorMessageKey) {
-      this.displayError(errorMessageKey)
+    if (errorMessage) {
+      this.displayFlashMessage(errorMessage)
     }
   }
 
-  getErrorMessageKey(status) {
+  getErrorMessage(status) {
     const errorMapping = {
-      413: "messages.errors.proxy_413",
-      502: "messages.errors.proxy_502", 
-      503: "messages.errors.proxy_503",
-      504: "messages.errors.proxy_504"
+      413: this.error413Value,
+      502: this.error502Value, 
+      503: this.error503Value,
+      504: this.error504Value
     }
 
     return errorMapping[status] || null
   }
 
-  displayError(i18nKey) {
-    // Get the localized error message
-    const errorMessage = this.getLocalizedMessage(i18nKey)
-    
-    if (errorMessage) {
-      this.showFlashMessage(errorMessage)
-    }
-  }
-
-  getLocalizedMessage(i18nKey) {
-    // Try to get the localized message from data attributes or fallback to hardcoded
-    const locale = document.documentElement.lang || 'en'
-    
-    // Define fallback messages
-    const fallbackMessages = {
-      'en': {
-        'messages.errors.proxy_413': 'The message or attached files are too large. Please reduce the file size and try again.',
-        'messages.errors.proxy_502': 'The server is temporarily unavailable. Please wait a moment and try again.',
-        'messages.errors.proxy_503': 'The server is temporarily unavailable. Please wait a moment and try again.',
-        'messages.errors.proxy_504': 'The server response timed out. Please wait a moment and try again.',
-        'messages.errors.network_error': 'A network error occurred. Please check your internet connection and try again.'
-      },
-      'ja': {
-        'messages.errors.proxy_413': 'メッセージまたは添付ファイルのサイズが大きすぎます。ファイルサイズを小さくして再度お試しください。',
-        'messages.errors.proxy_502': 'サーバーに一時的にアクセスできません。しばらく待ってから再度お試しください。',
-        'messages.errors.proxy_503': 'サーバーが一時的に利用できません。しばらく待ってから再度お試しください。',
-        'messages.errors.proxy_504': 'サーバーの応答がタイムアウトしました。しばらく待ってから再度お試しください。',
-        'messages.errors.network_error': 'ネットワークエラーが発生しました。インターネット接続を確認して再度お試しください。'
-      }
-    }
-
-    return fallbackMessages[locale]?.[i18nKey] || fallbackMessages['en'][i18nKey]
-  }
-
-  showFlashMessage(message) {
+  displayFlashMessage(message) {
     // Find the flash message container
     const flashContainer = document.getElementById('flash-message-container')
     
@@ -83,12 +55,12 @@ export default class extends Controller {
       return
     }
 
-    // Create a flash message element similar to the shared/_flash.html.erb partial
+    // Create a flash message element that matches the existing Rails flash partial structure
     const flashElement = document.createElement('div')
     flashElement.className = 'p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg'
     flashElement.setAttribute('role', 'alert')
-    // Note: Not adding dismissable controller here as it would need to be manually triggered
-    // The user can refresh or submit again to clear the message
+    flashElement.setAttribute('data-controller', 'dismissable')
+    flashElement.setAttribute('data-testid', 'flash-message')
     flashElement.textContent = message
 
     // Clear existing messages and add the new one

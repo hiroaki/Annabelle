@@ -18,6 +18,11 @@
             'class' => 'block pb-4 w-full',
             'data-controller' => 'file-upload form-error-handler',
             'data-file-upload-target' => 'dropZone',
+            'data-form-error-handler-error-413-value' => t('messages.errors.proxy_413'),
+            'data-form-error-handler-error-502-value' => t('messages.errors.proxy_502'),
+            'data-form-error-handler-error-503-value' => t('messages.errors.proxy_503'),
+            'data-form-error-handler-error-504-value' => t('messages.errors.proxy_504'),
+            'data-form-error-handler-error-network-value' => t('messages.errors.network_error'),
           }
         ) do |form|
       %>
