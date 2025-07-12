@@ -118,6 +118,11 @@ en:
     errors:
       generic: "An error occurred: %{error_message}"
       not_owned: "You cannot delete another user's message."
+      proxy_413: "The message or attached files are too large. Please reduce the file size and try again."
+      proxy_502: "The server is temporarily unavailable. Please wait a moment and try again."
+      proxy_503: "The server is temporarily unavailable. Please wait a moment and try again."
+      proxy_504: "The server response timed out. Please wait a moment and try again."
+      network_error: "A network error occurred. Please check your internet connection and try again."
     form:
       comment_label: "Comment"
       post: "Post"
