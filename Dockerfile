@@ -83,6 +83,10 @@ USER rails:rails
 # Entrypoint prepares the database
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start the server with thruster for production/staging
+# Start the server with thruster for production/staging.
+# Puma listening on port to 3000, kamal-proxy 3001 for Thruster
+ENV THRUSTER_HTTP_PORT="3001" \
+    THRUSTER_TARGET_PORT="3000" \
+    THRUSTER_DEBUG=1
 EXPOSE 3000
-CMD ["bundle", "exec", "thrust", "bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]
+CMD ["bundle", "exec", "thrust", "bin/rails", "server"]
