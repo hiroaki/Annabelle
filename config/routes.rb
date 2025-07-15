@@ -51,4 +51,13 @@ Rails.application.routes.draw do
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
+
+  # Test routes for proxy error handling (development only)
+  if Rails.env.development?
+    namespace :test do
+      get 'proxy-error/:status', to: 'test#proxy_error', as: :proxy_error
+      get 'app-error/:status', to: 'test#app_error', as: :app_error
+      get 'test-page', to: 'test#test_page', as: :test_page
+    end
+  end
 end
