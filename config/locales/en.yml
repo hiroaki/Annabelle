@@ -78,6 +78,13 @@ en:
       invalid_value: "is not a valid locale"
       unsupported_locale: "Unsupported locale"
       invalid_redirect_path: "Invalid redirect path specified"
+    proxy:
+      too_large: "Request too large. The file or request size exceeds the maximum allowed limit."
+      too_large_with_limit: "Request too large. The file or request size exceeds the maximum allowed limit of %{limit}."
+      bad_gateway: "Service temporarily unavailable. Please try again later."
+      service_unavailable: "Service temporarily unavailable. Please try again later."
+      gateway_timeout: "Request timeout. The server took too long to respond."
+      generic: "Request failed due to proxy configuration. Please try again later."
     messages:
       accepted: "must be accepted"
       blank: "can't be blank"

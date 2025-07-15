@@ -1,0 +1,12 @@
+# i18n-js configuration
+# This file configures which translations are exported to JavaScript
+
+---
+:pretty_print: false
+:plugins:
+  :js:
+    :file: "app/javascript/lib/i18n.js"
+:translations:
+  - file: "app/javascript/lib/translations.json"
+    patterns:
+      - "*"

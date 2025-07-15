@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby "3.4.4"
+ruby "3.2.3"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.0.0"
@@ -93,3 +93,4 @@ gem "rqrcode"
 gem "activerecord-session_store"
 gem "rails-i18n", "~> 8.0.0" # For Rails >= 8.0.0
 gem "http_accept_language"
+gem "i18n-js", "~> 4.2"

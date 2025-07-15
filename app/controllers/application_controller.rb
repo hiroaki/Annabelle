@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   before_action :set_locale
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :conditional_auto_login
+  before_action :set_app_response_header
 
   rescue_from I18n::InvalidLocale, with: :handle_invalid_locale
 
@@ -31,6 +32,11 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  # Add custom header to distinguish Rails app responses from proxy responses
+  def set_app_response_header
+    response.headers['X-App-Response'] = 'true'
+  end
 
   def handle_invalid_locale(exception)
     Rails.logger.error("[Locale] Invalid locale error: #{exception.message} (params: #{params.inspect})")
