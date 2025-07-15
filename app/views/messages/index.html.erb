@@ -1,4 +1,4 @@
-<div id="messages-container" data-controller="messages" class="bg-gray-100">
+<div id="messages-container" data-controller="messages proxy-error-handler" class="bg-gray-100">
   <div id="form-container" class="sticky top-0 z-10 lg:px-4 px-2">
     <!-- WORKAROUND: z-index:10 にしないと video が textarea の上に表示されてしまいます。
     web インスペクタを操作して z-index: 1 にすると、その時は textarea が上になるのですが、
@@ -6,7 +6,7 @@
     ページのロード時に全体の z-index 関係のの計算を、どこかでしているのかもしれません？
     -->
     <div id="form-wrapper" class="w-full max-w-full lg:max-w-[48%]">
-      <div id="flash-message-container" class="mx-2">
+      <div id="flash-message-container" class="mx-2" data-proxy-error-handler-target="errorContainer">
         <%= render 'shared/flash' %>
       </div>
       <% disabled = !current_user.confirmed? %>
