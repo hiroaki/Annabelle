@@ -1,7 +1,7 @@
 <%# Show current locale and provide links to change it %>
 <div class="language-switcher flex items-center space-x-2" data-turbo="false">
   <%
-    current_path = request.path
+    current_path = @language_switcher_path || request.fullpath
     locales = LocaleConfiguration.available_locales
   %>
   <% locales.each_with_index do |locale, idx| %>

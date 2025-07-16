@@ -32,24 +32,28 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   # GET /resource/sign_up
-  # def new
-  #   super
-  # end
+  def new
+    @language_switcher_path = new_user_registration_path
+    super
+  end
 
   # POST /resource
-  # def create
-  #   super
-  # end
+  def create
+    @language_switcher_path = new_user_registration_path
+    super
+  end
 
   # GET /resource/edit
-  # def edit
-  #   super
-  # end
+  def edit
+    @language_switcher_path = edit_user_registration_path
+    super
+  end
 
   # PUT /resource
-  # def update
-  #   super
-  # end
+  def update
+    @language_switcher_path = edit_user_registration_path
+    super
+  end
 
   # DELETE /resource
   # def destroy
