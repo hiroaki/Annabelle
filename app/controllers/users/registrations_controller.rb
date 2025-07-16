@@ -9,6 +9,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # before_action :configure_sign_up_params, only: [:create]
   # before_action :configure_account_update_params, only: [:update]
 
+  # unlink_oauth DELETE /:locale/users/oauth(.:format)
   # OAuth 認証を解除するアクション
   def unlink_oauth
     provider = params[:provider]
@@ -31,34 +32,18 @@ class Users::RegistrationsController < Devise::RegistrationsController
     devise_edit_registration_path_for(resource)
   end
 
-  # GET /resource/sign_up
-  def new
-    @language_switcher_path = new_user_registration_path
-    super
-  end
-
-  # POST /resource
+  # user_registration POST /:locale/users(.:format)
   def create
     @language_switcher_path = new_user_registration_path
     super
   end
 
-  # GET /resource/edit
-  def edit
-    @language_switcher_path = edit_user_registration_path
-    super
-  end
-
-  # PUT /resource
+  # user_registration PATCH /:locale/users(.:format)
+  # user_registration PUT /:locale/users(.:format)
   def update
     @language_switcher_path = edit_user_registration_path
     super
   end
-
-  # DELETE /resource
-  # def destroy
-  #   super
-  # end
 
   # GET /resource/cancel
   # Forces the session data which is usually expired after sign
