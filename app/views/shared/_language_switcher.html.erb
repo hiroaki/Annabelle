@@ -1,7 +1,11 @@
 <%# Show current locale and provide links to change it %>
 <div class="language-switcher flex items-center space-x-2" data-turbo="false">
   <%
-    current_path = request.path
+    # When forms fail validation, controllers use `render` instead of `redirect_to`,
+    # which keeps the POST/PUT URL (e.g., /users) instead of the GET URL (e.g., /users/edit).
+    # This causes 404 errors when language switcher tries to redirect to non-existent GET routes.
+    # Controllers set @language_switcher_path to provide the correct URL for language switching.
+    current_path = @language_switcher_path || request.fullpath
     locales = LocaleConfiguration.available_locales
   %>
   <% locales.each_with_index do |locale, idx| %>
