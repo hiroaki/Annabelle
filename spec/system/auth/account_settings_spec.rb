@@ -132,7 +132,7 @@ RSpec.describe 'アカウント設定', type: :system do
       # 正しいパスにリダイレクトされる（404にならない）
       expect(page).to have_current_path('/ja/users/edit')
       # アカウント設定画面特有の要素が表示されることを確認
-      expect(page).to have_selector("[data-testid='account-settings-title']")
+      expect(page).to have_selector("[data-testid='devise-registrations-account_settings-title']")
       expect(page).to have_selector("[data-testid='account-update-submit']")
     end
   end
