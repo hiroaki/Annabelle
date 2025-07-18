@@ -180,29 +180,33 @@ RSpec.describe 'Flash Message System Integration', type: :system do
       it 'clears flash-storage after rendering client-side messages' do
         page.execute_script('addFlashMessageToStorage("Test message", "alert")')
 
-        # Verify message is in storage
+        # Initially, message should be in storage
         storage_count = page.evaluate_script('document.querySelector("#flash-storage ul").children.length')
         expect(storage_count).to eq(1)
 
+        # After manual rendering, storage should be cleared
         page.execute_script('renderFlashMessages()')
-
-        # Verify storage is cleared after rendering
         storage_count_after = page.evaluate_script('document.querySelector("#flash-storage ul").children.length')
         expect(storage_count_after).to eq(0)
+
+        # Verify the message was actually rendered
+        expect(page).to have_selector('[data-testid="flash-message"]', text: 'Test message')
       end
 
       it 'correctly adds multiple messages to storage' do
-        # Test that storage works correctly before testing rendering
+        # Test that multiple messages can be added and rendered correctly
         page.execute_script('addFlashMessageToStorage("First message", "alert")')
-        expect(page.evaluate_script('document.querySelector("#flash-storage ul").children.length')).to eq(1)
-
         page.execute_script('addFlashMessageToStorage("Second message", "notice")')
-        expect(page.evaluate_script('document.querySelector("#flash-storage ul").children.length')).to eq(2)
+        page.execute_script('renderFlashMessages()')
+
+        expect(page).to have_selector('[data-testid="flash-message"]', count: 2)
+        expect(page).to have_selector('[data-testid="flash-message"]', text: 'First message')
+        expect(page).to have_selector('[data-testid="flash-message"]', text: 'Second message')
 
         page.execute_script('addFlashMessageToStorage("Third message", "warning")')
-        expect(page.evaluate_script('document.querySelector("#flash-storage ul").children.length')).to eq(3)
+        expect(page.evaluate_script('document.querySelector("#flash-storage ul").children.length')).to eq(1)  # Only the third message should be in storage
 
-        # Check the actual content
+        # Check the actual content - only the third message should remain in storage
         messages = page.evaluate_script(<<~JS)
           Array.from(document.querySelectorAll("#flash-storage ul li")).map(li => ({
             type: li.dataset.type,
@@ -211,8 +215,6 @@ RSpec.describe 'Flash Message System Integration', type: :system do
         JS
 
         expect(messages).to eq([
-          { 'type' => 'alert', 'text' => 'First message' },
-          { 'type' => 'notice', 'text' => 'Second message' },
           { 'type' => 'warning', 'text' => 'Third message' }
         ])
       end
@@ -259,9 +261,9 @@ RSpec.describe 'Flash Message System Integration', type: :system do
 
       it 'renders multiple messages correctly and clears storage' do
         # Add messages and verify each step
-        page.execute_script('addFlashMessageToStorage("First message", "alert")')
-        page.execute_script('addFlashMessageToStorage("Second message", "notice")')
-        page.execute_script('addFlashMessageToStorage("Third message", "warning")')
+        page.execute_script('addFlashMessageToStorage("First message", "alert", false)')
+        page.execute_script('addFlashMessageToStorage("Second message", "notice", false)')
+        page.execute_script('addFlashMessageToStorage("Third message", "warning", false)')
 
         # Verify storage has all messages
         storage_count = page.evaluate_script('document.querySelector("#flash-storage ul").children.length')
@@ -279,9 +281,9 @@ RSpec.describe 'Flash Message System Integration', type: :system do
       end
 
       it 'can render multiple messages at once' do
-        page.execute_script('addFlashMessageToStorage("First message", "alert")')
-        page.execute_script('addFlashMessageToStorage("Second message", "notice")')
-        page.execute_script('addFlashMessageToStorage("Third message", "warning")')
+        page.execute_script('addFlashMessageToStorage("First message", "alert", false)')
+        page.execute_script('addFlashMessageToStorage("Second message", "notice", false)')
+        page.execute_script('addFlashMessageToStorage("Third message", "warning", false)')
         page.execute_script('renderFlashMessages()')
 
         # Verify all messages are displayed
@@ -352,9 +354,9 @@ RSpec.describe 'Flash Message System Integration', type: :system do
 
     it 'maintains compatibility with assistive technologies' do
       # Add multiple types of messages to test different alert levels
-      page.execute_script('addFlashMessageToStorage("Error message", "alert")')
-      page.execute_script('addFlashMessageToStorage("Info message", "notice")')
-      page.execute_script('addFlashMessageToStorage("Warning message", "warning")')
+      page.execute_script('addFlashMessageToStorage("Error message", "alert", false)')
+      page.execute_script('addFlashMessageToStorage("Info message", "notice", false)')
+      page.execute_script('addFlashMessageToStorage("Warning message", "warning", false)')
       page.execute_script('renderFlashMessages()')
 
       # All should have alert role for accessibility

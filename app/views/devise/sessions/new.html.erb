@@ -8,16 +8,7 @@
 <%= turbo_page_requires_reload %>
 
 <div class="container p-4 max-w-xl mx-auto">
-  <% if flash[:alert] %>
-    <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-      <%= flash[:alert] %>
-    </div>
-  <% end %>
-  <% if flash[:notice] %>
-    <div class="p-4 mb-4 text-sm text-blue-700 bg-blue-100 rounded-lg" role="alert">
-      <%= flash[:notice] %>
-    </div>
-  <% end %>
+  <div id="flash-message-container" class="mx-2"></div>
 
   <h2 class="text-2xl font-bold mb-4"><%= t('devise.sessions.log_in') %></h2>
 

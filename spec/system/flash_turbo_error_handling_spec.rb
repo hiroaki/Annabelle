@@ -31,7 +31,7 @@ RSpec.describe 'Flash Message System - Turbo Error Handling', type: :system do
       it 'shows appropriate error message for file size errors' do
         # Simulate a 413 error by creating a mock event
         page.execute_script(<<~JS)
-          const event = new CustomEvent('turbo:submit-end', {
+          const event = new CustomEvent('turbo:render', {
             detail: {
               fetchResponse: { status: 413 }
             }
@@ -50,7 +50,7 @@ RSpec.describe 'Flash Message System - Turbo Error Handling', type: :system do
     context 'when simulating HTTP 503 (Service Unavailable)' do
       it 'shows appropriate error message for service unavailable' do
         page.execute_script(<<~JS)
-          const event = new CustomEvent('turbo:submit-end', {
+          const event = new CustomEvent('turbo:render', {
             detail: {
               fetchResponse: { status: 503 }
             }
@@ -65,7 +65,7 @@ RSpec.describe 'Flash Message System - Turbo Error Handling', type: :system do
     context 'when simulating other 4xx errors' do
       it 'shows generic 4xx error message for 400' do
         page.execute_script(<<~JS)
-          const event = new CustomEvent('turbo:submit-end', {
+          const event = new CustomEvent('turbo:render', {
             detail: {
               fetchResponse: { status: 400 }
             }
@@ -78,7 +78,7 @@ RSpec.describe 'Flash Message System - Turbo Error Handling', type: :system do
 
       it 'shows generic 4xx error message for 422' do
         page.execute_script(<<~JS)
-          const event = new CustomEvent('turbo:submit-end', {
+          const event = new CustomEvent('turbo:render', {
             detail: {
               fetchResponse: { status: 422 }
             }
@@ -93,7 +93,7 @@ RSpec.describe 'Flash Message System - Turbo Error Handling', type: :system do
     context 'when simulating 5xx errors' do
       it 'shows generic server error message for 500' do
         page.execute_script(<<~JS)
-          const event = new CustomEvent('turbo:submit-end', {
+          const event = new CustomEvent('turbo:render', {
             detail: {
               fetchResponse: { status: 500 }
             }
@@ -134,7 +134,7 @@ RSpec.describe 'Flash Message System - Turbo Error Handling', type: :system do
         
         # Now trigger a client-side error
         page.execute_script(<<~JS)
-          const event = new CustomEvent('turbo:submit-end', {
+          const event = new CustomEvent('turbo:render', {
             detail: {
               fetchResponse: { status: 413 }
             }
@@ -158,12 +158,12 @@ RSpec.describe 'Flash Message System - Turbo Error Handling', type: :system do
       visit messages_path
     end
 
-    it 'properly listens for turbo:submit-end events' do
+    it 'properly listens for turbo:render events' do
       # Verify the event listener is attached by checking if it responds to events
       initial_count = page.evaluate_script('document.querySelectorAll("[data-testid=flash-message]").length')
       
       page.execute_script(<<~JS)
-        const event = new CustomEvent('turbo:submit-end', {
+        const event = new CustomEvent('turbo:render', {
           detail: {
             fetchResponse: { status: 413 }
           }
@@ -204,7 +204,7 @@ RSpec.describe 'Flash Message System - Turbo Error Handling', type: :system do
       # Should not crash when event detail is missing
       expect {
         page.execute_script(<<~JS)
-          const event = new CustomEvent('turbo:submit-end', {
+          const event = new CustomEvent('turbo:render', {
             detail: {}
           });
           document.dispatchEvent(event);
@@ -218,7 +218,7 @@ RSpec.describe 'Flash Message System - Turbo Error Handling', type: :system do
     it 'handles events with null fetchResponse gracefully' do
       expect {
         page.execute_script(<<~JS)
-          const event = new CustomEvent('turbo:submit-end', {
+          const event = new CustomEvent('turbo:render', {
             detail: {
               fetchResponse: null
             }
@@ -233,7 +233,7 @@ RSpec.describe 'Flash Message System - Turbo Error Handling', type: :system do
     it 'handles successful status codes appropriately' do
       # Should not show error messages for 2xx status codes
       page.execute_script(<<~JS)
-        const event = new CustomEvent('turbo:submit-end', {
+        const event = new CustomEvent('turbo:render', {
           detail: {
             fetchResponse: { status: 200 }
           }
@@ -244,7 +244,7 @@ RSpec.describe 'Flash Message System - Turbo Error Handling', type: :system do
       expect(page).not_to have_selector('[data-testid="flash-message"]')
       
       page.execute_script(<<~JS)
-        const event = new CustomEvent('turbo:submit-end', {
+        const event = new CustomEvent('turbo:render', {
           detail: {
             fetchResponse: { status: 302 }
           }
