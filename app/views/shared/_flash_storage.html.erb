@@ -1,5 +1,6 @@
-<ul>
+<ul data-testid="flash-storage-list">
   <% flash.each do |type, message| %>
     <li data-type="<%= type %>"><%= message %></li>
   <% end %>
+  <!-- flash storage list -->
 </ul>
