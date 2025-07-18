@@ -1,0 +1,5 @@
+<ul>
+  <% flash.each do |type, message| %>
+    <li data-type="<%= type %>"><%= message %></li>
+  <% end %>
+</ul>
