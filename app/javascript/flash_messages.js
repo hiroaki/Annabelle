@@ -15,6 +15,10 @@ function renderFlashMessages() {
   
   container.innerHTML = '';
   
+  // Store count for debugging
+  const messageCount = ul.children.length;
+  container.setAttribute('data-message-count', messageCount);
+  
   // Existing style definitions from original _flash.html.erb
   const flashStyles = {
     alert: 'text-red-700 bg-red-100',
@@ -22,7 +26,10 @@ function renderFlashMessages() {
     warning: 'text-yellow-700 bg-yellow-100'
   };
   
-  ul.querySelectorAll('li').forEach(li => {
+  // Convert to array to avoid live collection issues
+  const liElements = Array.from(ul.querySelectorAll('li'));
+  
+  liElements.forEach((li, index) => {
     const type = li.dataset.type || 'notice';
     const message = li.textContent.trim();
     
@@ -37,6 +44,8 @@ function renderFlashMessages() {
     div.setAttribute('role', 'alert');
     div.setAttribute('data-testid', 'flash-message');
     div.setAttribute('data-controller', 'dismissable');
+    div.setAttribute('data-message-index', index);
+    div.setAttribute('data-message-type', type);
     div.textContent = message;
     
     container.appendChild(div);
@@ -47,13 +56,20 @@ function renderFlashMessages() {
 
 function addFlashMessageToStorage(message, type = 'alert') {
   const storage = document.getElementById('flash-storage');
-  if (!storage) return;
+  if (!storage) {
+    console.error('No flash-storage element found');
+    return;
+  }
   
   // Don't add empty messages
-  if (!message || !message.trim()) return;
+  if (!message || !message.trim()) {
+    console.warn('Empty message, not adding');
+    return;
+  }
   
   let ul = storage.querySelector('ul');
   if (!ul) {
+    console.log('No ul found, creating one');
     ul = document.createElement('ul');
     storage.appendChild(ul);
   }
@@ -62,6 +78,10 @@ function addFlashMessageToStorage(message, type = 'alert') {
   li.dataset.type = type;
   li.textContent = message;
   ul.appendChild(li);
+  
+  // Debug: verify the element was added
+  console.log('Added message:', message, 'type:', type);
+  console.log('Storage ul children count:', ul.children.length);
 }
 
 // Function to process flash messages immediately when DOM is ready
@@ -134,3 +154,30 @@ document.addEventListener('turbo:fetch-request-error', function(event) {
 // Make functions globally available for Turbo Stream calls and testing
 window.renderFlashMessages = renderFlashMessages;
 window.addFlashMessageToStorage = addFlashMessageToStorage;
+
+// Debug function to inspect storage state
+window.debugFlashStorage = function() {
+  const storage = document.getElementById('flash-storage');
+  const container = document.getElementById('flash-message-container');
+  
+  console.log('=== Flash Storage Debug ===');
+  console.log('Storage element:', !!storage);
+  console.log('Container element:', !!container);
+  
+  if (storage) {
+    const ul = storage.querySelector('ul');
+    console.log('Storage ul element:', !!ul);
+    if (ul) {
+      console.log('Storage ul children count:', ul.children.length);
+      Array.from(ul.children).forEach((li, index) => {
+        console.log(`Storage li ${index}:`, li.dataset.type, li.textContent);
+      });
+    }
+    console.log('Storage innerHTML:', storage.innerHTML);
+  }
+  
+  if (container) {
+    console.log('Container children count:', container.children.length);
+    console.log('Container innerHTML:', container.innerHTML);
+  }
+};

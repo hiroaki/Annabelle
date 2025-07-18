@@ -177,15 +177,25 @@ RSpec.describe 'Flash Message System Integration', type: :system do
       end
 
       it 'clears flash-storage after rendering client-side messages' do
+        # Debug initial state
+        page.execute_script('window.debugFlashStorage && window.debugFlashStorage()')
+        
         page.execute_script('addFlashMessageToStorage("Test message", "alert")')
         
+        # Debug after adding message
+        page.execute_script('window.debugFlashStorage && window.debugFlashStorage()')
+        
         # Verify message is in storage
-        expect(page.evaluate_script('document.querySelector("#flash-storage ul").children.length')).to eq(1)
+        storage_count = page.evaluate_script('document.querySelector("#flash-storage ul").children.length')
+        puts "Storage count after adding message: #{storage_count}"
+        expect(storage_count).to eq(1)
         
         page.execute_script('renderFlashMessages()')
         
         # Verify storage is cleared after rendering
-        expect(page.evaluate_script('document.querySelector("#flash-storage ul").children.length')).to eq(0)
+        storage_count_after = page.evaluate_script('document.querySelector("#flash-storage ul").children.length')
+        puts "Storage count after rendering: #{storage_count_after}"
+        expect(storage_count_after).to eq(0)
       end
 
       it 'can render multiple messages at once' do
@@ -193,6 +203,20 @@ RSpec.describe 'Flash Message System Integration', type: :system do
         page.execute_script('addFlashMessageToStorage("Second message", "notice")')
         page.execute_script('addFlashMessageToStorage("Third message", "warning")')
         page.execute_script('renderFlashMessages()')
+        
+        # Debug information
+        container = page.find('#flash-message-container')
+        message_count = container['data-message-count']
+        puts "Container data-message-count: #{message_count}"
+        
+        # Check individual messages
+        alert_msgs = page.all('[data-testid="flash-message"][data-message-type="alert"]')
+        notice_msgs = page.all('[data-testid="flash-message"][data-message-type="notice"]')
+        warning_msgs = page.all('[data-testid="flash-message"][data-message-type="warning"]')
+        
+        puts "Alert messages: #{alert_msgs.count}"
+        puts "Notice messages: #{notice_msgs.count}"
+        puts "Warning messages: #{warning_msgs.count}"
         
         expect(page).to have_selector('[data-testid="flash-message"]', count: 3)
         expect(page).to have_content('First message')
