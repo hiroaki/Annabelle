@@ -24,7 +24,11 @@ function renderFlashMessages() {
   
   ul.querySelectorAll('li').forEach(li => {
     const type = li.dataset.type || 'notice';
-    const message = li.textContent;
+    const message = li.textContent.trim();
+    
+    // Skip empty messages
+    if (!message) return;
+    
     const div = document.createElement('div');
     
     // Use same styles and data attributes as original _flash.html.erb
@@ -45,6 +49,9 @@ function addFlashMessageToStorage(message, type = 'alert') {
   const storage = document.getElementById('flash-storage');
   if (!storage) return;
   
+  // Don't add empty messages
+  if (!message || !message.trim()) return;
+  
   let ul = storage.querySelector('ul');
   if (!ul) {
     ul = document.createElement('ul');
@@ -57,16 +64,20 @@ function addFlashMessageToStorage(message, type = 'alert') {
   ul.appendChild(li);
 }
 
-// Function to process flash messages with a slight delay to ensure DOM is ready
+// Function to process flash messages immediately when DOM is ready
 function processFlashMessages() {
-  setTimeout(function() {
+  // Check if DOM is ready, if not wait for DOMContentLoaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderFlashMessages);
+  } else {
+    // DOM is already ready, process immediately
     renderFlashMessages();
-  }, 10);
+  }
 }
 
-// Simple event handling
-document.addEventListener('DOMContentLoaded', processFlashMessages);
-document.addEventListener('turbo:load', processFlashMessages);
+// Simple event handling - only process when actually needed
+document.addEventListener('DOMContentLoaded', renderFlashMessages);
+document.addEventListener('turbo:load', renderFlashMessages);
 
 // Error handling for turbo:submit-end
 document.addEventListener('turbo:submit-end', function(event) {
@@ -76,10 +87,8 @@ document.addEventListener('turbo:submit-end', function(event) {
   
   // Always trigger renderFlashMessages for successful responses that have server-side flash
   if (status >= 200 && status < 300) {
-    // Small delay to allow turbo stream to update flash-storage first
-    setTimeout(() => {
-      renderFlashMessages();
-    }, 10);
+    // For successful responses, wait for turbo streams to complete
+    renderFlashMessages();
     return;
   }
   
@@ -97,6 +106,26 @@ document.addEventListener('turbo:submit-end', function(event) {
     renderFlashMessages();
   } else if (status >= 500) {
     addFlashMessageToStorage('サーバーエラーが発生しました（5xxエラー）', 'alert');
+    renderFlashMessages();
+  }
+});
+
+// Handle turbo stream updates specifically
+document.addEventListener('turbo:before-stream-render', function(event) {
+  // Check if this stream update is for flash-storage
+  if (event.target && event.target.id === 'flash-storage') {
+    // Clear any existing client-side messages to avoid competition
+    const container = document.getElementById('flash-message-container');
+    if (container) {
+      container.innerHTML = '';
+    }
+  }
+});
+
+// Render flash messages after turbo stream updates
+document.addEventListener('turbo:after-stream-render', function(event) {
+  // Check if this stream update was for flash-storage
+  if (event.target && event.target.id === 'flash-storage') {
     renderFlashMessages();
   }
 });
