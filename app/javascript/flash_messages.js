@@ -110,23 +110,15 @@ document.addEventListener('turbo:submit-end', function(event) {
   }
 });
 
-// Handle turbo stream updates specifically
-document.addEventListener('turbo:before-stream-render', function(event) {
-  // Check if this stream update is for flash-storage
-  if (event.target && event.target.id === 'flash-storage') {
-    // Clear any existing client-side messages to avoid competition
-    const container = document.getElementById('flash-message-container');
-    if (container) {
-      container.innerHTML = '';
-    }
-  }
-});
-
-// Render flash messages after turbo stream updates
+// Handle turbo stream updates more broadly
 document.addEventListener('turbo:after-stream-render', function(event) {
-  // Check if this stream update was for flash-storage
-  if (event.target && event.target.id === 'flash-storage') {
-    renderFlashMessages();
+  // Always check if there are flash messages to render after any turbo stream
+  const storage = document.getElementById('flash-storage');
+  if (storage) {
+    const ul = storage.querySelector('ul');
+    if (ul && ul.children.length > 0) {
+      renderFlashMessages();
+    }
   }
 });
 

@@ -34,7 +34,7 @@ RSpec.describe 'Flash Message System Integration', type: :system do
 
     it 'has an empty ul element inside flash-storage by default' do
       storage = page.find('#flash-storage', visible: false)
-      expect(storage).to have_selector('ul')
+      expect(storage).to have_selector('ul', visible: false)
       # The ul should be empty initially
       expect(page.evaluate_script('document.querySelector("#flash-storage ul").children.length')).to eq(0)
     end
