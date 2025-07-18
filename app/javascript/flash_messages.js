@@ -6,18 +6,33 @@
  */
 
 function renderFlashMessages() {
+  console.log('renderFlashMessages called');
   const storage = document.getElementById('flash-storage');
   const container = document.getElementById('flash-message-container');
-  if (!storage || !container) return;
+  
+  console.log('storage element:', !!storage);
+  console.log('container element:', !!container);
+  
+  if (!storage || !container) {
+    console.log('Missing storage or container element');
+    return;
+  }
   
   const ul = storage.querySelector('ul');
-  if (!ul || ul.children.length === 0) return; // Early return for performance
+  console.log('ul element:', !!ul);
+  console.log('ul children length:', ul ? ul.children.length : 'N/A');
+  
+  if (!ul || ul.children.length === 0) {
+    console.log('No ul or no children, returning early');
+    return; // Early return for performance
+  }
   
   container.innerHTML = '';
   
   // Store count for debugging
   const messageCount = ul.children.length;
   container.setAttribute('data-message-count', messageCount);
+  console.log('Processing', messageCount, 'messages');
   
   // Existing style definitions from original _flash.html.erb
   const flashStyles = {
@@ -28,13 +43,19 @@ function renderFlashMessages() {
   
   // Convert to array to avoid live collection issues
   const liElements = Array.from(ul.querySelectorAll('li'));
+  console.log('li elements found:', liElements.length);
   
   liElements.forEach((li, index) => {
     const type = li.dataset.type || 'notice';
     const message = li.textContent.trim();
     
+    console.log(`Processing message ${index}: type=${type}, content=${message}`);
+    
     // Skip empty messages
-    if (!message) return;
+    if (!message) {
+      console.log(`Skipping empty message ${index}`);
+      return;
+    }
     
     const div = document.createElement('div');
     
@@ -48,10 +69,13 @@ function renderFlashMessages() {
     div.setAttribute('data-message-type', type);
     div.textContent = message;
     
+    console.log(`Adding message div to container: ${message}`);
     container.appendChild(div);
   });
   
+  console.log('Clearing storage ul');
   ul.innerHTML = '';
+  console.log('renderFlashMessages completed');
 }
 
 function addFlashMessageToStorage(message, type = 'alert') {
@@ -90,10 +114,12 @@ function processFlashMessages() {
 
 // Event handling - process flash messages on page load and navigation
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOMContentLoaded - calling renderFlashMessages');
   renderFlashMessages();
 });
 
 document.addEventListener('turbo:load', function() {
+  console.log('turbo:load - calling renderFlashMessages');
   renderFlashMessages();
 });
 
@@ -149,22 +175,23 @@ document.addEventListener('turbo:before-stream-render', function(event) {
 });
 
 document.addEventListener('turbo:after-stream-render', function(event) {
-  // Try multiple ways to detect if this was a flash-storage update
-  const target = event.target?.id || 
-                 event.detail?.render?.newStream?.getAttribute('target') ||
-                 event.detail?.newStream?.getAttribute('target');
+  // Debug turbo stream events
+  console.log('turbo:after-stream-render event:', event);
+  console.log('event.target:', event.target);
+  console.log('event.detail:', event.detail);
   
-  if (target === 'flash-storage') {
-    renderFlashMessages();
-  } else {
-    // Fallback: always check for flash messages after any stream render
-    const storage = document.getElementById('flash-storage');
-    if (storage) {
-      const ul = storage.querySelector('ul');
-      if (ul && ul.children.length > 0) {
-        renderFlashMessages();
-      }
+  // Check if this was a flash-storage update by examining the rendered content
+  const storage = document.getElementById('flash-storage');
+  if (storage) {
+    const ul = storage.querySelector('ul');
+    if (ul && ul.children.length > 0) {
+      console.log('Found flash messages in storage, rendering...');
+      renderFlashMessages();
+    } else {
+      console.log('No flash messages found in storage');
     }
+  } else {
+    console.log('No flash-storage element found');
   }
 });
 
