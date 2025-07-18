@@ -131,6 +131,7 @@ export default class extends Controller {
   }
   
   getErrorMessageForStatus(status) {
+    // Future i18n integration point
     const messages = {
       400: 'Invalid request. Please check your input.',
       401: 'You are not authorized to perform this action.',
@@ -143,10 +144,17 @@ export default class extends Controller {
       504: 'Request timeout. Please try again.'
     }
     
+    // TODO: Replace with i18n translation when available
+    // return I18n.t(`flash.errors.http_${status}`, { defaultValue: messages[status] })
+    
     return messages[status] || `An error occurred (${status}). Please try again.`
   }
   
   getNetworkErrorMessage() {
+    // Future i18n integration point
+    // TODO: Replace with i18n translation when available
+    // return I18n.t('flash.errors.network', { defaultValue: 'Network connection error...' })
+    
     return 'Network connection error. Please check your internet connection and try again.'
   }
   
