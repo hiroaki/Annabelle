@@ -88,17 +88,6 @@ function processFlashMessages() {
   }
 }
 
-// Function to process flash messages immediately when DOM is ready
-function processFlashMessages() {
-  // Check if DOM is ready, if not wait for DOMContentLoaded
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', renderFlashMessages);
-  } else {
-    // DOM is already ready, process immediately
-    renderFlashMessages();
-  }
-}
-
 // Event handling - process flash messages on page load and navigation
 document.addEventListener('DOMContentLoaded', function() {
   renderFlashMessages();
