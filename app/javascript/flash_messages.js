@@ -74,6 +74,15 @@ document.addEventListener('turbo:submit-end', function(event) {
   const storage = document.getElementById('flash-storage');
   const ul = storage?.querySelector('ul');
   
+  // Always trigger renderFlashMessages for successful responses that have server-side flash
+  if (status >= 200 && status < 300) {
+    // Small delay to allow turbo stream to update flash-storage first
+    setTimeout(() => {
+      renderFlashMessages();
+    }, 10);
+    return;
+  }
+  
   // Server-side Flash priority (simple competition avoidance)
   if (ul && ul.children.length > 0) return;
 

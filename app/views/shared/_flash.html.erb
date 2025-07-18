@@ -1,24 +1,5 @@
-<%
-  # Render flash messages as li elements to the flash-storage container via JavaScript
-  # This follows the unified flash system plan for issue #27
-%>
-<% if flash.any? %>
-  <script>
-    (function() {
-      const storage = document.getElementById('flash-storage');
-      if (storage) {
-        const ul = storage.querySelector('ul');
-        if (ul) {
-          // Clear any existing li elements to avoid duplication
-          ul.innerHTML = '';
-          <% flash.each do |type, message| %>
-            const li = document.createElement('li');
-            li.dataset.type = '<%= j(type) %>';
-            li.textContent = '<%= j(message) %>';
-            ul.appendChild(li);
-          <% end %>
-        }
-      }
-    })();
-  </script>
-<% end %>
+<ul>
+  <% flash.each do |type, message| %>
+    <li data-type="<%= type %>"><%= message %></li>
+  <% end %>
+</ul>
