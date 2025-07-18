@@ -198,6 +198,114 @@ RSpec.describe 'Flash Message System Integration', type: :system do
         expect(storage_count_after).to eq(0)
       end
 
+      it 'correctly adds multiple messages to storage' do
+        # Test that storage works correctly before testing rendering
+        page.execute_script('addFlashMessageToStorage("First message", "alert")')
+        expect(page.evaluate_script('document.querySelector("#flash-storage ul").children.length')).to eq(1)
+        
+        page.execute_script('addFlashMessageToStorage("Second message", "notice")')
+        expect(page.evaluate_script('document.querySelector("#flash-storage ul").children.length')).to eq(2)
+        
+        page.execute_script('addFlashMessageToStorage("Third message", "warning")')
+        expect(page.evaluate_script('document.querySelector("#flash-storage ul").children.length')).to eq(3)
+        
+        # Check the actual content
+        messages = page.evaluate_script('''
+          Array.from(document.querySelectorAll("#flash-storage ul li")).map(li => ({
+            type: li.dataset.type,
+            text: li.textContent
+          }))
+        ''')
+        
+        expect(messages).to eq([
+          { 'type' => 'alert', 'text' => 'First message' },
+          { 'type' => 'notice', 'text' => 'Second message' },
+          { 'type' => 'warning', 'text' => 'Third message' }
+        ])
+      end
+
+      it 'can render multiple messages at once without dismissable controller' do
+        page.execute_script('addFlashMessageToStorage("First message", "alert")')
+        page.execute_script('addFlashMessageToStorage("Second message", "notice")')
+        page.execute_script('addFlashMessageToStorage("Third message", "warning")')
+        
+        # Test the storage first
+        storage_count = page.evaluate_script('document.querySelector("#flash-storage ul").children.length')
+        expect(storage_count).to eq(3)
+        
+        # Temporarily disable dismissable controller to test basic rendering
+        page.execute_script('''
+          // Temporarily override createElement to avoid dismissable controller
+          const originalCreateElement = document.createElement;
+          document.createElement = function(tag) {
+            const element = originalCreateElement.call(document, tag);
+            if (tag === "div") {
+              // Don't set data-controller for this test
+              const originalSetAttribute = element.setAttribute;
+              element.setAttribute = function(name, value) {
+                if (name !== "data-controller") {
+                  originalSetAttribute.call(element, name, value);
+                }
+              };
+            }
+            return element;
+          };
+          
+          renderFlashMessages();
+          
+          // Restore original
+          document.createElement = originalCreateElement;
+        ''')
+        
+        # Check that all messages appear
+        expect(page).to have_selector('[data-testid="flash-message"]', count: 3)
+        expect(page).to have_content('First message')
+        expect(page).to have_content('Second message')
+        expect(page).to have_content('Third message')
+      end
+      
+      it 'debug: detailed analysis of multiple message rendering' do
+        # Add messages and verify each step
+        page.execute_script('addFlashMessageToStorage("First message", "alert")')
+        page.execute_script('addFlashMessageToStorage("Second message", "notice")')
+        page.execute_script('addFlashMessageToStorage("Third message", "warning")')
+        
+        # Verify storage has all messages
+        storage_count = page.evaluate_script('document.querySelector("#flash-storage ul").children.length')
+        expect(storage_count).to eq(3)
+        
+        # Call renderFlashMessages and immediately check results
+        page.execute_script('renderFlashMessages()')
+        
+        # Check the data-message-count attribute
+        message_count_attr = page.evaluate_script('document.getElementById("flash-message-container").getAttribute("data-message-count")')
+        puts "Container data-message-count attribute: #{message_count_attr}"
+        
+        # Check actual DOM elements
+        container_children = page.evaluate_script('document.getElementById("flash-message-container").children.length')
+        puts "Container actual children count: #{container_children}"
+        
+        # Check for each specific message
+        all_flash_elements = page.all('[data-testid="flash-message"]')
+        puts "Found #{all_flash_elements.count} flash elements"
+        
+        all_flash_elements.each_with_index do |element, index|
+          puts "Element #{index}: #{element.text}"
+          puts "  - classes: #{element[:class]}"
+          puts "  - data-message-type: #{element['data-message-type']}"
+          puts "  - data-message-index: #{element['data-message-index']}"
+        end
+        
+        # Check raw HTML content
+        container_html = page.evaluate_script('document.getElementById("flash-message-container").innerHTML')
+        puts "Container HTML: #{container_html}"
+        
+        # Storage should be cleared after rendering
+        storage_count_after = page.evaluate_script('document.querySelector("#flash-storage ul").children.length')
+        puts "Storage count after rendering: #{storage_count_after}"
+        expect(storage_count_after).to eq(0)
+      end
+
       it 'can render multiple messages at once' do
         page.execute_script('addFlashMessageToStorage("First message", "alert")')
         page.execute_script('addFlashMessageToStorage("Second message", "notice")')
