@@ -18,8 +18,11 @@
   <body class="min-h-screen flex flex-col">
     <!-- Flash Storage Container (hidden) - for staging flash messages before rendering -->
     <div id="flash-storage" style="display: none;">
-      <ul></ul>
+      <%= render 'shared/flash' %>
     </div>
+    
+    <!-- Flash Message Display Container - global flash message display area -->
+    <div id="flash-message-container"></div>
     
     <header class="flex p-2 lg:px-6 text-xs text-center text-slate-400 items-center bg-gray-100">
       <div class="flex items-center">
