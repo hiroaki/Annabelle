@@ -50,10 +50,10 @@ RSpec.describe 'Flash Message System Integration', type: :system do
         # Trigger a server-side flash message by trying to delete another user's message
         other_user = create(:user, :confirmed)
         message = create(:message, user: other_user, content: "other message")
-        
+
         login_as confirmed_user
         visit messages_path
-        
+
         accept_confirm do
           delete_link = find_link("delete-message-#{message.id}", visible: :all)
           page.execute_script("arguments[0].click();", delete_link)
@@ -61,7 +61,7 @@ RSpec.describe 'Flash Message System Integration', type: :system do
 
         # Check that the flash message is properly displayed
         expect(page).to have_selector('[data-testid="flash-message"]', text: I18n.t('messages.errors.not_owned'), wait: 2)
-        
+
         # Verify the flash message has proper styling and attributes
         flash_element = page.find('[data-testid="flash-message"]')
         expect(flash_element['role']).to eq('alert')
@@ -72,10 +72,10 @@ RSpec.describe 'Flash Message System Integration', type: :system do
       it 'clears the flash-storage after rendering messages' do
         other_user = create(:user, :confirmed)
         message = create(:message, user: other_user, content: "other message")
-        
+
         login_as confirmed_user
         visit messages_path
-        
+
         accept_confirm do
           delete_link = find_link("delete-message-#{message.id}", visible: :all)
           page.execute_script("arguments[0].click();", delete_link)
@@ -83,7 +83,7 @@ RSpec.describe 'Flash Message System Integration', type: :system do
 
         # Wait for the flash message to appear
         expect(page).to have_selector('[data-testid="flash-message"]', wait: 2)
-        
+
         # Check that flash-storage ul is empty after rendering
         expect(page.evaluate_script('document.querySelector("#flash-storage ul").children.length')).to eq(0)
       end
@@ -93,10 +93,10 @@ RSpec.describe 'Flash Message System Integration', type: :system do
       it 'does not show any flash messages for successful posts' do
         login_as confirmed_user
         visit messages_path
-        
+
         fill_in 'comment', with: 'This is a test message'
         click_button I18n.t('messages.form.post')
-        
+
         # Successful post should not show flash messages
         expect(page).not_to have_selector('[data-testid="flash-message"]')
         expect(page).to have_content('This is a test message')
@@ -107,13 +107,14 @@ RSpec.describe 'Flash Message System Integration', type: :system do
   describe 'Turbo Stream flash message updates' do
     it 'properly updates flash messages via Turbo Stream responses' do
       login_as confirmed_user
-      visit messages_path
-      
+
       # Simulate a condition that would trigger a flash message via turbo stream
       # This would happen when the server responds with a turbo stream that includes flash messages
       other_user = create(:user, :confirmed)
       message = create(:message, user: other_user, content: "message to delete")
-      
+
+      visit messages_path
+
       accept_confirm do
         delete_link = find_link("delete-message-#{message.id}", visible: :all)
         page.execute_script("arguments[0].click();", delete_link)
@@ -145,10 +146,10 @@ RSpec.describe 'Flash Message System Integration', type: :system do
         # Add a client-side alert message
         page.execute_script('addFlashMessageToStorage("Test alert message", "alert")')
         page.execute_script('renderFlashMessages()')
-        
+
         # Check that the message is displayed
         expect(page).to have_selector('[data-testid="flash-message"]', text: 'Test alert message')
-        
+
         # Check styling for alert type
         flash_element = page.find('[data-testid="flash-message"]')
         expect(flash_element['class']).to include('text-red-700', 'bg-red-100')
@@ -157,9 +158,9 @@ RSpec.describe 'Flash Message System Integration', type: :system do
       it 'can add and render notice messages' do
         page.execute_script('addFlashMessageToStorage("Test notice message", "notice")')
         page.execute_script('renderFlashMessages()')
-        
+
         expect(page).to have_selector('[data-testid="flash-message"]', text: 'Test notice message')
-        
+
         # Check styling for notice type
         flash_element = page.find('[data-testid="flash-message"]')
         expect(flash_element['class']).to include('text-blue-700', 'bg-blue-100')
@@ -168,33 +169,25 @@ RSpec.describe 'Flash Message System Integration', type: :system do
       it 'can add and render warning messages' do
         page.execute_script('addFlashMessageToStorage("Test warning message", "warning")')
         page.execute_script('renderFlashMessages()')
-        
+
         expect(page).to have_selector('[data-testid="flash-message"]', text: 'Test warning message')
-        
+
         # Check styling for warning type
         flash_element = page.find('[data-testid="flash-message"]')
         expect(flash_element['class']).to include('text-yellow-700', 'bg-yellow-100')
       end
 
       it 'clears flash-storage after rendering client-side messages' do
-        # Debug initial state
-        page.execute_script('window.debugFlashStorage && window.debugFlashStorage()')
-        
         page.execute_script('addFlashMessageToStorage("Test message", "alert")')
-        
-        # Debug after adding message
-        page.execute_script('window.debugFlashStorage && window.debugFlashStorage()')
-        
+
         # Verify message is in storage
         storage_count = page.evaluate_script('document.querySelector("#flash-storage ul").children.length')
-        puts "Storage count after adding message: #{storage_count}"
         expect(storage_count).to eq(1)
-        
+
         page.execute_script('renderFlashMessages()')
-        
+
         # Verify storage is cleared after rendering
         storage_count_after = page.evaluate_script('document.querySelector("#flash-storage ul").children.length')
-        puts "Storage count after rendering: #{storage_count_after}"
         expect(storage_count_after).to eq(0)
       end
 
@@ -202,21 +195,21 @@ RSpec.describe 'Flash Message System Integration', type: :system do
         # Test that storage works correctly before testing rendering
         page.execute_script('addFlashMessageToStorage("First message", "alert")')
         expect(page.evaluate_script('document.querySelector("#flash-storage ul").children.length')).to eq(1)
-        
+
         page.execute_script('addFlashMessageToStorage("Second message", "notice")')
         expect(page.evaluate_script('document.querySelector("#flash-storage ul").children.length')).to eq(2)
-        
+
         page.execute_script('addFlashMessageToStorage("Third message", "warning")')
         expect(page.evaluate_script('document.querySelector("#flash-storage ul").children.length')).to eq(3)
-        
+
         # Check the actual content
-        messages = page.evaluate_script('''
+        messages = page.evaluate_script(<<~JS)
           Array.from(document.querySelectorAll("#flash-storage ul li")).map(li => ({
             type: li.dataset.type,
             text: li.textContent
           }))
-        ''')
-        
+        JS
+
         expect(messages).to eq([
           { 'type' => 'alert', 'text' => 'First message' },
           { 'type' => 'notice', 'text' => 'Second message' },
@@ -228,13 +221,13 @@ RSpec.describe 'Flash Message System Integration', type: :system do
         page.execute_script('addFlashMessageToStorage("First message", "alert")')
         page.execute_script('addFlashMessageToStorage("Second message", "notice")')
         page.execute_script('addFlashMessageToStorage("Third message", "warning")')
-        
+
         # Test the storage first
         storage_count = page.evaluate_script('document.querySelector("#flash-storage ul").children.length')
         expect(storage_count).to eq(3)
-        
+
         # Temporarily disable dismissable controller to test basic rendering
-        page.execute_script('''
+        page.execute_script(<<~JS)
           // Temporarily override createElement to avoid dismissable controller
           const originalCreateElement = document.createElement;
           document.createElement = function(tag) {
@@ -250,59 +243,38 @@ RSpec.describe 'Flash Message System Integration', type: :system do
             }
             return element;
           };
-          
+
           renderFlashMessages();
-          
+
           // Restore original
           document.createElement = originalCreateElement;
-        ''')
-        
+        JS
+
         # Check that all messages appear
         expect(page).to have_selector('[data-testid="flash-message"]', count: 3)
         expect(page).to have_content('First message')
         expect(page).to have_content('Second message')
         expect(page).to have_content('Third message')
       end
-      
-      it 'debug: detailed analysis of multiple message rendering' do
+
+      it 'renders multiple messages correctly and clears storage' do
         # Add messages and verify each step
         page.execute_script('addFlashMessageToStorage("First message", "alert")')
         page.execute_script('addFlashMessageToStorage("Second message", "notice")')
         page.execute_script('addFlashMessageToStorage("Third message", "warning")')
-        
+
         # Verify storage has all messages
         storage_count = page.evaluate_script('document.querySelector("#flash-storage ul").children.length')
         expect(storage_count).to eq(3)
-        
+
         # Call renderFlashMessages and immediately check results
         page.execute_script('renderFlashMessages()')
-        
-        # Check the data-message-count attribute
-        message_count_attr = page.evaluate_script('document.getElementById("flash-message-container").getAttribute("data-message-count")')
-        puts "Container data-message-count attribute: #{message_count_attr}"
-        
-        # Check actual DOM elements
-        container_children = page.evaluate_script('document.getElementById("flash-message-container").children.length')
-        puts "Container actual children count: #{container_children}"
-        
-        # Check for each specific message
-        all_flash_elements = page.all('[data-testid="flash-message"]')
-        puts "Found #{all_flash_elements.count} flash elements"
-        
-        all_flash_elements.each_with_index do |element, index|
-          puts "Element #{index}: #{element.text}"
-          puts "  - classes: #{element[:class]}"
-          puts "  - data-message-type: #{element['data-message-type']}"
-          puts "  - data-message-index: #{element['data-message-index']}"
-        end
-        
-        # Check raw HTML content
-        container_html = page.evaluate_script('document.getElementById("flash-message-container").innerHTML')
-        puts "Container HTML: #{container_html}"
-        
+
+        # Check that messages are properly rendered
+        expect(page).to have_selector('[data-testid="flash-message"]', count: 3)
+
         # Storage should be cleared after rendering
         storage_count_after = page.evaluate_script('document.querySelector("#flash-storage ul").children.length')
-        puts "Storage count after rendering: #{storage_count_after}"
         expect(storage_count_after).to eq(0)
       end
 
@@ -311,25 +283,21 @@ RSpec.describe 'Flash Message System Integration', type: :system do
         page.execute_script('addFlashMessageToStorage("Second message", "notice")')
         page.execute_script('addFlashMessageToStorage("Third message", "warning")')
         page.execute_script('renderFlashMessages()')
-        
-        # Debug information
-        container = page.find('#flash-message-container')
-        message_count = container['data-message-count']
-        puts "Container data-message-count: #{message_count}"
-        
-        # Check individual messages
-        alert_msgs = page.all('[data-testid="flash-message"][data-message-type="alert"]')
-        notice_msgs = page.all('[data-testid="flash-message"][data-message-type="notice"]')
-        warning_msgs = page.all('[data-testid="flash-message"][data-message-type="warning"]')
-        
-        puts "Alert messages: #{alert_msgs.count}"
-        puts "Notice messages: #{notice_msgs.count}"
-        puts "Warning messages: #{warning_msgs.count}"
-        
+
+        # Verify all messages are displayed
         expect(page).to have_selector('[data-testid="flash-message"]', count: 3)
         expect(page).to have_content('First message')
         expect(page).to have_content('Second message')
         expect(page).to have_content('Third message')
+
+        # Verify different message types are properly styled
+        alert_element = page.find('[data-testid="flash-message"]', text: 'First message')
+        notice_element = page.find('[data-testid="flash-message"]', text: 'Second message')
+        warning_element = page.find('[data-testid="flash-message"]', text: 'Third message')
+
+        expect(alert_element['class']).to include('text-red-700', 'bg-red-100')
+        expect(notice_element['class']).to include('text-blue-700', 'bg-blue-100')
+        expect(warning_element['class']).to include('text-yellow-700', 'bg-yellow-100')
       end
     end
   end
@@ -343,7 +311,7 @@ RSpec.describe 'Flash Message System Integration', type: :system do
     it 'adds dismissable controller to rendered flash messages' do
       page.execute_script('addFlashMessageToStorage("Dismissable test message", "alert")')
       page.execute_script('renderFlashMessages()')
-      
+
       flash_element = page.find('[data-testid="flash-message"]')
       expect(flash_element['data-controller']).to eq('dismissable')
     end
@@ -351,18 +319,18 @@ RSpec.describe 'Flash Message System Integration', type: :system do
     it 'allows flash messages to be dismissed when clicking the close button' do
       page.execute_script('addFlashMessageToStorage("Message to dismiss", "alert")')
       page.execute_script('renderFlashMessages()')
-      
+
       # Wait for the dismissable controller to add the close button
       expect(page).to have_selector('[data-testid="flash-message"]', text: 'Message to dismiss')
       sleep(0.5) # Give time for the dismissable controller to add the close button
-      
+
       # The dismissable controller should add a close button
       flash_element = page.find('[data-testid="flash-message"]')
       close_button = flash_element.find('button', text: '×')
-      
+
       # Click the close button
       close_button.click
-      
+
       # The message should be dismissed (removed from DOM after animation)
       expect(page).not_to have_selector('[data-testid="flash-message"]', text: 'Message to dismiss', wait: 2)
     end
@@ -377,7 +345,7 @@ RSpec.describe 'Flash Message System Integration', type: :system do
     it 'includes proper ARIA attributes for screen readers' do
       page.execute_script('addFlashMessageToStorage("Accessible message", "alert")')
       page.execute_script('renderFlashMessages()')
-      
+
       flash_element = page.find('[data-testid="flash-message"]')
       expect(flash_element['role']).to eq('alert')
     end
@@ -388,7 +356,7 @@ RSpec.describe 'Flash Message System Integration', type: :system do
       page.execute_script('addFlashMessageToStorage("Info message", "notice")')
       page.execute_script('addFlashMessageToStorage("Warning message", "warning")')
       page.execute_script('renderFlashMessages()')
-      
+
       # All should have alert role for accessibility
       flash_elements = page.all('[data-testid="flash-message"]')
       expect(flash_elements.count).to eq(3)
@@ -403,13 +371,13 @@ RSpec.describe 'Flash Message System Integration', type: :system do
       # Create a scenario where both server and client would try to show messages
       other_user = create(:user, :confirmed)
       message = create(:message, user: other_user, content: "message causing server flash")
-      
+
       login_as confirmed_user
       visit messages_path
-      
+
       # Manually add a client-side message to storage first
       page.execute_script('addFlashMessageToStorage("Client error message", "alert")')
-      
+
       # Now trigger a server action that would also create a flash message
       accept_confirm do
         delete_link = find_link("delete-message-#{message.id}", visible: :all)
@@ -432,14 +400,14 @@ RSpec.describe 'Flash Message System Integration', type: :system do
       test_message = 'Test message with special characters: áéíóú & < > " \''
       page.execute_script("addFlashMessageToStorage(#{test_message.to_json}, 'alert')")
       page.execute_script('renderFlashMessages()')
-      
+
       expect(page).to have_selector('[data-testid="flash-message"]', text: test_message)
     end
 
     it 'handles empty messages gracefully' do
       page.execute_script('addFlashMessageToStorage("", "alert")')
       page.execute_script('renderFlashMessages()')
-      
+
       # Should not create a flash message for empty content
       expect(page).not_to have_selector('[data-testid="flash-message"]')
     end
