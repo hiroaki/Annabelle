@@ -57,9 +57,16 @@ function addFlashMessageToStorage(message, type = 'alert') {
   ul.appendChild(li);
 }
 
+// Function to process flash messages with a slight delay to ensure DOM is ready
+function processFlashMessages() {
+  setTimeout(function() {
+    renderFlashMessages();
+  }, 10);
+}
+
 // Simple event handling
-document.addEventListener('DOMContentLoaded', renderFlashMessages);
-document.addEventListener('turbo:load', renderFlashMessages);
+document.addEventListener('DOMContentLoaded', processFlashMessages);
+document.addEventListener('turbo:load', processFlashMessages);
 
 // Error handling for turbo:submit-end
 document.addEventListener('turbo:submit-end', function(event) {
@@ -94,6 +101,6 @@ document.addEventListener('turbo:fetch-request-error', function(event) {
   renderFlashMessages();
 });
 
-// Make renderFlashMessages globally available for Turbo Stream calls
+// Make functions globally available for Turbo Stream calls and testing
 window.renderFlashMessages = renderFlashMessages;
 window.addFlashMessageToStorage = addFlashMessageToStorage;
