@@ -6,7 +6,7 @@
     ページのロード時に全体の z-index 関係のの計算を、どこかでしているのかもしれません？
     -->
     <div id="form-wrapper" class="w-full max-w-full lg:max-w-[48%]">
-      <div id="flash-message-container" class="mx-2" data-flash-manager-target="legacyContainer">
+      <div id="flash-message-container" class="mx-2">
         <%= render 'shared/flash' %>
       </div>
       <% disabled = !current_user.confirmed? %>
