@@ -16,9 +16,10 @@ function renderFlashMessages() {
   
   container.innerHTML = '';
   
-  // Store count for debugging
+  // Store count for debugging and add timestamp
   const messageCount = ul.children.length;
   container.setAttribute('data-message-count', messageCount);
+  container.setAttribute('data-last-render', new Date().getTime());
   
   // Existing style definitions from original _flash.html.erb
   const flashStyles = {
@@ -155,6 +156,8 @@ document.addEventListener('turbo:after-stream-render', function(event) {
   if (storage) {
     const ul = storage.querySelector('ul');
     if (ul && ul.children.length > 0) {
+      // Add debugging attribute to track stream renders
+      storage.setAttribute('data-last-stream-render', new Date().getTime());
       renderFlashMessages();
     }
   }
