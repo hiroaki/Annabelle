@@ -1,1 +1,15 @@
-<%= turbo_stream.update "flash-message-container", partial: "shared/flash" %>
+<%# Clear flash-storage and add new messages, then trigger rendering %>
+<%= turbo_stream.update "flash-storage" do %>
+  <ul>
+    <% flash.each do |type, message| %>
+      <li data-type="<%= type %>"><%= message %></li>
+    <% end %>
+  </ul>
+<% end %>
+<%= turbo_stream.append "flash-storage" do %>
+  <script>
+    if (typeof renderFlashMessages === 'function') {
+      renderFlashMessages();
+    }
+  </script>
+<% end %>
