@@ -9,7 +9,6 @@ function renderFlashMessages() {
   const storage = document.getElementById('flash-storage');
   const container = document.getElementById('flash-message-container');
   
-  // Only process if both storage and container exist (unified flash system)
   if (!storage || !container) return;
   
   const ul = storage.querySelector('ul');
@@ -57,51 +56,26 @@ function renderFlashMessages() {
 }
 
 function addFlashMessageToStorage(message, type = 'alert') {
-  // Try to add to unified flash storage system first
   const storage = document.getElementById('flash-storage');
-  if (storage) {
-    // Don't add empty messages
-    if (!message || !message.trim()) {
-      return;
-    }
-    
-    let ul = storage.querySelector('ul');
-    if (!ul) {
-      ul = document.createElement('ul');
-      storage.appendChild(ul);
-    }
-    
-    const li = document.createElement('li');
-    li.dataset.type = type;
-    li.textContent = message;
-    ul.appendChild(li);
+  if (!storage) {
     return;
   }
   
-  // Fallback: add directly to flash-message-container if it exists (legacy system)
-  const container = document.getElementById('flash-message-container');
-  if (container) {
-    if (!message || !message.trim()) {
-      return;
-    }
-    
-    const flashStyles = {
-      alert: 'text-red-700 bg-red-100',
-      notice: 'text-blue-700 bg-blue-100',
-      warning: 'text-yellow-700 bg-yellow-100'
-    };
-    
-    const div = document.createElement('div');
-    const style = flashStyles[type] || flashStyles['warning'];
-    div.className = `p-4 mb-4 text-sm ${style} rounded-lg`;
-    div.setAttribute('role', 'alert');
-    div.setAttribute('data-testid', 'flash-message');
-    div.setAttribute('data-controller', 'dismissable');
-    div.setAttribute('data-message-type', type);
-    div.textContent = message;
-    
-    container.appendChild(div);
+  // Don't add empty messages
+  if (!message || !message.trim()) {
+    return;
   }
+  
+  let ul = storage.querySelector('ul');
+  if (!ul) {
+    ul = document.createElement('ul');
+    storage.appendChild(ul);
+  }
+  
+  const li = document.createElement('li');
+  li.dataset.type = type;
+  li.textContent = message;
+  ul.appendChild(li);
 }
 
 // Function to process flash messages immediately when DOM is ready
@@ -146,7 +120,7 @@ document.addEventListener('turbo:submit-end', function(event) {
   // Add client-side error messages for specific status codes
   if (status === 413) {
     addFlashMessageToStorage('ファイルサイズが大きすぎます（413エラー）', 'alert');
-    renderFlashMessages(); // This will only work if unified system is available
+    renderFlashMessages();
   } else if (status === 503) {
     addFlashMessageToStorage('サービスが一時的に利用できません（503エラー）', 'alert');
     renderFlashMessages();
@@ -194,7 +168,7 @@ document.addEventListener('turbo:fetch-request-error', function(event) {
     return;
   }
   addFlashMessageToStorage('ネットワークエラーが発生しました', 'alert');
-  renderFlashMessages(); // This will only work if unified system is available
+  renderFlashMessages();
 });
 
 // Make functions globally available for Turbo Stream calls and testing
