@@ -26,7 +26,8 @@
             <%= t('devise.sessions.two_factor_settings.confirm_otp_instruction') %>
           </p>
 
-          <%= render 'shared/flash' %>
+          <!-- TODO: ページの冒頭ではなく、ここに表示したい -->
+          <div data-flash-message-container class="mx-2"></div>
 
           <%= form_with scope: :two_fa, url: two_factor_settings_path, method: :post, data: { turbo_action: :advance } do |form| %>
             <div class="mb-4">
