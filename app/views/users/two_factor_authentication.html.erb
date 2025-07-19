@@ -13,6 +13,7 @@
               **data_with_testid('users_two_factor_authentication_disable', {
                 turbo_method: :delete,
                 turbo_confirm: t('users.two_factor_authentication.disable_confirm'),
+                turbo_frame: '_top',
               }),
             )
         %>
@@ -28,7 +29,9 @@
               t('users.two_factor_authentication.enable'),
               new_two_factor_settings_path,
               class: 'text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center',
-              **data_with_testid('users_two_factor_authentication_enable'),
+              **data_with_testid('users_two_factor_authentication_enable',
+                turbo_frame: '_top',
+              ),
             )
         %>
       </div>
