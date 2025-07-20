@@ -123,25 +123,8 @@ function addFlashMessageToStorage(message, type = 'alert') {
   // This allows for batching multiple messages
 }
 
-// Make functions globally available for testing only
-// In production, these should be accessed via module imports
-if (typeof window !== 'undefined') {
-  window.renderFlashMessages = renderFlashMessages;
-  window.addFlashMessageToStorage = addFlashMessageToStorage;
-}
-
 // Initialize the flash message system
 function initializeFlashMessageSystem() {
-  // Setup initial rendering when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-      renderFlashMessages();
-    });
-  } else {
-    // DOM is already ready
-    renderFlashMessages();
-  }
-
   document.addEventListener('turbo:load', function() {
     renderFlashMessages();
   });
@@ -237,14 +220,6 @@ function initializeFlashMessageSystem() {
   });
 }
 
-// Make functions globally available for testing only
-// In production, these should be accessed via module imports
-if (typeof window !== 'undefined') {
-  window.renderFlashMessages = renderFlashMessages;
-  window.addFlashMessageToStorage = addFlashMessageToStorage;
-}
-
-// ES6 Module exports
 export {
   renderFlashMessages,
   addFlashMessageToStorage,
