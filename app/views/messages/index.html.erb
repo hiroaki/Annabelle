@@ -6,7 +6,9 @@
     ページのロード時に全体の z-index 関係のの計算を、どこかでしているのかもしれません？
     -->
     <div id="form-wrapper" class="w-full max-w-full lg:max-w-[48%]">
-      <div id="flash-message-container" class="mx-2"></div>
+      <%= flash_storage %>
+      <%= flash_container %>
+
       <% disabled = !current_user.confirmed? %>
       <%=
         form_with(

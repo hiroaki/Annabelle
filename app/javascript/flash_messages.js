@@ -142,8 +142,11 @@ function initializeFlashMessageSystem() {
     renderFlashMessages();
   }
 
-  // Setup Turbo navigation handling
   document.addEventListener('turbo:load', function() {
+    renderFlashMessages();
+  });
+
+  document.addEventListener("turbo:frame-load", function() {
     renderFlashMessages();
   });
 
