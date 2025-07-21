@@ -140,6 +140,11 @@ function initializeFlashMessageSystem() {
     handleFlashAfterRender(event);
   });
 
+  // Handle form submission errors (proxy errors, HTTP errors)
+  document.addEventListener('turbo:submit-end', function(event) {
+    handleFlashAfterSubmitEnd(event);
+  });
+
   // Setup custom turbo:after-stream-render event for Turbo Stream updates
   // This replaces MutationObserver with a cleaner event-driven approach
   //
@@ -169,6 +174,48 @@ function initializeFlashMessageSystem() {
       renderFlashMessages();
     });
   })();
+
+  function handleFlashAfterSubmitEnd(event) {
+    // Get status from turbo:submit-end event structure
+    const status = event.detail?.formSubmission?.result?.fetchResponse?.response?.status;
+
+    // First, check if server-side flash messages exist and render them
+    const storage = document.getElementById('flash-storage');
+    const ul = storage?.querySelector('ul');
+    if (ul && ul.children.length > 0) {
+      renderFlashMessages(); // Render server messages
+      return;
+    }
+
+    // No server-side flash messages exist
+    // Show client-side error messages only for HTTP error status
+    if (!status || status < 400) {
+      return; // No error status, or success status - nothing to do
+    }
+
+    // Check if messages were already rendered (edge case protection)
+    const container = document.getElementById('flash-message-container');
+    if (container && container.children.length > 0) {
+      return; // Messages already displayed
+    }
+
+    // サーバー側で用意されたロケール済み汎用エラーメッセージ（general-error-messages UL）から
+    // ステータスコードに応じたメッセージを取得して表示します。
+    const generalerrors = document.getElementById('general-error-messages');
+    let message = null;
+    if (generalerrors && status >= 400) {
+      const key = String(status);
+      const li = generalerrors.querySelector(`li[data-status="${key}"]`);
+      if (li) message = li.textContent.trim();
+    }
+    if (message) {
+      addFlashMessageToStorage(message, 'alert');
+    } else {
+      console.error(`[FlashMessage] No error message defined for status: ${status}`);
+    }
+
+    renderFlashMessages();
+  }
 
   function handleFlashAfterRender(event) {
     const status = event.detail.fetchResponse?.status;
