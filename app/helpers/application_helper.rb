@@ -4,10 +4,7 @@ module ApplicationHelper
   end
 
   def flash_storage
-    # for staging flash messages before rendering
-    content_tag(:div, id: 'flash-storage', style: 'display: none;') do
-      render 'shared/flash_storage'
-    end
+    render 'shared/flash_storage'
   end
 
   def flash_container

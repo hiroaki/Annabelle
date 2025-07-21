@@ -58,6 +58,7 @@
 
 function renderFlashMessages() {
   const storage = document.getElementById('flash-storage');
+  const generalerrors = document.getElementById('general-error-messages');
   const container = document.getElementById('flash-message-container');
 
   if (!storage || !container) return;
@@ -94,7 +95,8 @@ function renderFlashMessages() {
     container.appendChild(div);
   });
 
-  ul.innerHTML = '';
+  storage.innerHTML = '';
+  generalerrors.innerHTML = '';
 }
 
 function addFlashMessageToStorage(message, type = 'alert') {
