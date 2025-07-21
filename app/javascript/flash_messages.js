@@ -193,19 +193,21 @@ function initializeFlashMessageSystem() {
       return; // Messages already displayed
     }
 
-    // TODO: Implement i18n-js for internationalized error messages
-    // Currently using hardcoded Japanese messages, should be replaced with:
-    // I18n.t('flash.errors.file_size_too_large') etc.
-    // Show appropriate generic error messages for HTTP errors without server flash
-    if (status === 413) {
-      addFlashMessageToStorage('ファイルサイズが大きすぎます（413エラー）', 'alert');
-    } else if (status === 503) {
-      addFlashMessageToStorage('サービスが一時的に利用できません（503エラー）', 'alert');
-    } else if (status >= 400 && status < 500) {
-      addFlashMessageToStorage('リクエストに問題があります（4xxエラー）', 'alert');
-    } else if (status >= 500) {
-      addFlashMessageToStorage('サーバーエラーが発生しました（5xxエラー）', 'alert');
+    // サーバー側で用意されたロケール済み汎用エラーメッセージ（general-error-messages UL）から
+    // ステータスコードに応じたメッセージを取得して表示します。
+    const generalerrors = document.getElementById('general-error-messages');
+    let message = null;
+    if (generalerrors && status >= 400) {
+      const key = String(status);
+      const li = generalerrors.querySelector(`li[data-status="${key}"]`);
+      if (li) message = li.textContent.trim();
     }
+    if (message) {
+      addFlashMessageToStorage(message, 'alert');
+    } else {
+      console.error(`[FlashMessage] No error message defined for status: ${status}`);
+    }
+
     renderFlashMessages();
   }
 
@@ -216,8 +218,18 @@ function initializeFlashMessageSystem() {
     if (ul && ul.children.length > 0) {
       return;
     }
-    // TODO: Replace with i18n-js: I18n.t('flash.errors.network_error')
-    addFlashMessageToStorage('ネットワークエラーが発生しました', 'alert');
+    // general-error-messagesからnetworkエラー文言を取得
+    const generalerrors = document.getElementById('general-error-messages');
+    let message = null;
+    if (generalerrors) {
+      const li = generalerrors.querySelector('li[data-status="network"]');
+      if (li) message = li.textContent.trim();
+    }
+    if (message) {
+      addFlashMessageToStorage(message, 'alert');
+    } else {
+      console.error('[FlashMessage] No error message defined for network error');
+    }
     renderFlashMessages();
   });
 }
