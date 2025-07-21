@@ -26,7 +26,8 @@
             <%= t('devise.sessions.two_factor_settings.confirm_otp_instruction') %>
           </p>
 
-          <%= render 'shared/flash' %>
+          <!-- TODO: ページの冒頭ではなく、ここに表示したい -->
+          <div data-flash-message-container class="mx-2"></div>
 
           <%= form_with scope: :two_fa, url: two_factor_settings_path, method: :post, data: { turbo_action: :advance } do |form| %>
             <div class="mb-4">
@@ -48,7 +49,10 @@
             </div>
 
             <div>
-              <%= form.submit t('devise.sessions.two_factor_settings.confirm_and_enable'), class: "w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500", **data_with_testid('confirm-and-enable-two-factor') %>
+              <%= form.submit(t('devise.sessions.two_factor_settings.confirm_and_enable'),
+                class: "w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500",
+                **data_with_testid('confirm-and-enable-two-factor')
+              ) %>
             </div>
           <% end %>
         </div>
