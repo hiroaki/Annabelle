@@ -64,7 +64,7 @@ function renderFlashMessages() {
   if (!storage || !container) return;
 
   const ul = storage.querySelector('ul');
-  if (!ul || ul.children.length === 0) return; // Early return for performance
+  if (!ul || ul.children.length === 0) return;
 
   container.innerHTML = '';
 
@@ -79,12 +79,10 @@ function renderFlashMessages() {
     const type = li.dataset.type || 'notice';
     const message = li.textContent.trim();
 
-    // Skip empty messages
     if (!message) return;
 
     const div = document.createElement('div');
 
-    // Use same styles and data attributes as original _flash.html.erb
     const style = flashStyles[type] || flashStyles['warning'];
     div.className = `p-4 mb-4 text-sm ${style} rounded-lg`;
     div.setAttribute('role', 'alert');
@@ -120,12 +118,8 @@ function addFlashMessageToStorage(message, type = 'alert') {
   li.dataset.type = type;
   li.textContent = message;
   ul.appendChild(li);
-
-  // Don't auto-render - let caller decide when to render
-  // This allows for batching multiple messages
 }
 
-// Initialize the flash message system
 function initializeFlashMessageSystem() {
   document.addEventListener('turbo:load', function() {
     renderFlashMessages();
@@ -135,17 +129,22 @@ function initializeFlashMessageSystem() {
     renderFlashMessages();
   });
 
-  // Handle all flash messages (success + error) after DOM updates complete
-  document.addEventListener('turbo:render', function(event) {
-    const status = event.detail.fetchResponse?.status;
-    handleFlashErrorStatus(status);
+  document.addEventListener('turbo:render', function() {
     renderFlashMessages();
   });
 
-  // Handle form submission errors (proxy errors, HTTP errors)
+  // turbo:submit-end イベントは、フォーム送信時にサーバーからの HTTP レスポンスが返る場合だけでなく、
+  // プロキシエラーやネットワークエラーなど、 Rails に到達しないケースも扱います。
   document.addEventListener('turbo:submit-end', function(event) {
-    const status = event.detail?.formSubmission?.result?.fetchResponse?.response?.status;
-    handleFlashErrorStatus(status);
+    const res = event.detail.fetchResponse;
+    if (res === undefined) {
+      // fetchResponse が undefined の場合は、ネットワーク断やプロキシによる遮断など、
+      // サーバーに到達していない可能性があるため、その場合はネットワークエラーとして扱います。
+      handleFlashErrorStatus('network');
+      console.warn('[FlashMessage] No response received from server. Possible network or proxy error.');
+    } else {
+      handleFlashErrorStatus(res.statusCode);
+    }
     renderFlashMessages();
   });
 
@@ -166,9 +165,8 @@ function initializeFlashMessageSystem() {
     // Hook into turbo:before-stream-render to add our custom event
     document.addEventListener("turbo:before-stream-render", (event) => {
       const originalRender = event.detail.render;
-
-      event.detail.render = function (streamElement) {
-        originalRender(streamElement);
+      event.detail.render = async function (streamElement) {
+        await originalRender(streamElement);
         document.dispatchEvent(afterRenderEvent);
       };
     });
@@ -213,7 +211,7 @@ function initializeFlashMessageSystem() {
     if (ul && ul.children.length > 0) {
       return;
     }
-    // general-error-messagesからnetworkエラー文言を取得
+
     const generalerrors = document.getElementById('general-error-messages');
     let message = null;
     if (generalerrors) {
