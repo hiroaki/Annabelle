@@ -137,7 +137,16 @@ function initializeFlashMessageSystem() {
 
   // Handle all flash messages (success + error) after DOM updates complete
   document.addEventListener('turbo:render', function(event) {
-    handleFlashAfterRender(event);
+    const status = event.detail.fetchResponse?.status;
+    handleFlashErrorStatus(status);
+    renderFlashMessages();
+  });
+
+  // Handle form submission errors (proxy errors, HTTP errors)
+  document.addEventListener('turbo:submit-end', function(event) {
+    const status = event.detail?.formSubmission?.result?.fetchResponse?.response?.status;
+    handleFlashErrorStatus(status);
+    renderFlashMessages();
   });
 
   // Setup custom turbo:after-stream-render event for Turbo Stream updates
@@ -170,31 +179,18 @@ function initializeFlashMessageSystem() {
     });
   })();
 
-  function handleFlashAfterRender(event) {
-    const status = event.detail.fetchResponse?.status;
-
-    // First, check if server-side flash messages exist and render them
+  function handleFlashErrorStatus(status) {
     const storage = document.getElementById('flash-storage');
     const ul = storage?.querySelector('ul');
     if (ul && ul.children.length > 0) {
-      renderFlashMessages(); // Render server messages
       return;
     }
 
-    // No server-side flash messages exist
-    // Show client-side error messages only for HTTP error status
-    if (!status || status < 400) {
-      return; // No error status, or success status - nothing to do
-    }
+    if (!status || status < 400) return;
 
-    // Check if messages were already rendered (edge case protection)
     const container = document.getElementById('flash-message-container');
-    if (container && container.children.length > 0) {
-      return; // Messages already displayed
-    }
+    if (container && container.children.length > 0) return;
 
-    // サーバー側で用意されたロケール済み汎用エラーメッセージ（general-error-messages UL）から
-    // ステータスコードに応じたメッセージを取得して表示します。
     const generalerrors = document.getElementById('general-error-messages');
     let message = null;
     if (generalerrors && status >= 400) {
@@ -202,17 +198,16 @@ function initializeFlashMessageSystem() {
       const li = generalerrors.querySelector(`li[data-status="${key}"]`);
       if (li) message = li.textContent.trim();
     }
+
     if (message) {
       addFlashMessageToStorage(message, 'alert');
     } else {
       console.error(`[FlashMessage] No error message defined for status: ${status}`);
     }
-
-    renderFlashMessages();
   }
 
   // Network error handling
-  document.addEventListener('turbo:fetch-request-error', function(event) {
+  document.addEventListener('turbo:fetch-request-error', function(_event) {
     const storage = document.getElementById('flash-storage');
     const ul = storage?.querySelector('ul');
     if (ul && ul.children.length > 0) {
