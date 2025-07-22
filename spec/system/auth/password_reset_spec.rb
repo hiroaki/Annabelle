@@ -15,11 +15,11 @@ RSpec.describe 'パスワードリセット', type: :system do
 
     # リセット用メールアドレスを入力
     fill_in 'Email', with: user.email, id: 'user_email'
-    
+
     perform_enqueued_jobs do
       find("[data-testid='password-reset-submit']").click
       expect(page).to have_content(I18n.t('devise.passwords.send_instructions'))
-      
+
       # メールが送信されたことを確認
       mail = ActionMailer::Base.deliveries.last
       expect(mail.to).to include(user.email)
@@ -60,7 +60,7 @@ RSpec.describe 'パスワードリセット', type: :system do
       visit new_user_session_path
       click_link I18n.t('devise.shared.forgot_your_password')
       fill_in 'Email', with: user.email
-      
+
       perform_enqueued_jobs do
         find("[data-testid='password-reset-submit']").click
         mail = ActionMailer::Base.deliveries.last
@@ -81,7 +81,7 @@ RSpec.describe 'パスワードリセット', type: :system do
       visit new_user_session_path
       click_link I18n.t('devise.shared.forgot_your_password')
       fill_in 'Email', with: user.email
-      
+
       perform_enqueued_jobs do
         find("[data-testid='password-reset-submit']").click
         mail = ActionMailer::Base.deliveries.last
@@ -95,6 +95,59 @@ RSpec.describe 'パスワードリセット', type: :system do
         find("[data-testid='password-edit-submit']").click
 
         expect(page).to have_content(I18n.t('errors.messages.too_short', count: 6))
+      end
+    end
+  end
+
+  describe '言語スイッチャーの動作' do
+    it 'パスワードリセット申請時のバリデーションエラーでも正しく動作すること' do
+      visit new_user_password_path
+
+      # バリデーションエラーを発生させる
+      find("[data-testid='password-reset-submit']").click
+
+      # エラーメッセージが表示される
+      expect(page).to have_content(I18n.t('errors.messages.blank'))
+
+      # 言語スイッチャーが表示されていることを確認
+      expect(page).to have_link('日本語')
+
+      # 言語を切り替え
+      click_link '日本語'
+
+      # 正しいパスにリダイレクトされる（404にならない）
+      expect(page).to have_current_path('/ja/users/password/new')
+      expect(page).to have_selector("[data-testid='password-reset-submit']")
+    end
+
+    it 'パスワード更新時のバリデーションエラーでも正しく動作すること' do
+      visit new_user_password_path
+      fill_in 'Email', with: user.email
+
+      perform_enqueued_jobs do
+        find("[data-testid='password-reset-submit']").click
+        mail = ActionMailer::Base.deliveries.last
+        reset_link = mail.body.to_s.match(/href="([^"]+)"/)[1]
+        reset_path = URI.parse(reset_link).path
+        reset_query = URI.parse(reset_link).query
+        visit "#{reset_path}?#{reset_query}"
+
+        # バリデーションエラーを発生させる（パスワードなし）
+        find("[data-testid='password-edit-submit']").click
+
+        # エラーメッセージが表示される
+        expect(page).to have_content(I18n.t('errors.messages.blank'))
+
+        # 言語スイッチャーが表示されていることを確認
+        expect(page).to have_link('日本語')
+
+        # 言語を切り替え
+        click_link '日本語'
+
+        # パスワード更新の場合、トークンが失効するためログイン画面にリダイレクトされる
+        # これは正常な動作（404にならない）
+        expect(page).to have_current_path('/ja/users/sign_in')
+        expect(page).to have_content('パスワード再設定メールからアクセスしてください')
       end
     end
   end

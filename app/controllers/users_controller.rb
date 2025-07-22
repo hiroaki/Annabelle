@@ -12,6 +12,8 @@ class UsersController < ApplicationController
 
   # update_profile PATCH /:locale/profile(.:format)
   def update
+    @language_switcher_path = edit_profile_path
+
     if @user.update(user_params_for_profile)
       language_changed = @user.saved_change_to_preferred_language?
       form_selected_language = params[:user][:preferred_language]

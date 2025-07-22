@@ -1,9 +1,17 @@
-<div class="container p-4">
-  <h2 class="text-2xl font-bold mb-4"><%= title %></h2>
+<turbo-frame id="users-frame">
+  <div class="container p-4">
+    <%=
+      content_tag(:h2, title,
+        class: 'text-2xl font-bold mb-4',
+        **data_with_testid(testid)
+      )
+    %>
 
-  <%= render 'shared/flash' %>
+    <%= flash_storage %>
+    <%= flash_container %>
 
-  <div>
-    <%= yield %>
+    <div>
+      <%= yield %>
+    </div>
   </div>
-</div>
+</turbo-frame>

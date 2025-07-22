@@ -1,13 +1,10 @@
 <div class="container p-4 max-w-xl mx-auto">
-  <% if flash[:alert] %>
-    <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-      <%= flash[:alert] %>
-    </div>
-  <% end %>
-
   <h2 class="text-2xl font-bold mb-4"><%= t('devise.sessions.two_factor_authentication') %></h2>
 
   <%= form_with scope: :user, url: session_path(:user), method: :post, html: { class: "space-y-6" } do |f| %>
+    <%= flash_storage %>
+    <%= flash_container %>
+
     <div class="mb-6">
       <label for="user_otp_attempt" class="block mb-2 text-sm font-medium text-gray-900">
         <%= t('devise.sessions.enter_otp_code') %>

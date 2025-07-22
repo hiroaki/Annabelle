@@ -1,8 +1,4 @@
-<div class="container p-4">
-  <%= content_tag :h2, t('devise.registrations.account_settings'), class: 'text-2xl font-bold mb-4', **data_with_testid('account-settings-title') %>
-
-  <%= render "shared/flash" %>
-
+<%= users_frame('devise.registrations.account_settings') do %>
   <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "space-y-6" }) do |f| %>
     <%= render "shared/error_messages", resource: resource %>
 
@@ -141,8 +137,9 @@
         class: "text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center",
         **data_with_testid('account-cancel',
           turbo_confirm: t('devise.registrations.cancel_confirm'),
+          turbo_frame: '_top',
         ),
       )
     %>
   </div>
-</div>
+<% end %>

@@ -3,3 +3,7 @@ import "@hotwired/turbo-rails"
 import "controllers"
 import "channels"
 import "lib/lazysizes.min"
+import { initializeFlashMessageSystem } from "flash_messages"
+
+// Initialize Flash Message System
+initializeFlashMessageSystem();

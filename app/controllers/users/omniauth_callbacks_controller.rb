@@ -31,11 +31,26 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def link_provider_or_alert(auth, user, locale)
     provider_name = provider_display_name(auth)
 
-    if user.linked_with?(auth.provider) && user.provider_uid(auth.provider) != auth.uid
-      flash[:alert] = I18n.t("devise.omniauth_callbacks.provider.already_linked", provider: provider_name)
+    if Authorization.provider_uid_exists?(auth.provider, auth.uid)
+      if user.provider_uid(auth.provider) == auth.uid
+        # 正常：自身のuserでリンクされている
+        flash[:alert] = I18n.t("devise.omniauth_callbacks.provider.already_linked", provider: provider_name)
+      else
+        # 警戒：他のuserでリンクされている（ただし、flashメッセージでは区別しない）
+        flash[:alert] = I18n.t("devise.omniauth_callbacks.provider.already_linked", provider: provider_name)
+        logger.warn("AUTHORIZATION_CONFLICT: (provider_uid_exists) provider=#{auth.provider} uid=#{auth.uid} user=#{user.id}")
+      end
     else
-      user.link_with(auth.provider, auth.uid)
-      flash[:notice] = I18n.t("devise.omniauth_callbacks.provider.linked", provider: provider_name)
+      authorization = user.link_with(auth.provider, auth.uid)
+      if authorization.errors.any?
+        # 警戒：未リンクのチェックとリンク処理との間があるため、バリデーションによって ["UIDは既に使用されています"] が検出される可能性もあります。
+        flash[:alert] = I18n.t("devise.omniauth_callbacks.provider.already_linked", provider: provider_name)
+        error_types = authorization.errors.details.flat_map { |attr, arr| arr.map { |h| "#{attr}:#{h[:error]}" } }.uniq.join(',')
+        logger.warn("AUTHORIZATION_CONFLICT: (link_with) provider=#{auth.provider} uid=#{auth.uid} user=#{user.id} error_types=#{error_types}")
+      else
+        # 正常：リンク成功
+        flash[:notice] = I18n.t("devise.omniauth_callbacks.provider.linked", provider: provider_name)
+      end
     end
 
     redirect_to determine_redirect_path(:link_provider, locale)
