@@ -101,4 +101,12 @@ Rails.application.configure do
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+
+  # Maximum request body size (in bytes) for form submissions.
+  # If your proxy server enforces a request size limit, be sure to set the same value here.
+  # (The check on the app side is only for user experience; the actual enforcement is done by the proxy.)
+  # フォーム送信時のリクエストサイズ上限（バイト数）。
+  # Proxyサーバ側でリクエストサイズ制限がある場合は、必ず同じ値をここにも設定してください。
+  # （アプリ側のチェックはユーザー体験向上のための目安であり、実際の制限はProxyで行われます）
+  config.x.max_request_body = ENV.fetch('MAX_REQUEST_BODY', nil).presence
 end
