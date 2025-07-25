@@ -49,6 +49,7 @@ env:
     APP_HTTP_PORT: <%= ENV.fetch('APP_HTTP_PORT') %>
     SMTP_ADDRESS: <%= ENV.fetch('SMTP_ADDRESS') %>
     SMTP_PORT: <%= ENV.fetch('SMTP_PORT') %>
+    DEVISE_MAILER_SENDER: <%= ENV.fetch('DEVISE_MAILER_SENDER') %>
     MAX_REQUEST_BODY: <%= ENV.fetch('MAX_REQUEST_BODY') %>
   secret:
     - ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
