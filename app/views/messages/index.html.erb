@@ -10,17 +10,28 @@
       <%= flash_container %>
 
       <% disabled = !current_user.confirmed? %>
-      <%=
-        form_with(
-          url: messages_path,
-          html: {
-            'data-action' => 'turbo:submit-end->file-upload#resetForm',
+
+      <%
+        if Rails.configuration.x.max_request_body.present?
+          max_size = Rails.configuration.x.max_request_body.to_i
+          html_options = {
+            'data-controller' => 'form-size-checker file-upload',
+            'data-form-size-checker-max-size-value' => Rails.configuration.x.max_request_body.to_i,
+            'data-form-size-checker-error-message-value' => t('messages.form.size_limit_exceeded', max_size: number_to_human_size(max_size, precision: 3)),
+            'data-action' => 'submit->form-size-checker#check turbo:submit-end->file-upload#resetForm',
             'class' => 'block pb-4 w-full',
-            'data-controller' => 'file-upload',
             'data-file-upload-target' => 'dropZone',
           }
-        ) do |form|
+        else
+          html_options = {
+            'data-controller' => 'file-upload',
+            'data-action' => 'turbo:submit-end->file-upload#resetForm',
+            'class' => 'block pb-4 w-full',
+            'data-file-upload-target' => 'dropZone',
+          }
+        end
       %>
+      <%= form_with(url: messages_path, html: html_options) do |form| %>
         <fieldset class="border border-gray-200 rounded-lg bg-gray-50 w-full" <%= 'disabled' if disabled %>>
           <div class="px-4 py-2 bg-white rounded-t-lg">
             <label for="comment" class="sr-only"><%= t('messages.form.comment_label') %></label>

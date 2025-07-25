@@ -87,4 +87,12 @@ Rails.application.configure do
   # その hosts を明示的に設定するか、または clear しないと、アクセスがブロックされます。
   config.hosts.clear
   # config.hosts << "web"
+
+  # Maximum request body size (in bytes) for form submissions.
+  # If your proxy server enforces a request size limit, be sure to set the same value here.
+  # (The check on the app side is only for user experience; the actual enforcement is done by the proxy.)
+  # フォーム送信時のリクエストサイズ上限（バイト数）。
+  # Proxyサーバ側でリクエストサイズ制限がある場合は、必ず同じ値をここにも設定してください。
+  # （アプリ側のチェックはユーザー体験向上のための目安であり、実際の制限はProxyで行われます）
+  config.x.max_request_body = ENV.fetch('MAX_REQUEST_BODY', nil).presence
 end

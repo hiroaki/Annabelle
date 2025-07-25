@@ -121,6 +121,7 @@ ja:
     form:
       comment_label: "コメント"
       post: "投稿"
+      size_limit_exceeded: "送信データが許可されたサイズ（%{max_size}）を超えています。"
   two_factor_settings:
     already_enabled: "二要素認証は既に有効になっています。"
     backup_codes_already_seen: "バックアップコードは既に表示済みです。"

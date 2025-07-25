@@ -121,6 +121,7 @@ en:
     form:
       comment_label: "Comment"
       post: "Post"
+      size_limit_exceeded: "The data you are trying to submit exceeds the allowed size (%{max_size})."
   two_factor_settings:
     already_enabled: "Two factor authentication is already enabled."
     backup_codes_already_seen: "You have already seen your backup codes."

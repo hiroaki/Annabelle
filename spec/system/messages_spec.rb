@@ -112,4 +112,36 @@ RSpec.describe 'Messages Form', type: :system do
       expect(page).not_to have_selector("[data-testid='delete-message-#{message.id}']")
     end
   end
+
+  context 'when form size exceeds the limit' do
+    before do
+      login_as confirmed_user
+      visit messages_path
+    end
+
+    it 'shows a size limit exceeded error and does not submit the form' do
+      # 1バイトの上限を仮定してテスト（テスト用にENVやconfig.x.max_request_bodyをstubしてもよい）
+      allow(Rails.configuration.x).to receive(:max_request_body).and_return(1)
+      visit current_path # 設定反映のためリロード
+
+      fill_in 'comment', with: 'a' * 10_000 # 十分大きなデータ
+      click_button I18n.t('messages.form.post')
+
+      expect(page).to have_selector('[data-testid="flash-message"]', text: "1 Byte")
+      # メッセージが投稿されていないことも確認
+      expect(page).not_to have_content('a' * 10_000)
+    end
+
+    it 'allows submission when max_request_body is nil (no size limit)' do
+      allow(Rails.configuration.x).to receive(:max_request_body).and_return(nil)
+      visit current_path # 設定反映のためリロード
+
+      fill_in 'comment', with: 'a' * 10_000
+      click_button I18n.t('messages.form.post')
+
+      # フラッシュメッセージが出ないこと、投稿が成功することを確認
+      expect(page).not_to have_selector('[data-testid="flash-message"]', text: /size limit/i)
+      expect(page).to have_content('a' * 10_000)
+    end
+  end
 end

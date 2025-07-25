@@ -1,25 +1,46 @@
 # syntax = docker/dockerfile:1
 
+# # 本番環境
+# $ docker build --build-arg RAILS_ENV=production -t annabelle-production:latest .
+#
+# # ステージング環境
+# $ docker build --build-arg RAILS_ENV=staging -t annabelle-staging:latest .
+#
+
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
 ARG RUBY_VERSION=3.4.4
-FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim as base
+
+# RAILS_ENVを必須のARGとして定義（デフォルト値なし）
+ARG RAILS_ENV
+
+FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim AS base
+
+# ARGを再宣言してからENVで使用
+ARG RAILS_ENV
 
 # Rails app lives here
 WORKDIR /rails
 
-# Set production environment
-ENV RAILS_ENV="production" \
-    BUNDLE_DEPLOYMENT="1" \
+# Set environment with flexibility for staging/production
+ENV BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
-
+    BUNDLE_WITHOUT="development:test" \
+    RAILS_ENV=$RAILS_ENV
 
 # Throw-away build stage to reduce size of final image
-FROM base as build
+FROM base AS build
 
-# Install packages needed to build gems
+# Install packages needed to build gems and run the application
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libvips pkg-config libyaml-dev
+    apt-get install --no-install-recommends -y \
+    build-essential \
+    git \
+    libvips \
+    pkg-config \
+    libyaml-dev \
+    libsqlite3-dev \
+    tzdata \
+    ffmpeg
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
@@ -31,18 +52,22 @@ RUN bundle install && \
 COPY . .
 
 # Precompile bootsnap code for faster boot times
-RUN bundle exec bootsnap precompile app/ lib/
+RUN bundle exec bootsnap precompile -j 0 --gemfile app/ lib/ config/
 
-# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
+# Precompiling assets without requiring secret RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
-
 
 # Final stage for app image
 FROM base
 
 # Install packages needed for deployment
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libsqlite3-0 libvips && \
+    apt-get install --no-install-recommends -y \
+    curl \
+    libsqlite3-0 \
+    libvips \
+    tzdata \
+    ffmpeg && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Copy built artifacts: gems, application
@@ -51,12 +76,17 @@ COPY --from=build /rails /rails
 
 # Run and own only the runtime files as a non-root user for security
 RUN useradd rails --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp
+    mkdir -p /rails/db /rails/log /rails/storage /rails/tmp && \
+    chown -R rails:rails /rails
 USER rails:rails
 
-# Entrypoint prepares the database.
+# Entrypoint prepares the database
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start the server by default, this can be overwritten at runtime
+# Start the server with thruster for production/staging.
+# Puma listening on port to 3000, kamal-proxy 3001 for Thruster
+ENV THRUSTER_HTTP_PORT="3001" \
+    THRUSTER_TARGET_PORT="3000" \
+    THRUSTER_DEBUG=1
 EXPOSE 3000
-CMD ["./bin/rails", "server"]
+CMD ["bundle", "exec", "thrust", "bin/rails", "server"]
