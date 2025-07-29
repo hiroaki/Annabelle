@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus";
-import { addFlashMessageToStorage, renderFlashMessages } from "flash_messages";
+import { appendMessageToStorage, renderFlashMessages } from "flash_messages";
 
 // Checks the total size of form data before submission.
 // If the size exceeds the specified limit, shows an error message and cancels submission.
@@ -16,10 +16,6 @@ import { addFlashMessageToStorage, renderFlashMessages } from "flash_messages";
 //    data-form-size-checker-error-message-value="サイズ制限エラー時のメッセージ"
 export default class extends Controller {
   static values = { maxSize: Number, errorMessage: String };
-
-  connect() {
-    console.log("connect form-size-checker-controller");
-  }
 
   check(event) {
     const form = this.element;
@@ -44,7 +40,7 @@ export default class extends Controller {
   }
 
   showError(message) {
-    addFlashMessageToStorage(message, "alert");
+    appendMessageToStorage(message, "alert");
     renderFlashMessages();
   }
 }
