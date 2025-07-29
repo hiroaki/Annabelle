@@ -117,11 +117,10 @@ function renderFlashMessages() {
   */
 function appendMessageToStorage(message, type = 'alert') {
   const storageContainer = document.getElementById("flash-storage");
-  let storage = storageContainer.querySelector('[data-flash-storage]')
+  let storage = storageContainer.querySelector('[data-flash-storage]');
   if (!storage) {
     storage = document.createElement('div');
     storage.setAttribute('data-flash-storage', 'true');
-    // storage.setAttribute('data-testid', 'flash-message');
     storage.style.display = 'none';
     storageContainer.appendChild(storage);
   }
