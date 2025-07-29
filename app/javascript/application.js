@@ -5,5 +5,10 @@ import "channels"
 import "lib/lazysizes.min"
 import { initializeFlashMessageSystem } from "flash_messages"
 
-// Initialize Flash Message System
-initializeFlashMessageSystem();
+// https://developer.mozilla.org/ja/docs/Web/API/Document/DOMContentLoaded_event
+// > if チェックと addEventListener() 呼び出しの間に文書が読み込まれることはあり得ません。
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeFlashMessageSystem);
+} else {
+  initializeFlashMessageSystem();
+}
