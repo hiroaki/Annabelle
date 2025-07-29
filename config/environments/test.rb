@@ -58,4 +58,11 @@ Rails.application.configure do
   # その hosts を明示的に設定するか、または clear しないと、アクセスがブロックされます。
   config.hosts.clear
   # config.hosts << "web"
+
+  unless config.active_record.encryption.primary_key
+    require 'securerandom'
+    config.active_record.encryption.primary_key = SecureRandom.hex(32)
+    config.active_record.encryption.deterministic_key = SecureRandom.hex(32)
+    config.active_record.encryption.key_derivation_salt = SecureRandom.hex(32)
+  end
 end
