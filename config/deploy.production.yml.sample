@@ -1,1 +1,70 @@
-# TODO
+service: annabelle
+
+image: <%= ENV.fetch('DEPLOY_IMAGE') %>
+
+servers:
+  web:
+    hosts:
+<% ENV.fetch('DEPLOY_SERVERS_WEB_HOSTS').split(',').each do |host| %>
+      - <%= host.strip %>
+<% end %>
+
+proxy:
+  ssl: true
+  host: <%= ENV.fetch('DEPLOY_PROXY_HOST') %>
+  app_port: 3001
+<% if ENV.fetch('DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY').present? %>
+  buffering:
+    requests: true
+    responses: true
+    max_request_body: <%= ENV.fetch('DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY') %>
+    max_response_body: 0
+<% end %>
+
+registry:
+  server: <%= ENV.fetch('DEPLOY_REGISTRY_SERVER') %>
+  username: <%= ENV.fetch('DEPLOY_REGISTRY_USERNAME') %>
+  password:
+    - DEPLOY_REGISTRY_PASSWORD
+
+builder:
+  arch:
+    - amd64
+    - arm64
+  context: .
+  dockerfile: Dockerfile
+  args:
+    RAILS_ENV: production
+
+env:
+  clear:
+    RAILS_ENV: production
+    ANNABELLE_VARIANT_PROCESSOR: vips
+    APP_HTTP_HOST: <%= ENV.fetch('APP_HTTP_HOST') %>
+    APP_HTTP_PROTOCOL: <%= ENV.fetch('APP_HTTP_PROTOCOL') %>
+    APP_HTTP_PORT: <%= ENV.fetch('APP_HTTP_PORT') %>
+    SMTP_ADDRESS: <%= ENV.fetch('SMTP_ADDRESS') %>
+    SMTP_PORT: <%= ENV.fetch('SMTP_PORT') %>
+    DEVISE_MAILER_SENDER: <%= ENV.fetch('DEVISE_MAILER_SENDER') %>
+    MAX_REQUEST_BODY: <%= ENV.fetch('MAX_REQUEST_BODY') %>
+  secret:
+    - ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
+    - ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
+    - ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
+    - GITHUB_CLIENT_ID
+    - GITHUB_CLIENT_SECRET
+    - BASIC_AUTH_USER
+    - BASIC_AUTH_PASSWORD
+    - SECRET_KEY_BASE
+
+ssh:
+  port: <%= ENV.fetch('DEPLOY_SSH_PORT', 22) %>
+  user: <%= ENV.fetch('DEPLOY_SSH_USER') %>
+  keys_only: true
+  keys:
+<% ENV.fetch('DEPLOY_SSH_KEYS').split(',').each do |key| %>
+    - <%= key.strip %>
+<% end %>
+
+volumes:
+  - "<%= ENV.fetch('DEPLOY_VOLUMES_STORAGE') %>:/rails/storage"

@@ -62,6 +62,7 @@ env:
     - SECRET_KEY_BASE
 
 ssh:
+  port: <%= ENV.fetch('DEPLOY_SSH_PORT', 22) %>
   user: <%= ENV.fetch('DEPLOY_SSH_USER') %>
   keys_only: true
   keys:
