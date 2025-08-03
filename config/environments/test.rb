@@ -65,4 +65,12 @@ Rails.application.configure do
     config.active_record.encryption.deterministic_key = SecureRandom.hex(32)
     config.active_record.encryption.key_derivation_salt = SecureRandom.hex(32)
   end
+
+  # FIXME: OAuth 設定の有無を各テストの中で制御できるようにしてください。
+  #
+  # 現在、環境変数で OAuth 設定を切り替えているため、
+  # ルーティングやモデルの状態が初期化時に決まってしまいます。
+  # テストごとに切り替えられないため、 OAuth が有効な状態を前提としています。
+  ENV['GITHUB_CLIENT_ID'] = 'gggggggggggggggggggg'
+  ENV['GITHUB_CLIENT_SECRET'] = 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh'
 end
