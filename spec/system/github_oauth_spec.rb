@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe "GitHub OAuth連携", type: :system, js: true do
+RSpec.describe "GitHub OAuth連携", type: :system, js: true, oauth_github_required: true do
   def visit_signin_and_click_github
     visit new_user_session_path
     click_button "Sign in with GitHub"
