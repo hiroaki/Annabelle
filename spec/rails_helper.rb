@@ -5,6 +5,11 @@
 # or whatever your preferred test framework uses):
 require 'simplecov'
 require 'simplecov-lcov'
+if ENV['RSPEC_DISABLE_OAUTH_GITHUB'].present?
+  SimpleCov.command_name 'rspec_oauth_disabled'
+else
+  SimpleCov.command_name 'rspec_oauth_enabled'
+end
 SimpleCov::Formatter::LcovFormatter.config do |c|
   c.output_directory = 'coverage'
   c.lcov_file_name = 'lcov.info'
