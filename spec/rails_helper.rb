@@ -65,6 +65,11 @@ RSpec.configure do |config|
     skip "Skipped: RSPEC_DISABLE_OAUTH_GITHUB (GitHub OAuth is disabled)" if ENV['RSPEC_DISABLE_OAUTH_GITHUB']
   end
 
+  # Skip GitHub OAuth-disabled specs when RSPEC_DISABLE_OAUTH_GITHUB is not set
+  config.before(:each, :oauth_github_disabled) do
+    skip 'This spec is only for RSPEC_DISABLE_OAUTH_GITHUB=1' unless ENV['RSPEC_DISABLE_OAUTH_GITHUB']
+  end
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join('spec/fixtures')
