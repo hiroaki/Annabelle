@@ -5,6 +5,11 @@
 # or whatever your preferred test framework uses):
 require 'simplecov'
 require 'simplecov-lcov'
+if ENV['RSPEC_DISABLE_OAUTH_GITHUB']
+  SimpleCov.command_name 'rspec_oauth_github_disabled'
+else
+  SimpleCov.command_name 'rspec_oauth_github_enabled'
+end
 SimpleCov::Formatter::LcovFormatter.config do |c|
   c.output_directory = 'coverage'
   c.lcov_file_name = 'lcov.info'
@@ -53,7 +58,18 @@ end
 
 Rails.application.load_seed if Rails.env.test?
 
+
 RSpec.configure do |config|
+  # Skip GitHub OAuth-required specs when RSPEC_DISABLE_OAUTH_GITHUB is set
+  config.before(:each, :oauth_github_required) do
+    skip "Skipped: RSPEC_DISABLE_OAUTH_GITHUB (GitHub OAuth is disabled)" if ENV['RSPEC_DISABLE_OAUTH_GITHUB']
+  end
+
+  # Skip GitHub OAuth-disabled specs when RSPEC_DISABLE_OAUTH_GITHUB is not set
+  config.before(:each, :oauth_github_disabled) do
+    skip 'This spec is only for RSPEC_DISABLE_OAUTH_GITHUB=1' unless ENV['RSPEC_DISABLE_OAUTH_GITHUB']
+  end
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join('spec/fixtures')

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'OmniauthCallbacks', type: :request do
+RSpec.describe 'OmniauthCallbacks', type: :request, oauth_github_required: true do
   let(:user) { create(:user, :confirmed) }
   let(:provider) { :github }
   let(:uid) { '12345' }

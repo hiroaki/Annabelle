@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe LocaleController, type: :request do
+RSpec.describe LocaleController, type: :request, oauth_github_required: true do
   let(:user) { create(:user) }
 
   describe "GET /locale/:locale" do

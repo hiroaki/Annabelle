@@ -5,6 +5,7 @@ on:
     branches: [ develop ]
   pull_request:
     branches: [ develop ]
+  workflow_dispatch:
 
 jobs:
   rspec:
@@ -55,6 +56,10 @@ jobs:
       - name: Run RSpec tests
         run: bundle exec rspec
         timeout-minutes: 5
+
+      - name: Run GitHub OAuth disabled system spec
+        run: RSPEC_DISABLE_OAUTH_GITHUB=1 bin/rspec spec/system/github_oauth_disabled_spec.rb
+        timeout-minutes: 3
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4

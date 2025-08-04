@@ -66,11 +66,12 @@ Rails.application.configure do
     config.active_record.encryption.key_derivation_salt = SecureRandom.hex(32)
   end
 
-  # FIXME: OAuth 設定の有無を各テストの中で制御できるようにしてください。
-  #
-  # 現在、環境変数で OAuth 設定を切り替えているため、
-  # ルーティングやモデルの状態が初期化時に決まってしまいます。
-  # テストごとに切り替えられないため、 OAuth が有効な状態を前提としています。
-  ENV['GITHUB_CLIENT_ID'] = 'gggggggggggggggggggg'
-  ENV['GITHUB_CLIENT_SECRET'] = 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh'
+  # 環境変数 RSPEC_DISABLE_OAUTH_GITHUB によって OAuth 設定の有無を切り替え、
+  # テストスイートを２回に分けて実行するようにします。
+  # rails_helper.rb に、 SimpeCove に関係する記述箇所がありますので確認してください。
+  # ２回にわたるカバレッジのデータをマージする必要があります。
+  unless ENV['RSPEC_DISABLE_OAUTH_GITHUB'].present?
+    ENV['GITHUB_CLIENT_ID'] = 'gggggggggggggggggggg'
+    ENV['GITHUB_CLIENT_SECRET'] = 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh'
+  end
 end
