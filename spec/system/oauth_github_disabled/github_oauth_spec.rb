@@ -38,17 +38,11 @@ RSpec.describe 'GitHub OAuth UI', type: :system do
     end
   end
 
-  context 'when GitHub OAuth is enabled' do
-    before do
-      skip 'This spec is only for RSPEC_DISABLE_OAUTH_GITHUB not set' if ENV['RSPEC_DISABLE_OAUTH_GITHUB']
-    end
+  context 'when GitHub OAuth is enabled', oauth_github_required: true do
     include_examples 'GitHub OAuth UI presence', true
   end
 
-  context 'when GitHub OAuth is disabled' do
-    before do
-      skip 'This spec is only for RSPEC_DISABLE_OAUTH_GITHUB=1' unless ENV['RSPEC_DISABLE_OAUTH_GITHUB']
-    end
+  context 'when GitHub OAuth is disabled', oauth_github_disabled: true do
     include_examples 'GitHub OAuth UI presence', false
   end
 end
