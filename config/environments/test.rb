@@ -71,7 +71,7 @@ Rails.application.configure do
   # rails_helper.rb に、 SimpeCove に関係する記述箇所がありますので確認してください。
   # ２回にわたるカバレッジのデータをマージする必要があります。
   unless ENV['RSPEC_DISABLE_OAUTH_GITHUB'].present?
-    ENV['GITHUB_CLIENT_ID'] = 'gggggggggggggggggggg'
-    ENV['GITHUB_CLIENT_SECRET'] = 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh'
+    ENV['GITHUB_CLIENT_ID'] = 'test_github_client_id'
+    ENV['GITHUB_CLIENT_SECRET'] = 'test_github_client_secret'
   end
 end
