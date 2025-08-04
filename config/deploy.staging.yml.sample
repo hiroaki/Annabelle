@@ -16,7 +16,7 @@ proxy:
   #   certificate_pem: CERTIFICATE_PEM
   #   private_key_pem: PRIVATE_KEY_PEM
   host: <%= ENV.fetch('DEPLOY_PROXY_HOST') %>
-  app_port: 3000
+  app_port: 3001
 <% if ENV.fetch('DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY').present? %>
   buffering:
     requests: true
