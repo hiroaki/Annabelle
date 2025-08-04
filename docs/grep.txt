@@ -1,0 +1,61 @@
+hiroaki@Torkan:annabelle (docs *) $ find app bin config docker lib public spec -type f -name '*.rb' -exec grep -HnE "EN
+V\[['\"]|ENV\.fetch\(['\"]" {} \;
+app/models/user.rb:142:    issuer = 'Annabelle' # TODO --> ENV['OTP_2FA_ISSUER_NAME']
+app/controllers/application_controller.rb:46:    ENV['BASIC_AUTH_USER'].presence
+app/controllers/application_controller.rb:50:    ENV['BASIC_AUTH_PASSWORD'].presence
+config/environments/production.rb:41:  config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
+config/environments/production.rb:61:    host: ENV['APP_HTTP_HOST'] || 'localhost',
+config/environments/production.rb:62:    port: ENV['APP_HTTP_PORT'] || 3000,
+config/environments/production.rb:63:    protocol: ENV['APP_HTTP_PROTOCOL'] || 'http',
+config/environments/production.rb:77:    address:              ENV['SMTP_ADDRESS'] || 'localhost',
+config/environments/production.rb:78:    port:                 ENV['SMTP_PORT'] || 587,
+config/environments/production.rb:79:    domain:               ENV['SMTP_DOMAIN'], # HELO
+config/environments/production.rb:80:    user_name:            ENV['SMTP_USERNAME'],
+config/environments/production.rb:81:    password:             ENV['SMTP_PASSWORD'],
+config/environments/production.rb:111:  config.x.max_request_body = ENV.fetch('MAX_REQUEST_BODY', nil).presence
+config/environments/staging.rb:11:    address: ENV['SMTP_ADDRESS'],
+config/environments/staging.rb:12:    port: ENV['SMTP_PORT'],
+config/environments/development.rb:42:    host: ENV['APP_HTTP_HOST'] || 'localhost',
+config/environments/development.rb:43:    port: ENV['APP_HTTP_PORT'] || 3000,
+config/environments/development.rb:44:    protocol: ENV['APP_HTTP_PROTOCOL'] || 'http',
+config/environments/development.rb:50:    address:              ENV['SMTP_ADDRESS'] || 'localhost',
+config/environments/development.rb:51:    port:                 ENV['SMTP_PORT'] || 1025,
+config/environments/development.rb:52:    domain:               ENV['SMTP_DOMAIN'], # HELO
+config/environments/development.rb:53:    user_name:            ENV['SMTP_USERNAME'],
+config/environments/development.rb:54:    password:             ENV['SMTP_PASSWORD'],
+config/environments/development.rb:97:  config.x.max_request_body = ENV.fetch('MAX_REQUEST_BODY', nil).presence
+config/environments/test.rb:16:  config.eager_load = ENV["CI"].present?
+config/environments/test.rb:73:  unless ENV['RSPEC_DISABLE_OAUTH_GITHUB'].present?
+config/environments/test.rb:74:    ENV['GITHUB_CLIENT_ID'] = 'test_github_client_id'
+config/environments/test.rb:75:    ENV['GITHUB_CLIENT_SECRET'] = 'test_github_client_secret'
+config/application.rb:28:    config.active_record.encryption.primary_key = ENV["ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY"]
+config/application.rb:29:    config.active_record.encryption.deterministic_key = ENV["ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY"]
+config/application.rb:30:    config.active_record.encryption.key_derivation_salt = ENV["ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT"]
+config/application.rb:42:    processor = ENV.fetch("ANNABELLE_VARIANT_PROCESSOR", "mini_magick").to_sym
+config/puma.rb:8:# You can control the number of workers using ENV["WEB_CONCURRENCY"]. You
+config/puma.rb:27:threads_count = ENV.fetch("RAILS_MAX_THREADS", 3)
+config/puma.rb:31:port ENV.fetch("PORT", 3000)
+config/puma.rb:37:plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"]
+config/puma.rb:41:pidfile ENV["PIDFILE"] if ENV["PIDFILE"]
+config/boot.rb:1:ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
+config/initializers/kaminari_config.rb:3:dpp = ENV['KAMINARI_DEFAULT_PER_PAGE'].to_i
+config/initializers/devise.rb:31:  config.mailer_sender = ENV['DEVISE_MAILER_SENDER'].presence || 'annabelle@localhost'
+config/initializers/devise.rb:280:  if ENV['GITHUB_CLIENT_ID'].present? && ENV['GITHUB_CLIENT_SECRET'].present?
+config/initializers/devise.rb:282:      ENV['GITHUB_CLIENT_ID'],
+config/initializers/devise.rb:283:      ENV['GITHUB_CLIENT_SECRET'],
+spec/support/capybara.rb:5:  lang = ENV['CAPYBARA_LANG'] || 'en'
+spec/support/capybara.rb:11:    headless: %w[0 false].exclude?(ENV['HEADLESS']),
+spec/support/capybara.rb:12:    slowmo: ENV['SLOWMO']&.to_f,
+spec/support/capybara.rb:21:  if ENV['DOCKER'].present?
+spec/support/capybara.rb:52:  if ENV['DOCKER'].present?
+spec/controllers/application_controller_spec.rb:12:      orig = ENV['BASIC_AUTH_USER']
+spec/controllers/application_controller_spec.rb:14:      ENV['BASIC_AUTH_USER'] = orig
+spec/controllers/application_controller_spec.rb:18:      ENV['BASIC_AUTH_USER'] = 'user1'
+spec/controllers/application_controller_spec.rb:30:      orig = ENV['BASIC_AUTH_PASSWORD']
+spec/controllers/application_controller_spec.rb:32:      ENV['BASIC_AUTH_PASSWORD'] = orig
+spec/controllers/application_controller_spec.rb:36:      ENV['BASIC_AUTH_PASSWORD'] = 'secret'
+spec/rails_helper.rb:8:if ENV['RSPEC_DISABLE_OAUTH_GITHUB']
+spec/rails_helper.rb:26:ENV['RAILS_ENV'] ||= 'test'
+spec/rails_helper.rb:65:    skip "Skipped: RSPEC_DISABLE_OAUTH_GITHUB (GitHub OAuth is disabled)" if ENV['RSPEC_DISABLE_OAUTH_GITHUB']
+spec/rails_helper.rb:70:    skip 'This spec is only for RSPEC_DISABLE_OAUTH_GITHUB=1' unless ENV['RSPEC_DISABLE_OAUTH_GITHUB']
+hiroaki@Torkan:annabelle (docs *) $ 
