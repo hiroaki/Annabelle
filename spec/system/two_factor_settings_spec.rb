@@ -13,7 +13,7 @@ RSpec.describe 'TwoFactorSettings', type: :system do
       it 'redirects to sign in page' do
         visit new_two_factor_settings_path
         expect(page).to have_current_path(new_user_session_path)
-        expect(page).to have_content('Sign in')
+        expect(page).to have_content('Log in')
       end
     end
 
@@ -53,7 +53,7 @@ RSpec.describe 'TwoFactorSettings', type: :system do
       it 'redirects to sign in page' do
         visit edit_two_factor_settings_path
         expect(page).to have_current_path(new_user_session_path)
-        expect(page).to have_content('Sign in')
+        expect(page).to have_content('Log in')
       end
     end
 

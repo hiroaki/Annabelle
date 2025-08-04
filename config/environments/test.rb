@@ -65,4 +65,13 @@ Rails.application.configure do
     config.active_record.encryption.deterministic_key = SecureRandom.hex(32)
     config.active_record.encryption.key_derivation_salt = SecureRandom.hex(32)
   end
+
+  # 環境変数 RSPEC_DISABLE_OAUTH_GITHUB によって OAuth 設定の有無を切り替え、
+  # テストスイートを２回に分けて実行するようにします。
+  # rails_helper.rb に、 SimpeCove に関係する記述箇所がありますので確認してください。
+  # ２回にわたるカバレッジのデータをマージする必要があります。
+  unless ENV['RSPEC_DISABLE_OAUTH_GITHUB'].present?
+    ENV['GITHUB_CLIENT_ID'] = 'test_github_client_id'
+    ENV['GITHUB_CLIENT_SECRET'] = 'test_github_client_secret'
+  end
 end

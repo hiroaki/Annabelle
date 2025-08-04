@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'アカウント設定', type: :system do
+RSpec.describe 'アカウント設定', type: :system, oauth_github_required: true do
   include ActionMailer::TestHelper
   let(:user) { create(:user, :confirmed, password: 'current_password') }
 

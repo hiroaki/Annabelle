@@ -3,7 +3,7 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :two_factor_authenticatable, :two_factor_backupable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :confirmable, :omniauthable, omniauth_providers: %i[github]
+         :confirmable, :omniauthable, omniauth_providers: Devise.omniauth_configs.keys
 
   # for two_factor_backupable
   attribute :otp_backup_codes, JsonStringArrayType.new, default: []
