@@ -58,7 +58,7 @@ jobs:
         timeout-minutes: 5
 
       - name: Run GitHub OAuth disabled system spec
-        run: RSPEC_DISABLE_OAUTH_GITHUB=1 bin/rspec spec/system/github_oauth_disabled_spec.rb
+        run: RSPEC_DISABLE_OAUTH_GITHUB=1 bin/rspec spec/system/oauth_github_disabled/
         timeout-minutes: 3
 
       - name: Upload coverage reports
