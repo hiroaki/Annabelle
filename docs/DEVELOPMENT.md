@@ -48,9 +48,9 @@ This project uses Tailwind for CSS. You need to build the CSS files with the fol
 $ bin/rails tailwindcss:build
 ```
 
-Whenever you make changes to the CSS, you need to rebuild it. Therefore, during development, it is convenient to run `bin/rails tailwindcss:watch` concurrently to automatically build Tailwind CSS. You can also use `bin/dev` to launch multiple processes at once. A sample configuration is provided in `Procfile.dev.skel`, which you can customize as needed.
+Whenever you make changes to the CSS, you need to rebuild it. Therefore, during development, it is convenient to run `bin/rails tailwindcss:watch` concurrently to automatically build Tailwind CSS. You can also use `bin/dev` to launch multiple processes at once. A sample configuration is provided in `Procfile.dev.sample`, which you can customize as needed.
 
-CSS の変更のたびに、ビルドが必要です。したがって開発中は、 Tailwind CSS の自動ビルドのために `bin/rails tailwindcss:watch` を同時に実行しておくと便利です。また、複数のプロセスを同時に起動するために `bin/dev` も利用可能です。雛形として `Procfile.dev.skel` が用意されているので、必要に応じてカスタマイズしてください。
+CSS の変更のたびに、ビルドが必要です。したがって開発中は、 Tailwind CSS の自動ビルドのために `bin/rails tailwindcss:watch` を同時に実行しておくと便利です。また、複数のプロセスを同時に起動するために `bin/dev` も利用可能です。雛形として `Procfile.dev.sample` が用意されているので、必要に応じてカスタマイズしてください。
 
 
 ## 4. Run / 実行

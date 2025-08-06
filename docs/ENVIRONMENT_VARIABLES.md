@@ -8,17 +8,17 @@ If you are using dotenv, please rename one of the sample files and use it as you
 
 | File Name         | Purpose / Description |
 |-------------------|-----------------------|
-| dot.env.development.skel  | Sample for development. No deployment-related environment variables are included. |
-| dot.env.staging.skel      | Intended for building a staging environment. Contains the variables needed for the configuration described in DEPLOY.md and pairs with config/deploy.staging.yml. |
-| dot.env.production.skel   | Intended for production use. It is almost the same as the staging sample, except for the proxy.ssl settings. Use it as a reference. |
+| dot.env.development.sample  | Sample for development. No deployment-related environment variables are included. |
+| dot.env.staging.sample      | Intended for building a staging environment. Contains the variables needed for the configuration described in DEPLOY.md and pairs with config/deploy.staging.yml. |
+| dot.env.production.sample   | Intended for production use. It is almost the same as the staging sample, except for the proxy.ssl settings. Use it as a reference. |
 
 dotenv を利用する場合は、サンプルのファイルを、リネームして利用してください。サンプルの `.env` は、 production / staging / development それぞれの環境用の３つがありますが、いずれも汎用的なものではなく、あくまで雛形です。以降に述べていく各環境変数の説明を確認の上、必要な値を設定してください：
 
 | ファイル名         | 用途・説明 |
 |------------------|-----------|
-| dot.env.development.skel | 開発用のサンプルです。デプロイ用の環境変数はありません。 |
-| dot.env.staging.skel     | ステージング環境の構築用。DEPLOY.mdに記載の構成を実現するために必要な変数を含み、config/deploy.staging.ymlとペアです。|
-| dot.env.production.skel  | 本番環境用のサンプル。ステージング用とほぼ同じですが、proxy.sslの設定が異なります。参考としてご利用ください。 |
+| dot.env.development.sample | 開発用のサンプルです。デプロイ用の環境変数はありません。 |
+| dot.env.staging.sample     | ステージング環境の構築用。DEPLOY.mdに記載の構成を実現するために必要な変数を含み、config/deploy.staging.ymlとペアです。|
+| dot.env.production.sample  | 本番環境用のサンプル。ステージング用とほぼ同じですが、proxy.sslの設定が異なります。参考としてご利用ください。 |
 
 **Important:**
 Many of the environment variables described below contain sensitive information (such as passwords, encryption keys, and API secrets). Never commit them to your repository or share them publicly.
