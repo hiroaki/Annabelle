@@ -13,11 +13,11 @@ proxy:
   ssl: true
   host: <%= ENV.fetch('DEPLOY_PROXY_HOST') %>
   app_port: 3001
-<% if ENV.fetch('DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY').present? %>
+<% if ENV['DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY'].present? %>
   buffering:
     requests: true
     responses: true
-    max_request_body: <%= ENV.fetch('DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY') %>
+    max_request_body: <%= ENV['DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY'] %>
     max_response_body: 0
 <% end %>
 
@@ -46,7 +46,7 @@ env:
     SMTP_ADDRESS: <%= ENV.fetch('SMTP_ADDRESS') %>
     SMTP_PORT: <%= ENV.fetch('SMTP_PORT') %>
     DEVISE_MAILER_SENDER: <%= ENV.fetch('DEVISE_MAILER_SENDER') %>
-    MAX_REQUEST_BODY: <%= ENV.fetch('MAX_REQUEST_BODY') %>
+    MAX_REQUEST_BODY: <%= ENV['MAX_REQUEST_BODY'] %>
   secret:
     - SMTP_USERNAME
     - SMTP_PASSWORD

@@ -39,16 +39,16 @@ Rails.application.configure do
 
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = {
-    host: ENV['APP_HTTP_HOST'] || 'localhost',
-    port: ENV['APP_HTTP_PORT'] || 3000,
-    protocol: ENV['APP_HTTP_PROTOCOL'] || 'http',
+    host: ENV['APP_HTTP_HOST'].presence || 'localhost',
+    port: ENV['APP_HTTP_PORT'].presence || 3000,
+    protocol: ENV['APP_HTTP_PROTOCOL'].presence || 'http',
   }
 
-  #
+  # Specify outgoing SMTP server.
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address:              ENV['SMTP_ADDRESS'] || 'localhost',
-    port:                 ENV['SMTP_PORT'] || 1025,
+    address:              ENV['SMTP_ADDRESS'].presence || 'localhost',
+    port:                 ENV['SMTP_PORT'].presence || 1025,
     domain:               ENV['SMTP_DOMAIN'], # HELO
     user_name:            ENV['SMTP_USERNAME'],
     password:             ENV['SMTP_PASSWORD'],
@@ -94,5 +94,5 @@ Rails.application.configure do
   # フォーム送信時のリクエストサイズ上限（バイト数）。
   # Proxyサーバ側でリクエストサイズ制限がある場合は、必ず同じ値をここにも設定してください。
   # （アプリ側のチェックはユーザー体験向上のための目安であり、実際の制限はProxyで行われます）
-  config.x.max_request_body = ENV.fetch('MAX_REQUEST_BODY', nil).presence
+  config.x.max_request_body = ENV['MAX_REQUEST_BODY'].presence
 end

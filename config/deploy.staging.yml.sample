@@ -10,18 +10,18 @@ servers:
 <% end %>
 
 proxy:
-  # ssl:
-  #   # Kamal supports loading custom SSL certificates directly from secrets.
-  #   # You should pass a hash mapping the certificate_pem and private_key_pem to the secret names.
-  #   certificate_pem: CERTIFICATE_PEM
-  #   private_key_pem: PRIVATE_KEY_PEM
+  ssl:
+    # Kamal supports loading custom SSL certificates directly from secrets.
+    # You should pass a hash mapping the certificate_pem and private_key_pem to the secret names.
+    certificate_pem: DEPLOY_CERTIFICATE_PEM
+    private_key_pem: DEPLOY_PRIVATE_KEY_PEM
   host: <%= ENV.fetch('DEPLOY_PROXY_HOST') %>
   app_port: 3001
-<% if ENV.fetch('DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY').present? %>
+<% if ENV['DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY'].present? %>
   buffering:
     requests: true
     responses: true
-    max_request_body: <%= ENV.fetch('DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY') %>
+    max_request_body: <%= ENV['DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY'] %>
     max_response_body: 0
 <% end %>
 
@@ -44,13 +44,13 @@ env:
   clear:
     RAILS_ENV: staging
     ANNABELLE_VARIANT_PROCESSOR: vips
-    APP_HTTP_HOST: <%= ENV.fetch('APP_HTTP_HOST') %>
-    APP_HTTP_PROTOCOL: <%= ENV.fetch('APP_HTTP_PROTOCOL') %>
-    APP_HTTP_PORT: <%= ENV.fetch('APP_HTTP_PORT') %>
-    SMTP_ADDRESS: <%= ENV.fetch('SMTP_ADDRESS') %>
-    SMTP_PORT: <%= ENV.fetch('SMTP_PORT') %>
-    DEVISE_MAILER_SENDER: <%= ENV.fetch('DEVISE_MAILER_SENDER') %>
-    MAX_REQUEST_BODY: <%= ENV.fetch('MAX_REQUEST_BODY') %>
+    APP_HTTP_HOST: <%= ENV.fetch('APP_HTTP_HOST', 'localhost') %>
+    APP_HTTP_PROTOCOL: <%= ENV.fetch('APP_HTTP_PROTOCOL', 'https') %>
+    APP_HTTP_PORT: <%= ENV.fetch('APP_HTTP_PORT', 443) %>
+    SMTP_ADDRESS: <%= ENV.fetch('SMTP_ADDRESS', 'annabelle-mailcatcher') %>
+    SMTP_PORT: <%= ENV.fetch('SMTP_PORT', 1025) %>
+    DEVISE_MAILER_SENDER: <%= ENV.fetch('DEVISE_MAILER_SENDER', 'admin@localhost') %>
+    MAX_REQUEST_BODY: <%= ENV['MAX_REQUEST_BODY'] %>
   secret:
     - ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
     - ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
@@ -77,8 +77,7 @@ accessories:
   mailcatcher:
     service: smtp
     image: sj26/mailcatcher:v0.10.0
-    host: <%= ENV.fetch('SMTP_ADDRESS') %>
+    host: <%= ENV.fetch('DEPLOY_ACCESSORIES_MAILCATCHER_HOST') %>
     options:
       publish:
-        - "<%= ENV.fetch('SMTP_PORT') %>:1025"
         - "1080:1080"
