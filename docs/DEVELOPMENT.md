@@ -1,11 +1,68 @@
 # Development Environment / 開発環境の構築
 
-If you want to develop based on this project, please clone the repository and set up your environment as follows.
+You can set up the development environment in two ways:
 
-このプロジェクトをベースに開発する場合は、リポジトリをクローンし、以下のようにして環境を構築してください。
+- (A) Using Docker Compose (recommended if you have Docker installed)
+- (B) Without Docker (for environments where Docker is not available)
 
+After cloning the repository, please choose one of the following methods to set up your environment.
 
-## 1. Preparing DB / データベースのセットアップ
+このプロジェクトをベースに開発する場合は、リポジトリをクローンした後、次のいずれかの方法で環境を構築してください。
+
+- (A) Docker Compose で構築する
+- (B) Docker を使わずに構築する
+
+## (A) Using Docker Compose / Docker Compose で構築する
+
+With the Compose settings, the current directory on the host is mounted as the top-level application directory inside the container. This means that any changes made to the source code on the host are immediately reflected in the application running inside the container.
+
+Compose の設定によって、カレント・ディレクトリがコンテナ内のアプリのトップ・ディレクトリにマウントされるようになります。これによりホスト上のソースの変更が即座にコンテナ内のサーバに反映されるようになっています。
+
+### A-1. Build and start the container / ビルド、コンテナ起動
+
+This will start the Rails console inside the container, which is just to keep the container running.
+The Rails server will NOT start automatically, so please operate inside the container as described below.
+
+これによりコンテナ内で Rails コンソールが起動しますが、これはコンテナを維持するためだけのものです。
+Rails サーバーは起動しませんので、その後に述べるようにコンテナ内で操作してください。
+
+```
+$ docker compose up --build
+```
+
+### A-2. In another terminal, enter the container / 別ターミナルでコンテナ内にはいる
+
+```
+$ docker compose exec web bash
+```
+
+### A-3. Run rails commands inside the container / コンテナ内で rails コマンドを実行
+
+実行に必要な設定は環境変数から設定します。起動の前に設定してください。最低限の設定内容はビルド時に設定されています。詳しくは [/docs/ENVIRONMENT_VARIABLES.md](/docs/ENVIRONMENT_VARIABLES.md) を参照してください。
+
+```
+# Start the server
+> bin/rails s -b 0.0.0.0 -p 3000
+```
+
+```
+# Run migrations or other Rails commands
+> bin/rails db:migrate
+```
+
+### A-4. Access from your browser on the host / ホスト上のブラウザでアクセス
+
+```
+# Application
+http://127.0.0.1:3000/
+
+# MailCatcher Web UI
+http://127.0.0.1:1080/
+```
+
+## (B) Without Docker / Docker を使わずに構築する
+
+### B-1. Preparing DB / データベースのセットアップ
 
 First, run the database migrations and seed the database:
 
@@ -15,45 +72,13 @@ First, run the database migrations and seed the database:
 $ bin/rails db:prepare
 ```
 
-This process will create an administrator user in the `users` table. Please change the administrator's password as follows:
-
-この処理で `users` テーブルに管理者ユーザが作成されます。管理者ユーザのパスワードは次の手順で変更してください：
-
-```
-$ bin/rails c
-> user = User.admin_user
-> user.password = 'YOU MUST CHANGE THIS!'
-> user.save!
-```
-
-Note: Please do not change any values other than the password in the current version.
-
-注意：現時点ではパスワード以外の値は変更しないでください。
-
-
-## 2. Environment Variables / 環境変数
+### B-2. Environment Variables / 環境変数
 
 Set the necessary environment variables to run the application.
 
 アプリケーションを動作させるために、 [/docs/ENVIRONMENT_VARIABLES.md](/docs/ENVIRONMENT_VARIABLES.md) に記載されている環境変数を設定してください。
 
-
-## 3. Build Tailwind CSS / Tailwind CSS のビルド
-
-This project uses Tailwind for CSS. You need to build the CSS files with the following command:
-
-このプロジェクトの CSS には Tailwind を使用しています。 CSS ファイルのビルドが必要なため、次のコマンドを実行してください：
-
-```
-$ bin/rails tailwindcss:build
-```
-
-Whenever you make changes to the CSS, you need to rebuild it. Therefore, during development, it is convenient to run `bin/rails tailwindcss:watch` concurrently to automatically build Tailwind CSS. You can also use `bin/dev` to launch multiple processes at once. A sample configuration is provided in `Procfile.dev.sample`, which you can customize as needed.
-
-CSS の変更のたびに、ビルドが必要です。したがって開発中は、 Tailwind CSS の自動ビルドのために `bin/rails tailwindcss:watch` を同時に実行しておくと便利です。また、複数のプロセスを同時に起動するために `bin/dev` も利用可能です。雛形として `Procfile.dev.sample` が用意されているので、必要に応じてカスタマイズしてください。
-
-
-## 4. Run / 実行
+### B-3. Run / 実行
 
 Once everything is configured, start the web server by running.
 
@@ -67,6 +92,38 @@ Then, access the homepage via your browser.
 
 その後、ブラウザでトップページにアクセスします。
 
+## Change Admin Password / 管理者ユーザのパスワード変更
+
+When initializing the database, a seed process will create an administrator user in the `users` table. Please change the administrator user's password using the Rails console or a similar method:
+
+データベース初期化時、 seed データの投入により `users` テーブルに管理者ユーザが作成されます。管理者ユーザのパスワードは Rails コンソールなどから変更してください：
+
+```
+$ bin/rails c
+> user = User.admin_user
+> user.password = 'YOU MUST CHANGE THIS!'
+> user.save!
+```
+
+Note: Please do not change any values other than the password in the current version.
+
+注意：現時点ではパスワード以外の値は変更しないでください。
+
+## Build Tailwind CSS / Tailwind CSS のビルド
+
+This project uses Tailwind for CSS. You need to build the CSS files with the following command before starting the server for the first time:
+
+このプロジェクトの CSS には Tailwind を使用しています。 CSS ファイルのビルドが必要なため、サーバーの最初の起動の前に、いちど次のコマンドを実行してください：
+
+```
+$ bin/rails tailwindcss:build
+```
+
+Whenever you make changes to the CSS, you need to rebuild it. Therefore, during development, it is convenient to run `bin/rails tailwindcss:watch` concurrently for automatic Tailwind CSS builds. You can also use `bin/dev` to launch multiple processes at once. A sample configuration is provided in `Procfile.dev.sample`, which you can customize as needed.
+
+そして、 CSS の変更のたびに、ビルドが必要です。したがって開発中は、 Tailwind CSS の自動ビルドのために `bin/rails tailwindcss:watch` を同時に実行しておくと便利です。また、複数のプロセスを同時に起動するために `bin/dev` も利用可能です。雛形として `Procfile.dev.sample` が用意されているので、必要に応じてカスタマイズしてください。
+
+-----
 
 # Customization Guide / カスタマイズ・ガイド
 
@@ -264,10 +321,3 @@ $ HEADLESS=0 SLOWMO=0.5 bin/rspec ./spec/system/something_spec.rb:123
 This idea was inspired by [Upgrading from Selenium to Cuprite](https://janko.io/upgrading-from-selenium-to-cuprite/). Thank you.
 
 このアイデアは [Rails: SeleniumをCupriteにアップグレードする（翻訳）](https://techracho.bpsinc.jp/hachi8833/2023_10_16/133982) から頂きました。ありがとうございます。
-
-
-# Docker Environment / Docker 環境
-
-Docker environment is also available for testing purposes. See [/docker/README.md](/docker/README.md) for details.
-
-テストを実施するための用途限定で、 Docker 環境での構築をサポートしています。 [/docker/README.md](/docker/README.md) を参照してください。
