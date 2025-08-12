@@ -32,7 +32,7 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
+  # config.action_mailer.raise_delivery_errors = false
 
   # Make template changes take effect immediately.
   config.action_mailer.perform_caching = false
@@ -45,13 +45,15 @@ Rails.application.configure do
   }
 
   # Specify outgoing SMTP server.
+  # NOTE: user_name に空文字を渡すのと、nil を渡すのとでは挙動が異なります。
+  # nil では ArgumentError (SMTP-AUTH requested but missing user name) 例外になります。
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     address:              ENV['SMTP_ADDRESS'].presence || 'localhost',
     port:                 ENV['SMTP_PORT'].presence || 1025,
-    domain:               ENV['SMTP_DOMAIN'], # HELO
-    user_name:            ENV['SMTP_USERNAME'],
-    password:             ENV['SMTP_PASSWORD'],
+    domain:               ENV['SMTP_DOMAIN'].presence || '',
+    user_name:            ENV['SMTP_USERNAME'].presence || '',
+    password:             ENV['SMTP_PASSWORD'].presence || '',
     authentication:       :plain,
     enable_starttls_auto: true
   }
