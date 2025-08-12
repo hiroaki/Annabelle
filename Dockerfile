@@ -6,12 +6,13 @@
 # # ステージング環境
 # $ docker build --build-arg RAILS_ENV=staging -t annabelle-staging:latest .
 #
+# # 開発環境
+# $ docker build --build-arg RAILS_ENV=development -t annabelle-development:latest .
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
 ARG RUBY_VERSION=3.4.4
 
-# RAILS_ENVを必須のARGとして定義（デフォルト値なし）
-ARG RAILS_ENV
+ARG RAILS_ENV=production
 
 FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim AS base
 
@@ -22,9 +23,7 @@ ARG RAILS_ENV
 WORKDIR /rails
 
 # Set environment with flexibility for staging/production
-ENV BUNDLE_DEPLOYMENT="1" \
-    BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development:test" \
+ENV BUNDLE_PATH="/usr/local/bundle" \
     RAILS_ENV=$RAILS_ENV
 
 # Throw-away build stage to reduce size of final image
@@ -44,7 +43,14 @@ RUN apt-get update -qq && \
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
-RUN bundle install && \
+RUN if [ "$RAILS_ENV" = "development" ]; then \
+      bundle config unset --local without; \
+      bundle install; \
+    else \
+      bundle config set --local without 'development test'; \
+      bundle config set deployment true; \
+      bundle install; \
+    fi && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
 
@@ -55,7 +61,11 @@ COPY . .
 RUN bundle exec bootsnap precompile -j 0 --gemfile app/ lib/ config/
 
 # Precompiling assets without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+RUN if [ "$RAILS_ENV" != "development" ]; then \
+      SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile; \
+    else \
+      echo "Skip assets:precompile in development"; \
+    fi
 
 # Final stage for app image
 FROM base
