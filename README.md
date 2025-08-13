@@ -38,13 +38,13 @@ An additional option for user authentication is available: two-factor authentica
 
 ユーザ認証に追加のオプションで、タイムベースのワンタイムパスワード (TOTP) による二要素認証 (2FA) が利用できます。
 
-This implementation was based on an article by James Ridgway, which was extremely helpful. Thank you.
+This implementation is based on an article by James Ridgway, which was extremely helpful. Thank you.
 
 なおこの実装にあたっては James Ridgway 氏による記事が大変参考になりました。ありがとうございます。
 
 [Implementing OTP two-factor authentication as a second login step with Rails and Devise](https://www.jamesridgway.co.uk/implementing-a-two-step-otp-u2f-login-workflow-with-rails-and-devise/)
 
-### Bacic Authentication / Basic 認証
+### Basic Authentication / Basic 認証
 
 In addition to user authentication, Basic Authentication can also be enabled. While user authentication allows registered users to access the site, enabling Basic Authentication provides an extra layer of access control for the entire site.
 
@@ -62,7 +62,7 @@ For better compatibility with older operating systems and environments, ImageMag
 
 そのバックエンドには古い OS や環境との互換性向上のため、デフォルトで ImageMagick を選択していますので、 ImageMagick がインストールされている必要があります。ただし、 libvips を利用できる場合は ImageMagick の代わりにそれをインストールし、利用することができます。
 
-#### Video Processing / 動画処理
+### Video Processing / 動画処理
 
 To generate previews (thumbnails) or perform transcoding for video files uploaded via Active Storage, you must have `ffmpeg` installed on your system.
 
@@ -82,9 +82,9 @@ For testing, this project uses the cuprite (gem) as the driver for Capybara. The
 
 ### Database / データベース
 
-This project uses SQLite3 as its database.
+This project uses SQLite3 as its database. No separate database server process is required.
 
-本プロジェクトは、データベースとして SQLite3 を使用します。
+本プロジェクトは、データベースとして SQLite3 を使用します。データベース専用のプロセスは不要です。
 
 ### GitHub Account / GitHub アカウント
 
@@ -96,9 +96,13 @@ GitHub OAuth 認証を利用する場合は、プロジェクト用の GitHub OA
 
 ### Development Environment / 開発環境の構築
 
-See [/docs/DEVELOPMENT.md](/docs/DEVELOPMENT.md)
+See [/docs/DEVELOPMENT.md](/docs/DEVELOPMENT.md). If you have Docker Compose available, you can start the development environment simply by building:
 
-[/docs/DEVELOPMENT.md](/docs/DEVELOPMENT.md) を参照してください。
+[/docs/DEVELOPMENT.md](/docs/DEVELOPMENT.md) を参照してください。 Docker Compose が利用できるのであれば、ビルドするだけです：
+
+```
+$ docker compose up --build
+```
 
 ### Staging Environment / ステージング環境の構築
 
