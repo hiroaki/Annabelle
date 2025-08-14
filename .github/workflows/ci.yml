@@ -68,7 +68,17 @@ jobs:
           name: coverage-report
           path: coverage/
 
+      - name: Check Coveralls availability
+        id: coveralls_check
+        run: |
+          if curl -sSf https://coveralls.io > /dev/null; then
+            echo "available=true" >> $GITHUB_OUTPUT
+          else
+            echo "available=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Coveralls GitHub Action
+        if: steps.coveralls_check.outputs.available == 'true'
         uses: coverallsapp/github-action@v2.3.6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
