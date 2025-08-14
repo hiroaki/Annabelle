@@ -13,7 +13,7 @@ RSpec.describe 'TwoFactorSettings', type: :system do
       it 'redirects to sign in page' do
         visit new_two_factor_settings_path
         expect(page).to have_current_path(new_user_session_path)
-        expect(page).to have_content('Sign in')
+        expect(page).to have_content('Log in')
       end
     end
 
@@ -53,7 +53,7 @@ RSpec.describe 'TwoFactorSettings', type: :system do
       it 'redirects to sign in page' do
         visit edit_two_factor_settings_path
         expect(page).to have_current_path(new_user_session_path)
-        expect(page).to have_content('Sign in')
+        expect(page).to have_content('Log in')
       end
     end
 
@@ -138,7 +138,7 @@ RSpec.describe 'TwoFactorSettings', type: :system do
         it 'enables 2FA and redirects to edit with notice' do
           fill_in 'Code', with: totp.now
           find('[data-testid="confirm-and-enable-two-factor"]').click
-          expect(page).to have_selector('[data-testid="two-factor-enabled-message"]')
+          expect(page).to have_selector('[data-testid="devise-sessions-two_factor_settings-title-title"]')
           expect(page).to have_selector('[data-testid="backup-codes-title"]')
           expect(page).to have_content('Successfully enabled two factor authentication')
         end

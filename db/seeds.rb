@@ -9,10 +9,17 @@
 #   end
 
 unless User.exists?(email: 'admin@localhost', admin: true)
+  password =
+    if Rails.env.production?
+      SecureRandom.urlsafe_base64(16)
+    else
+      'YOU MUST CHANGE THIS'
+    end
+
   User.create!(
     email: 'admin@localhost',
     username: 'adminuser',
-    password: 'YOU MUST CHANGE THIS',
+    password: password,
     admin: true,
     confirmed_at: Time.current
   )

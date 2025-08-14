@@ -58,27 +58,19 @@ Rails.application.configure do
 
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = {
-    host: ENV['APP_HTTP_HOST'] || 'localhost',
-    port: ENV['APP_HTTP_PORT'] || 3000,
-    protocol: ENV['APP_HTTP_PROTOCOL'] || 'http',
+    host: ENV['APP_HTTP_HOST'].presence || 'localhost',
+    port: ENV['APP_HTTP_PORT'].presence || 3000,
+    protocol: ENV['APP_HTTP_PROTOCOL'].presence || 'http',
   }
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
-  #
+  # Specify outgoing SMTP server.
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address:              ENV['SMTP_ADDRESS'] || 'localhost',
-    port:                 ENV['SMTP_PORT'] || 587,
-    domain:               ENV['SMTP_DOMAIN'], # HELO
-    user_name:            ENV['SMTP_USERNAME'],
-    password:             ENV['SMTP_PASSWORD'],
+    address:              ENV['SMTP_ADDRESS'].presence || 'localhost',
+    port:                 ENV['SMTP_PORT'].presence || 587,
+    domain:               ENV['SMTP_DOMAIN'].presence || '',
+    user_name:            ENV['SMTP_USERNAME'].presence || '',
+    password:             ENV['SMTP_PASSWORD'].presence || '',
     authentication:       :plain,
     enable_starttls_auto: true
   }
@@ -101,4 +93,12 @@ Rails.application.configure do
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+
+  # Maximum request body size (in bytes) for form submissions.
+  # If your proxy server enforces a request size limit, be sure to set the same value here.
+  # (The check on the app side is only for user experience; the actual enforcement is done by the proxy.)
+  # フォーム送信時のリクエストサイズ上限（バイト数）。
+  # Proxyサーバ側でリクエストサイズ制限がある場合は、必ず同じ値をここにも設定してください。
+  # （アプリ側のチェックはユーザー体験向上のための目安であり、実際の制限はProxyで行われます）
+  config.x.max_request_body = ENV['MAX_REQUEST_BODY'].presence
 end

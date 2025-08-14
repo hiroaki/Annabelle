@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'OAuth Language Processing', type: :system, js: true do
+RSpec.describe 'OAuth Language Processing', type: :system, js: true, oauth_github_required: true do
   include OmniauthMacros
 
   before do

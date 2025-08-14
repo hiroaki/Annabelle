@@ -80,4 +80,28 @@ RSpec.describe 'User registration', type: :system do
       expect_error_message(User, :email, :blank)
     end
   end
+
+  context '言語スイッチャーの動作' do
+    it 'バリデーションエラー時でも正しく動作すること' do
+      visit new_user_registration_path
+
+      # バリデーションエラーを発生させる
+      find('[data-testid="signup-submit"]').click
+
+      # エラーメッセージが表示される
+      expect(page).to have_content("can't be blank")
+
+      # 言語スイッチャーが表示されていることを確認
+      expect(page).to have_link('日本語')
+
+      # 言語を切り替え
+      click_link '日本語'
+
+      # 正しいパスにリダイレクトされる（404にならない）
+      expect(page).to have_current_path('/ja/users/sign_up')
+      # 登録画面特有の要素が表示されることを確認
+      expect(page).to have_selector('[data-testid="signup-title"]')
+      expect(page).to have_selector('[data-testid="signup-submit"]')
+    end
+  end
 end

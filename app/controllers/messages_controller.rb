@@ -13,8 +13,8 @@ class MessagesController < ApplicationController
   rescue => ex
     flash.now.alert = I18n.t("messages.errors.generic", error_message: ex.message)
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.replace('flash-message-container', partial: 'shared/flash') }
-      format.html { render :index, status: :unprocessable_entity }
+      format.turbo_stream { render turbo_stream: turbo_stream.update('flash-storage', partial: 'shared/flash_storage') }
+      format.html { render :index, status: :unprocessable_content }
     end
   end
 
@@ -25,16 +25,16 @@ class MessagesController < ApplicationController
     set_messages
     respond_to do |format|
       format.turbo_stream {
-        render turbo_stream: turbo_stream.replace('flash-message-container', partial: 'shared/flash')
+        render turbo_stream: turbo_stream.update('flash-storage', partial: 'shared/flash_storage')
       }
-      format.html { render :index, status: :unprocessable_entity }
+      format.html { render :index, status: :unprocessable_content }
     end
   rescue => ex
     flash.now.alert = I18n.t("messages.errors.generic", error_message: ex.message)
     set_messages
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.replace('flash-message-container', partial: 'shared/flash') }
-      format.html { render :index, status: :unprocessable_entity }
+      format.turbo_stream { render turbo_stream: turbo_stream.update('flash-storage', partial: 'shared/flash_storage') }
+      format.html { render :index, status: :unprocessable_content }
     end
   end
 

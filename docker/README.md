@@ -1,3 +1,10 @@
+Note: This document and related files (files in the docker directory) are scheduled for deletion.
+For Docker environment setup, please use the Dockerfile located in the top-level directory.
+
+注意：この文書および関係ファイル（ /docker ディレクトリ内のファイル）は削除予定です。 Docker 環境の構築についてはトップ・ディレクトリにある Dockerfile を使用してください。
+
+-----
+
 # Dockerfile.vips
 
 ## Purpose / 作成意図

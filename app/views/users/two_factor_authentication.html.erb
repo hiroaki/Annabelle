@@ -1,4 +1,5 @@
 <%= users_frame('users.two_factor_authentication.title') do %>
+
   <% if current_user.otp_required_for_login %>
     <div class="mb-4">
       <p class="text-sm text-gray-700 mb-2">

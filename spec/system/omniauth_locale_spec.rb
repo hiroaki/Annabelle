@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Omniauth OAuth locale handling', type: :system do
+RSpec.describe 'Omniauth OAuth locale handling', type: :system, oauth_github_required: true do
   let(:user) { create(:user, :confirmed, preferred_language: 'ja') }
 
   before do

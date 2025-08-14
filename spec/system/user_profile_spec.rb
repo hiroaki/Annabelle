@@ -147,4 +147,29 @@ RSpec.describe 'User profile editing', type: :system do
       expect(user.reload.preferred_language).to eq('en')
     end
   end
+
+  describe 'Language switcher during validation errors' do
+    it 'works correctly when profile update fails' do
+      visit edit_profile_path
+
+      # バリデーションエラーを発生させる
+      fill_in 'Username', with: ''
+      click_button 'Update'
+
+      # エラーメッセージが表示される
+      expect(page).to have_content("Username can't be blank")
+
+      # 言語スイッチャーが表示されていることを確認
+      expect(page).to have_link('日本語')
+
+      # 言語を切り替え
+      click_link '日本語'
+
+      # 正しいパスにリダイレクトされる（404にならない）
+      expect(page).to have_current_path('/ja/profile/edit')
+      # プロフィール編集画面特有の要素が表示されることを確認
+      expect(page).to have_selector("[data-testid='account-preferred-language']")
+      expect(page).to have_field('ユーザー名')
+    end
+  end
 end

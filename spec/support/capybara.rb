@@ -46,7 +46,7 @@ end
 # Capybara 設定
 Capybara.configure do |config|
   config.test_id = 'data-testid'
-  config.default_max_wait_time = 10
+  config.default_max_wait_time = 2
   config.default_normalize_ws = true
 
   if ENV['DOCKER'].present?

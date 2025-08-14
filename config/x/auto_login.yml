@@ -15,3 +15,6 @@ test:
 
 production:
   enabled: false
+
+staging:
+  enabled: false

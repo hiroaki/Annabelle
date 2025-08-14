@@ -1,0 +1,8 @@
+# The kamal command requires the destination option.
+# Please configure deployment settings for production and staging in their respective files.
+# This file defines the common settings for both environments.
+#
+# kamal コマンドでは destination オプションを必須とします。
+# production および staging のデプロイ設定をそれぞれのファイルに設定してください。
+# このファイルは双方の共通部分を定義します。
+require_destination: true
