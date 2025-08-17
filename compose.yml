@@ -80,8 +80,11 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - .:/rails
       - bundle:/usr/local/bundle
+      - .:/rails
+      - tmp:/rails/tmp
+      - log:/rails/log
+      - storage:/rails/storage
     tty: true
     stdin_open: true
     depends_on:
@@ -95,3 +98,6 @@ services:
 
 volumes:
   bundle:
+  tmp:
+  log:
+  storage:
