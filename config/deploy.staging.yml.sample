@@ -11,8 +11,6 @@ servers:
 
 proxy:
   ssl:
-    # Kamal supports loading custom SSL certificates directly from secrets.
-    # You should pass a hash mapping the certificate_pem and private_key_pem to the secret names.
     certificate_pem: DEPLOY_CERTIFICATE_PEM
     private_key_pem: DEPLOY_PRIVATE_KEY_PEM
   host: <%= ENV.fetch('DEPLOY_PROXY_HOST') %>
