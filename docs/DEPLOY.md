@@ -194,9 +194,17 @@ For details on application and deployment environment variables, see [/docs/ENVI
 
 ## Running the Deployment / デプロイの実行
 
-After setting the environment variables in your shell, deploy with the following command:
+After setting the environment variables in your shell, proceed with deployment. For the initial deployment, deploy the accessory first, then deploy the main application:
 
-シェルに環境変数をセットしたのち、次のコマンドでデプロイします。
+シェルに環境変数をセットしたのち、デプロイします。最初のデプロイ時にはアクセサリを先にデプロイします：
+
+```
+$ bundle exec kamal accessory boot mailcatcher --destination=staging
+```
+
+Next, deploy the main application:
+
+次にアプリ本体をデプロイします：
 
 ```
 $ bundle exec kamal deploy --destination=staging
@@ -207,6 +215,7 @@ If you are using dotenv, you can specify the `.env.staging` file as follows:
 dotenv を使って環境変数を設定しながら実行する場合は、ファイル `.env.staging` を指定しながら実行します：
 
 ```
+$ dotenv -f .env.staging bundle exec kamal accessory boot mailcatcher --destination=staging
 $ dotenv -f .env.staging bundle exec kamal deploy --destination=staging
 ```
 
