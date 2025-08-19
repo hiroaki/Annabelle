@@ -11,8 +11,6 @@ servers:
 
 proxy:
   ssl:
-    # Kamal supports loading custom SSL certificates directly from secrets.
-    # You should pass a hash mapping the certificate_pem and private_key_pem to the secret names.
     certificate_pem: DEPLOY_CERTIFICATE_PEM
     private_key_pem: DEPLOY_PRIVATE_KEY_PEM
   host: <%= ENV.fetch('DEPLOY_PROXY_HOST') %>
@@ -47,10 +45,11 @@ env:
     APP_HTTP_HOST: <%= ENV.fetch('APP_HTTP_HOST', 'localhost') %>
     APP_HTTP_PROTOCOL: <%= ENV.fetch('APP_HTTP_PROTOCOL', 'https') %>
     APP_HTTP_PORT: <%= ENV.fetch('APP_HTTP_PORT', 443) %>
-    SMTP_ADDRESS: <%= ENV.fetch('SMTP_ADDRESS', 'annabelle-mailcatcher') %>
+    SMTP_ADDRESS: <%= ENV.fetch('SMTP_ADDRESS', 'smtp') %>
     SMTP_PORT: <%= ENV.fetch('SMTP_PORT', 1025) %>
     DEVISE_MAILER_SENDER: <%= ENV.fetch('DEVISE_MAILER_SENDER', 'admin@localhost') %>
-    MAX_REQUEST_BODY: <%= ENV['MAX_REQUEST_BODY'] %>
+    MAX_REQUEST_BODY: <%= ENV.fetch('MAX_REQUEST_BODY', '""') %>
+    ANNABELLE_MAGIC_NUMBER: <%= ENV.fetch('ANNABELLE_MAGIC_NUMBER', '""') %>
   secret:
     - ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
     - ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
