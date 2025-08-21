@@ -32,7 +32,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq && \
   DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
   build-essential \
   git \
-  libvips \
+  libvips-dev \
   pkg-config \
   libyaml-dev \
   libsqlite3-dev \
