@@ -1,5 +1,3 @@
-# syntax = docker/dockerfile:1
-
 # # 本番環境
 # $ docker build --build-arg RAILS_ENV=production -t annabelle-production:latest .
 #
