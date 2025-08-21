@@ -1,5 +1,3 @@
-# syntax = docker/dockerfile:1
-
 # # 本番環境
 # $ docker build --build-arg RAILS_ENV=production -t annabelle-production:latest .
 #
@@ -30,16 +28,14 @@ ENV BUNDLE_PATH="/usr/local/bundle" \
 FROM base AS build
 
 # Install packages needed to build gems and run the application
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y \
-    build-essential \
-    git \
-    libvips \
-    pkg-config \
-    libyaml-dev \
-    libsqlite3-dev \
-    tzdata \
-    ffmpeg
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
+  && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+  build-essential \
+  pkg-config \
+  libyaml-dev \
+  libsqlite3-dev \
+  tzdata \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
@@ -71,14 +67,14 @@ RUN if [ "$RAILS_ENV" != "development" ]; then \
 FROM base
 
 # Install packages needed for deployment
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y \
-    curl \
-    libsqlite3-0 \
-    libvips \
-    tzdata \
-    ffmpeg && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
+  && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+  curl \
+  libsqlite3-0 \
+  libvips \
+  tzdata \
+  ffmpeg \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy built artifacts: gems, application
 COPY --from=build /usr/local/bundle /usr/local/bundle
