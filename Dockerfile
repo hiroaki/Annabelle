@@ -31,13 +31,10 @@ FROM base AS build
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq && \
   DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
   build-essential \
-  git \
-  libvips-dev \
   pkg-config \
   libyaml-dev \
   libsqlite3-dev \
-  tzdata \
-  ffmpeg && \
+  tzdata && \
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install application gems
