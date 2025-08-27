@@ -46,7 +46,8 @@ env:
     SMTP_ADDRESS: <%= ENV.fetch('SMTP_ADDRESS') %>
     SMTP_PORT: <%= ENV.fetch('SMTP_PORT') %>
     DEVISE_MAILER_SENDER: <%= ENV.fetch('DEVISE_MAILER_SENDER') %>
-    MAX_REQUEST_BODY: <%= ENV['MAX_REQUEST_BODY'] %>
+    MAX_REQUEST_BODY: <%= ENV.fetch('MAX_REQUEST_BODY', '""') %>
+    ANNABELLE_MAGIC_NUMBER: <%= ENV.fetch('ANNABELLE_MAGIC_NUMBER', '""') %>
   secret:
     - SMTP_USERNAME
     - SMTP_PASSWORD

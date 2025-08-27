@@ -1,4 +1,4 @@
-[![Coverage Status](https://coveralls.io/repos/github/hiroaki/Annabelle/badge.svg?branch=develop)](https://coveralls.io/github/hiroaki/Annabelle?branch=develop)
+![Coveralls](https://img.shields.io/coverallsCoverage/github/hiroaki/Annabelle?branch=develop)
 
 # Annabelle / アナベル
 

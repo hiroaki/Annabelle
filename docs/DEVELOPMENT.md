@@ -38,7 +38,21 @@ $ docker compose exec web bash
 
 ### A-3. Run rails commands inside the container / コンテナ内で rails コマンドを実行
 
+Before running the application, make sure to set the required environment variables. Most essential settings are already configured at build time, but please refer to [/docs/ENVIRONMENT_VARIABLES.md](/docs/ENVIRONMENT_VARIABLES.md) for details.
+
 実行に必要な設定は環境変数から設定します。起動の前に設定してください。最低限の設定内容はビルド時に設定されています。詳しくは [/docs/ENVIRONMENT_VARIABLES.md](/docs/ENVIRONMENT_VARIABLES.md) を参照してください。
+
+On the first run, set up the database manually as follows:
+
+初回は、データベースのセットアップを行ってください。
+
+```
+> bin/rails db:prepare
+```
+
+Depending on your development needs, you can run any Rails command inside the container, such as starting the server or running migrations.
+
+開発状況に応じて、サーバーの起動やマイグレーションなど、任意の rails コマンドをコンテナ内で実行します。
 
 ```
 # Start the server

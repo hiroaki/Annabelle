@@ -39,16 +39,16 @@ jobs:
 
       - name: Install Google Chrome
         run: |
-          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
+          wget -O- https://dl.google.com/linux/linux_signing_key.pub | \
+            gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome.gpg > /dev/null
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | \
+            sudo tee /etc/apt/sources.list.d/google-chrome.list
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
 
       - name: Set up database
         run: |
-          bin/rails db:create
-          bin/rails db:schema:load
-          bin/rails db:seed
+          bin/rails db:prepare
 
       - name: Precompile assets
         run: bin/rails assets:precompile
@@ -68,7 +68,17 @@ jobs:
           name: coverage-report
           path: coverage/
 
+      - name: Check Coveralls availability
+        id: coveralls_check
+        run: |
+          if curl -sSf https://coveralls.io > /dev/null; then
+            echo "available=true" >> $GITHUB_OUTPUT
+          else
+            echo "available=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Coveralls GitHub Action
+        if: steps.coveralls_check.outputs.available == 'true'
         uses: coverallsapp/github-action@v2.3.6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
