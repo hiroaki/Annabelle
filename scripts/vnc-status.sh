@@ -2,33 +2,22 @@
 set -euo pipefail
 
 # vnc-status.sh
-# Quick status for Xvfb/x11vnc/Fluxbox and related artifacts.
-
-VNC_DISPLAY="${VNC_DISPLAY:-:1}"
-DISPLAY_NUM="${VNC_DISPLAY#:}"
+VNC_DISPLAY_NUMBER="${VNC_DISPLAY_NUMBER:-1}"
 USER_HOME="${HOME:-/home/rails}"
 
-echo "== Processes =="
-pgrep -a Xvfb || echo "(no Xvfb)"
-pgrep -a x11vnc || echo "(no x11vnc)"
+echo "== vncserver sessions =="
+vncserver -list || echo "(no vncserver sessions)"
+
+echo
+echo "== Processes related to vnc/Xvnc/fluxbox =="
+pgrep -a Xvnc || echo "(no Xvnc)"
+pgrep -a vnc || true
 pgrep -a fluxbox || echo "(no fluxbox)"
 
 echo
-echo "== Sockets/locks =="
-ls -l "/tmp/.X${DISPLAY_NUM}-lock" 2>/dev/null || echo "/tmp/.X${DISPLAY_NUM}-lock (absent)"
-ls -l "/tmp/.X11-unix/X${DISPLAY_NUM}" 2>/dev/null || echo "/tmp/.X11-unix/X${DISPLAY_NUM} (absent)"
+echo "== xstartup log (if any) =="
+ls -l "${USER_HOME}/.vnc" 2>/dev/null || true
+tail -n 80 "${USER_HOME}/.vnc/$(hostname):${VNC_DISPLAY_NUMBER}.log" 2>/dev/null || true
 
 echo
-echo "== x11vnc log (tail) =="
-tail -n 80 "${USER_HOME}/.vnc/x11vnc.log" 2>/dev/null || echo "(no log)"
-
-echo
-if command -v ss >/dev/null 2>&1; then
-  echo "== Listening ports (grep 5901) =="
-  ss -ltnp | grep 5901 || echo "(no listener on 5901)"
-else
-  echo "(tip) 'ss' not found; to check listener: nc -vz 127.0.0.1 5901 (from host)"
-fi
-
-echo
-echo "Hint: connect with a VNC viewer to 127.0.0.1:5901 (or host:1)."
+echo "Hint: connect with a TigerVNC client to 127.0.0.1:$((${VNC_DISPLAY_NUMBER} + 5900))."
