@@ -52,11 +52,7 @@ services:
 $ docker compose exec --user root web bash -lc \
   "/bin/bash /rails/scripts/install_chromium_vnc.sh"
 
-(Host) Make the helper scripts executable so they can be run inside the container without additional chmod steps:
-
-```bash
-chmod +x scripts/install_chromium_vnc.sh scripts/vnc-start.sh scripts/vnc-stop.sh scripts/vnc-status.sh
-```
+Note: the installer will also ensure a usable `vncpasswd` tool is available (it calls a small helper that creates a wrapper using `x11vnc -storepasswd` when necessary). You can invoke the helper scripts directly via `/bin/bash /rails/scripts/<name>.sh`.
 ```
 
 このスクリプトは以下を実施します：
@@ -85,6 +81,15 @@ docker compose exec web bash -lc \
 ```
 docker compose exec web bash -lc "/bin/bash /rails/scripts/vnc-stop.sh"
 ```
+
+注意事項（xstartup の管理）:
+
+- `vnc-start.sh` はリポジトリ内の `scripts/xstartup.template` を `~/.vnc/xstartup` にコピーして起動します。テンプレートが存在しない場合、起動は失敗します。
+- テンプレートを編集すれば起動時のデスクトップ構成をカスタマイズできます。
+
+ログの参照／デバッグ:
+
+- `vnc-start.sh` はサーバをバックグラウンド起動して終了します。ログを追いたい場合は別端末で `docker compose exec web bash -lc "/bin/bash /rails/scripts/vnc-status.sh"` を実行するか、直接 `tail -f /home/rails/.vnc/$(hostname):1.log` のように参照してください。
 
 ---
 
@@ -130,8 +135,19 @@ $ docker compose exec web bash -lc "export DISPLAY=:1 HEADLESS=0; bundle exec rs
   - `docker compose exec --user root web bash -lc "apt-get update"` を再実行後、インストールスクリプトをやり直す。
   - 依存パッケージ（`libnss3` など）は `chromium` で自動導入されます。
 
--- 画面が真っ黒のまま
+- 画面が真っ黒のまま
   - `fluxbox` と `chromium` が存在するか確認。`/rails/scripts/vnc-start.sh` を手動で実行して起動します。
+
+- passwd ファイルが 0 バイトになっている / 認証エラーが出る場合
+
+  簡潔な対処: インストールスクリプトを root で再実行して `vncpasswd` を確保し、VNC を再起動してください。通常これだけで問題は解決します。
+
+  ```
+  docker compose exec --user root web bash -lc "/bin/bash /rails/scripts/install_chromium_vnc.sh"
+  docker compose exec web bash -lc "VNC_PASSWORD='your-secret-password' VNC_DISPLAY_NUMBER=1 /bin/bash /rails/scripts/vnc-start.sh"
+  ```
+
+  （必要なら先に `vnc-stop.sh` で停止してから再起動してください。）
 
 ---
 

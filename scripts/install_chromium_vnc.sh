@@ -1,4 +1,48 @@
 #!/usr/bin/env bash
+
+# install_chromium_vnc.sh
+#
+# Purpose:
+#   Install a developer-focused GUI stack inside the running development container:
+#     - Chromium (browser)
+#     - TigerVNC (Xvnc via `vncserver`)
+#     - Fluxbox (lightweight window manager)
+#     - autocutsel (clipboard sync) and useful fonts
+#
+# Effects:
+#   - Installs packages required to run Chromium under an Xvnc session created by
+#     TigerVNC. The script will also create a small `vncpasswd` wrapper using
+#     `x11vnc -storepasswd` when the platform package does not supply `vncpasswd`.
+#
+# Preconditions / Notes:
+#   - This script must be run as root inside the running dev container.
+#     Example (from host):
+#
+#       docker compose exec --user root web bash -lc \
+#         "/bin/bash /rails/scripts/install_chromium_vnc.sh"
+#
+#   - The repository's design intentionally installs Chromium/VNC at container
+#     runtime (not at image build time). Ensure the container is running before
+#     executing this script.
+#
+#   - The script runs apt-get in non-interactive mode and attempts to handle
+#     Debian packaging differences (e.g. missing `vncpasswd` on some arches).
+#
+#   - After install, start VNC as the application user (see `scripts/vnc-start.sh`).
+#
+# Usage summary:
+#   1) Run the installer as root (inside the container).
+#   2) As the application user (rails), run `scripts/vnc-start.sh` with
+#      environment variables `VNC_PASSWORD`, `VNC_DISPLAY_NUMBER`, `VNC_GEOMETRY`.
+#
+# Example (install -> start):
+#   docker compose exec --user root web bash -lc \
+#     "/bin/bash /rails/scripts/install_chromium_vnc.sh"
+#
+#   docker compose exec web bash -lc \
+#     "VNC_PASSWORD='secret' VNC_DISPLAY_NUMBER=1 VNC_GEOMETRY='1280x800' \
+#       /bin/bash /rails/scripts/vnc-start.sh"
+
 set -euo pipefail
 
 # install_chromium_vnc.sh
@@ -46,66 +90,12 @@ apt-get clean
 rm -rf /var/lib/apt/lists/*
 
 echo "[OK] Chromium + TigerVNC (Xvnc) + Fluxbox installed."
-
-# Provide a vncpasswd wrapper if not present (use x11vnc -storepasswd under the hood)
-if ! command -v vncpasswd >/dev/null 2>&1; then
-  if command -v x11vnc >/dev/null 2>&1; then
-    cat > /usr/local/bin/vncpasswd <<'WRAP'
-#!/bin/sh
-# Minimal wrapper to emulate `vncpasswd -f` using x11vnc's storepasswd.
-# Usage in our scripts: echo "$PASS" | vncpasswd -f > ~/.vnc/passwd
-case "$1" in
-  -h|--help)
-    echo "vncpasswd wrapper (x11vnc backend)"
-    echo "Usage: echo 'secret' | vncpasswd -f > ~/.vnc/passwd"
-    echo "Interactive mode: x11vnc -storepasswd"
-    exit 0
-    ;;
-  -f)
-  # read password from stdin and write the hashed passfile to stdout
-  exec x11vnc -storepasswd - -
-    ;;
-  *)
-  # interactive fallback (prompts and writes to ~/.vnc/passwd)
-  exec x11vnc -storepasswd
-    ;;
-esac
-WRAP
-    chmod +x /usr/local/bin/vncpasswd
-    echo "[OK] Installed vncpasswd wrapper via x11vnc -storepasswd."
-  else
-    echo "[ERROR] Neither vncpasswd nor x11vnc is available; cannot prepare VNC password tool." >&2
-    exit 1
-  fi
-fi
-
-# If a vncpasswd wrapper already exists and is our x11vnc-based script, refresh it to the latest version
-if command -v vncpasswd >/dev/null 2>&1; then
-  VP="$(command -v vncpasswd)"
-  if [ "$VP" = "/usr/local/bin/vncpasswd" ] && grep -q "x11vnc -storepasswd" "$VP" 2>/dev/null; then
-    cat > /usr/local/bin/vncpasswd <<'WRAP'
-#!/bin/sh
-# vncpasswd wrapper (x11vnc backend)
-# Supports:
-#   -h|--help : show help and exit 0
-#   -f        : read password from stdin, write hashed to stdout
-#   (default) : interactive prompt writing to ~/.vnc/passwd
-case "$1" in
-  -h|--help)
-    echo "vncpasswd wrapper (x11vnc backend)"
-    echo "Usage: echo 'secret' | vncpasswd -f > ~/.vnc/passwd"
-    echo "Interactive mode: x11vnc -storepasswd"
-    exit 0
-    ;;
-  -f)
-    exec x11vnc -storepasswd - -
-    ;;
-  *)
-    exec x11vnc -storepasswd
-    ;;
-esac
-WRAP
-    chmod +x /usr/local/bin/vncpasswd
-    echo "[OK] Refreshed vncpasswd wrapper." 
-  fi
+# Ensure a usable `vncpasswd` tool exists. This helper will create a wrapper
+# around x11vnc -storepasswd if necessary.
+if [[ -x "/rails/scripts/install_vncpasswd.sh" ]]; then
+  /bin/bash /rails/scripts/install_vncpasswd.sh || {
+    echo "[WARN] install_vncpasswd.sh failed; you may need to install x11vnc or vncpasswd manually." >&2
+  }
+else
+  echo "[NOTE] install_vncpasswd.sh not present; ensure 'vncpasswd' is available for vnc-start.sh to work." >&2
 fi
