@@ -32,12 +32,15 @@ cat > /usr/local/bin/vncpasswd <<'WRAP'
 case "$1" in
   -h|--help)
     echo "vncpasswd wrapper (x11vnc backend)"
-    echo "Usage: echo 'secret' | vncpasswd -f > ~/.vnc/passwd"
+    echo "Usage: echo 'secret' | vncpasswd -f"
     echo "Interactive mode: x11vnc -storepasswd"
     exit 0
     ;;
   -f)
-    exec x11vnc -storepasswd - -
+    # Read password from stdin and write to ~/.vnc/passwd
+    read password
+    mkdir -p ~/.vnc
+    x11vnc -storepasswd "$password" ~/.vnc/passwd
     ;;
   *)
     exec x11vnc -storepasswd
