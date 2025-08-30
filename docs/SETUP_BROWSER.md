@@ -35,7 +35,8 @@ $ docker compose exec --user root web bash -lc \
 
 ## RSpec での利用
 
-RSpec は、デフォルトではブラウザはヘッドレス・モードで動作するようになっています。言い換えると、ヘッドレス・モードをオフにした実行はできません。ブラウザの画面を表示したい場合は VNC を導入してください。
+
+RSpec は、デフォルトではブラウザはヘッドレス・モードで動作するようになっています。言い換えると、ヘッドレス・モードをオフにした実行はできません。ブラウザの画面を表示したい場合は VNC を導入してください（`docs/SETUP_VNC.md` を参照）。
 
 ```bash
 $ docker compose exec web bash -lc "bundle exec rspec spec/system"
