@@ -41,3 +41,6 @@
 
 # Test coverage output
 coverage
+
+# Local Docker Compose overrides (developer-specific)
+compose.override.yml

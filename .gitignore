@@ -47,3 +47,6 @@ coverage
 config/deploy.production.yml
 config/deploy.staging.yml
 
+# Local Docker Compose overrides (developer-specific)
+compose.override.yml
+

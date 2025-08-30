@@ -23,10 +23,12 @@ def cuprite_options
       'no-sandbox' => nil,           # Required for Docker containers
       'disable-dev-shm-usage' => nil, # Overcome limited resource problems
       'disable-gpu' => nil,          # Disable GPU hardware acceleration
-      'headless' => nil              # Run in headless mode for Docker
     })
-    options[:headless] = true
-    options[:inspector] = false
+
+    # Respect HEADLESS env: do not force headless here. Set inspector based on HEADLESS.
+    options[:inspector] = %w[0 false].include?(ENV['HEADLESS']) ? true : false
+
+    # Ensure the cuprite driver uses the packaged Chromium binary inside the container.
     options[:browser_path] = '/usr/bin/chromium'
   end
 
