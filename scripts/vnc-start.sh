@@ -26,7 +26,7 @@ if [[ ! -s "${VNC_PASS_FILE}" ]]; then
     exit 1
   fi
   if ! command -v vncpasswd >/dev/null 2>&1; then
-    echo "[ERROR] 'vncpasswd' not found. Please run the installer as root to install/create it: /rails/scripts/install_chromium_vnc.sh" >&2
+    echo "[ERROR] 'vncpasswd' not found. Please run the VNC installer as root to install/create it: /rails/scripts/vnc-install-tigervnc.sh" >&2
     exit 1
   fi
   # Use discovered vncpasswd to generate the passwd file
