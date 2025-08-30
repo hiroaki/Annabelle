@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# install_chromium_vnc.sh
+# install_chromium_vnc.sh (DEPRECATED: use split installers)
 #
 # Purpose:
 #   Install a developer-focused GUI stack inside the running development container:
@@ -30,7 +30,11 @@
 #
 #   - After install, start VNC as the application user (see `scripts/vnc-start.sh`).
 #
-# Usage summary:
+# Replacement scripts:
+#   - Browser only: /rails/scripts/browser-install-chromium.sh
+#   - VNC only    : /rails/scripts/vnc-install-tigervnc.sh
+#
+# Usage summary (legacy, still works):
 #   1) Run the installer as root (inside the container).
 #   2) As the application user (rails), run `scripts/vnc-start.sh` with
 #      environment variables `VNC_PASSWORD`, `VNC_DISPLAY_NUMBER`, `VNC_GEOMETRY`.
@@ -47,6 +51,9 @@ set -euo pipefail
 
 # install_chromium_vnc.sh
 # Root-only: install Chromium + TigerVNC (Xvnc) + Fluxbox (light WM) and fonts inside the container.
+
+echo "[WARN] install_chromium_vnc.sh is deprecated." >&2
+echo "[WARN] Use browser-install-chromium.sh and vnc-install-tigervnc.sh separately." >&2
 
 if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
   echo "[ERROR] Run as root inside the container (docker compose exec --user root web ...)" >&2
