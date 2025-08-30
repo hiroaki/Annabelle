@@ -72,6 +72,7 @@ http://127.0.0.1:3000/
 
 # MailCatcher Web UI
 http://127.0.0.1:1080/
+```
 
 ### A-5. Optional: GUI browser for debugging via VNC / VNC 経由の GUI ブラウザ（オプション）
 
@@ -79,9 +80,8 @@ If you need to debug system specs or visually inspect the browser locally, you c
 
 System Spec のデバッグや手元での GUI 確認が必要な場合は、コンテナ内に Chromium と VNC を追加インストールして利用できます。詳細手順は次を参照してください：
 
-- docs/SETUP_BROWSER.md
-- docs/SETUP_VNC.md
-```
+- [/docs/SETUP_BROWSER.md](/docs/SETUP_BROWSER.md)
+- [/docs/SETUP_VNC.md](/docs/SETUP_VNC.md)
 
 ## (B) Without Docker / Docker を使わずに構築する
 
