@@ -2,9 +2,14 @@
 set -euo pipefail
 
 # vnc-start.sh (TigerVNC / Xvnc only)
-# Start a TigerVNC-managed Xvnc session and run ~/.vnc/xstartup to launch
-# a lightweight window manager, clipboard sync, and Chromium. Intended to be
-# run as the application user (rails).
+#
+# Purpose:
+#   Start a TigerVNC-managed Xvnc session and run ~/.vnc/xstartup to launch
+#   a lightweight window manager and any programs defined there.
+#
+# Usage (inside container as app user):
+#   $ VNC_PASSWORD='secret' VNC_DISPLAY_NUMBER=1 VNC_GEOMETRY='1280x800' \
+#     /bin/bash /rails/scripts/vnc-start.sh
 
 # Determine user home robustly: prefer $HOME, fall back to /home/rails if unset
 USER_HOME="${HOME:-$(getent passwd "$(whoami)" | cut -d: -f6 || echo /home/rails)}"
@@ -26,11 +31,16 @@ if [[ ! -s "${VNC_PASS_FILE}" ]]; then
     exit 1
   fi
   if ! command -v vncpasswd >/dev/null 2>&1; then
-    echo "[ERROR] 'vncpasswd' not found. Please run the VNC installer as root to install/create it: /rails/scripts/install-vnc-tigervnc.sh" >&2
+    echo "[ERROR] 'vncpasswd' not found. Please run the VNC installer as root: /rails/scripts/install-vnc-tigervnc.sh" >&2
     exit 1
   fi
   # Use discovered vncpasswd to generate the passwd file
   if echo "${VNC_PASSWORD}" | vncpasswd -f > "${VNC_PASS_FILE}" 2>/dev/null; then
+    # Ensure file was created and is non-empty
+    if [[ ! -s "${VNC_PASS_FILE}" ]]; then
+      echo "[ERROR] vncpasswd did not produce a valid password file at ${VNC_PASS_FILE}" >&2
+      exit 1
+    fi
     chmod 600 "${VNC_PASS_FILE}"
   else
     echo "[ERROR] vncpasswd failed to create ${VNC_PASS_FILE}" >&2

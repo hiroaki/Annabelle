@@ -44,10 +44,9 @@ $ docker compose exec --user root web bash -lc \
 ```
 
 このスクリプトは次を行います：
-- `tigervnc-standalone-server`/`tigervnc-common`、`x11vnc`、`fluxbox`、`autocutsel` のインストール
+- `tigervnc-standalone-server`/`tigervnc-common`/`tigervnc-tools`、`fluxbox`、`autocutsel` のインストール（正規の `vncpasswd` は `tigervnc-tools` により提供）
 - `rails` ユーザの作成（なければ）
 - `/tmp/.X11-unix` の準備
-- `scripts/install-vncpasswd.sh` を使った `vncpasswd` の確保
 
 ## 2) VNC サーバ起動
 

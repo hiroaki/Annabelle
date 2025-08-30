@@ -1,18 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# browser-install-chromium.sh
+# install-browser-chromium.sh
+#
 # Purpose:
 #   Install Chromium browser and essential fonts inside the running dev container.
-#   This is required for RSpec system specs using cuprite. Does NOT install VNC.
+#   This is required for RSpec system specs using cuprite.
 #
 # Usage (from host):
-#   docker compose exec --user root web bash -lc \
-#     "/bin/bash /rails/scripts/browser-install-chromium.sh"
-#
-# Notes:
-#   - Must be run as root inside the container.
-#   - Creates convenient symlinks for chrome-compatible paths.
+#   Run inside the container as root
+#   # /bin/bash /rails/scripts/install-browser-chromium.sh
 
 if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
   echo "[ERROR] Run as root inside the container (docker compose exec --user root web ...)" >&2
