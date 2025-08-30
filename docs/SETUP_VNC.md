@@ -40,14 +40,14 @@ services:
 
 ```bash
 $ docker compose exec --user root web bash -lc \
-  "/bin/bash /rails/scripts/vnc-install-tigervnc.sh"
+  "/bin/bash /rails/scripts/install-vnc-tigervnc.sh"
 ```
 
 このスクリプトは次を行います：
 - `tigervnc-standalone-server`/`tigervnc-common`、`x11vnc`、`fluxbox`、`autocutsel` のインストール
 - `rails` ユーザの作成（なければ）
 - `/tmp/.X11-unix` の準備
-- `scripts/install_vncpasswd.sh` を使った `vncpasswd` の確保
+- `scripts/install-vncpasswd.sh` を使った `vncpasswd` の確保
 
 ## 2) VNC サーバ起動
 

@@ -26,7 +26,7 @@ $ docker compose up
 
 ```bash
 $ docker compose exec --user root web bash -lc \
-  "/bin/bash /rails/scripts/browser-install-chromium.sh"
+  "/bin/bash /rails/scripts/install-browser-chromium.sh"
 ```
 
 このスクリプトは次を行います：
@@ -47,5 +47,5 @@ $ docker compose exec web bash -lc "bundle exec rspec spec/system"
 - Chromium が見つからない／起動しない
   - `apt` の更新後に再実行：
     ```bash
-    docker compose exec --user root web bash -lc "apt-get update -qq && /bin/bash /rails/scripts/browser-install-chromium.sh"
+    $ docker compose exec --user root web bash -lc "apt-get update -qq && /bin/bash /rails/scripts/install-browser-chromium.sh"
     ```

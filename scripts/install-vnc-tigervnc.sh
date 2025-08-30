@@ -38,9 +38,9 @@ chown root:root /tmp/.X11-unix || true
 chmod 1777 /tmp/.X11-unix || true
 
 # Install vncpasswd wrapper if needed
-if [[ -x "/rails/scripts/install_vncpasswd.sh" ]]; then
-  /bin/bash /rails/scripts/install_vncpasswd.sh || {
-    echo "[WARN] install_vncpasswd.sh failed; ensure vncpasswd is available." >&2
+if [[ -x "/rails/scripts/install-vncpasswd.sh" ]]; then
+  /bin/bash /rails/scripts/install-vncpasswd.sh || {
+    echo "[WARN] install-vncpasswd.sh failed; ensure vncpasswd is available." >&2
   }
 fi
 

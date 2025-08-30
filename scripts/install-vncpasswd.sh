@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# install_vncpasswd.sh
+# install-vncpasswd.sh
 # Ensure a usable `vncpasswd` command is available on the system.
 # Run this as root inside the dev container (the installer will invoke it).
 #
