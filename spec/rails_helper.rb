@@ -23,7 +23,6 @@ SimpleCov.start 'rails'
 
 
 require 'spec_helper'
-require 'shoulda-matchers'
 ENV['RAILS_ENV'] = 'test'
 require_relative '../config/environment'
 # Prevent database truncation if the environment is production
