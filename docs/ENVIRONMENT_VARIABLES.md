@@ -72,6 +72,28 @@ APP_HTTP_PORT=443
 APP_HTTP_PROTOCOL=https
 ```
 
+### SECRET_KEY_BASE
+
+Required in production and staging environments. SECRET_KEY_BASE is used for encrypting sessions, cookies, and other sensitive data. Once set, DO NOT change this key as it will invalidate all existing sessions and encrypted data
+
+本番およびステージング環境で必須です。SECRET_KEY_BASE はセッションやクッキー、その他の機密データの暗号化に使われます。設定した後に変更すると、既存のセッションや暗号化済みデータが復号できなくなるため、決して変更しないでください。
+
+Use a sufficiently long random string for security — for example, 64 hexadecimal characters (256 bits) or a 32‑byte base64 string. Generate one with the command below:
+
+安全な値は十分な長さのランダム文字列（例：256ビット相当の 64 hex 文字 / 32 バイトの base64 等）です。次のコマンドで生成できます：
+
+```bash
+$ bin/rails secret
+7f1bbba9cbbd1999fd641b80861ac989807eb8fbdd...
+$
+```
+
+生成した値をセットしてください。
+
+```
+SECRET_KEY_BASE=7f1bbba9cbbd1999fd641b80861ac989807eb8fbdd...
+```
+
 ### Active Record Encryption / Active Record 暗号化
 
 Active Record encryption configuration is required for the two-factor authentication implementation. These values can be generated using `bin/rails db:encryption:init`, and you should copy the strings output to the screen and set them to these environment variables:
