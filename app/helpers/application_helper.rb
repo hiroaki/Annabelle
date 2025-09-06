@@ -69,4 +69,17 @@ module ApplicationHelper
   def flash_global_storage
     content_tag(:div, '', id: 'flash-storage', style: 'display: none;')
   end
+
+  def exported_locale_messages
+    keys = %w[
+      cable_disconnected
+    ]
+    content_tag(:ul, id: 'exported-locale-messages', style: 'display: none;') do
+      safe_join(
+        keys.map do |key|
+          content_tag(:li, t("exports.#{key}"), data: { key: key })
+        end
+      )
+    end
+  end
 end

@@ -1,4 +1,5 @@
 import consumer from "channels/consumer"
+import { appendMessageToStorage, renderFlashMessages, clearFlashMessages } from "flash_messages"
 
 consumer.subscriptions.create("MessagesChannel", {
   connected() {
@@ -8,7 +9,12 @@ consumer.subscriptions.create("MessagesChannel", {
 
   disconnected() {
     // Called when the subscription has been terminated by the server
-    console.log("MessagesChannel: disconnected")
+    console.log("MessagesChannel: disconnected");
+
+    const flashMessage = this.disconnectedMessage();
+    clearFlashMessages(flashMessage);
+    appendMessageToStorage(flashMessage, 'warning');
+    renderFlashMessages();
   },
 
   received(data) {
@@ -31,5 +37,11 @@ consumer.subscriptions.create("MessagesChannel", {
       const elem = messages.querySelector(`[data-message-id="${destroyed_message_id}"]`);
       if (elem) elem.remove();
     }
+  },
+
+  disconnectedMessage() {
+    const fallbackMessage = "Connection to the server has been lost. Please reload the page to reconnect";
+    const localeMessage = document.querySelector('#exported-locale-messages li[data-key="cable_disconnected"]');
+    return localeMessage ? localeMessage.textContent : fallbackMessage;
   }
 });
