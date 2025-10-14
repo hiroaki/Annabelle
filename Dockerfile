@@ -1,10 +1,10 @@
-# # 本番環境
+# # For production environment
 # $ docker build --build-arg RAILS_ENV=production -t annabelle-production:latest .
 #
-# # ステージング環境
+# # For staging environment
 # $ docker build --build-arg RAILS_ENV=staging -t annabelle-staging:latest .
 #
-# # 開発環境
+# # For development environment
 # $ docker build --build-arg RAILS_ENV=development -t annabelle-development:latest .
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
@@ -14,7 +14,7 @@ ARG RAILS_ENV=production
 
 FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim AS base
 
-# ARGを再宣言してからENVで使用
+# Re-declare ARG before using it in ENV
 ARG RAILS_ENV
 
 # Rails app lives here
@@ -39,6 +39,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
+# NOTE:
+# We use `bundle config set --local without 'development test'` and `bundle config set deployment true`
+# instead of environment variables, because some tools (e.g. bootsnap precompile) require .bundle/config
+# to correctly recognize excluded gem groups. Using only environment variables may cause build failures
+# when gems in excluded groups are missing.
 RUN if [ "$RAILS_ENV" = "development" ]; then \
       bundle config unset --local without; \
       bundle install; \
@@ -47,8 +52,7 @@ RUN if [ "$RAILS_ENV" = "development" ]; then \
       bundle config set deployment true; \
       bundle install; \
     fi && \
-    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
-    bundle exec bootsnap precompile --gemfile
+    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git
 
 # Copy application code
 COPY . .
@@ -74,25 +78,35 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
   libvips \
   tzdata \
   ffmpeg \
+  && if [ "$RAILS_ENV" = "development" ]; then \
+    apt-get install --no-install-recommends -y \
+      build-essential pkg-config libyaml-dev libsqlite3-dev vim-tiny less; \
+  fi \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy built artifacts: gems, application
-COPY --from=build /usr/local/bundle /usr/local/bundle
+# Copy built artifacts: application
 COPY --from=build /rails /rails
+COPY --from=build /usr/local/bundle /usr/local/bundle
 
 # Run and own only the runtime files as a non-root user for security
 RUN useradd rails --create-home --shell /bin/bash && \
-    mkdir -p /rails/db /rails/log /rails/storage /rails/tmp && \
-    chown -R rails:rails /rails
+    mkdir -p /rails/db /rails/log /rails/storage /rails/tmp /usr/local/bundle && \
+    chown -R rails:rails /rails /usr/local/bundle
+
 USER rails:rails
 
 # Entrypoint prepares the database
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start the server with thruster for production/staging.
-# Puma listening on port to 3000, kamal-proxy 3001 for Thruster
-ENV THRUSTER_HTTP_PORT="3001" \
-    THRUSTER_TARGET_PORT="3000" \
-    THRUSTER_DEBUG=1
-EXPOSE 3000
+# Puma listening on port to THRUSTER_TARGET_PORT,
+# kamal-proxy THRUSTER_HTTP_PORT for Thruster
+ARG THRUSTER_HTTP_PORT=3001
+ARG THRUSTER_TARGET_PORT=3000
+
+ENV THRUSTER_HTTP_PORT=${THRUSTER_HTTP_PORT} \
+    THRUSTER_TARGET_PORT=${THRUSTER_TARGET_PORT} \
+    THRUSTER_DEBUG=1 \
+    PORT=${THRUSTER_TARGET_PORT}
+EXPOSE ${PORT}
 CMD ["bundle", "exec", "thrust", "bin/rails", "server"]
