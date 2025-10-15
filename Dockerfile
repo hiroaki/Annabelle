@@ -8,7 +8,7 @@
 # $ docker build --build-arg RAILS_ENV=development -t annabelle-development:latest .
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
-ARG RUBY_VERSION=3.4.4
+ARG RUBY_VERSION=3.4.7
 
 ARG RAILS_ENV=production
 
