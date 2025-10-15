@@ -13,6 +13,11 @@
     <%= javascript_importmap_tags %>
 
     <%= current_user_presenter.meta_tag %>
+
+    <%# WIP: EXPERIMENTAL FEATURE %>
+    <%= stylesheet_link_tag "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" %>
+    <%= javascript_include_tag "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js", defer: true %>
+    <%= javascript_include_tag "https://unpkg.com/leaflet-gpx@2.2.0/gpx.js", defer: true %>
   </head>
 
   <body class="min-h-screen flex flex-col">
