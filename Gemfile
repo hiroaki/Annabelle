@@ -96,6 +96,7 @@ gem 'rqrcode'
 gem 'activerecord-session_store'
 gem 'rails-i18n', '~> 8.0.0' # For Rails >= 8.0.0
 gem 'http_accept_language'
+gem 'flash_unified'
 
 # HTTP/2 proxy for simple production-ready deployments of Rails applications.
 gem 'thruster', require: false

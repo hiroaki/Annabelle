@@ -158,6 +158,9 @@ GEM
     ffi (1.17.2-x86-linux-gnu)
     ffi (1.17.2-x86_64-darwin)
     ffi (1.17.2-x86_64-linux-gnu)
+    flash_unified (0.3.1)
+      rails (>= 7.1)
+      turbo-rails (>= 2.0)
     globalid (1.3.0)
       activesupport (>= 6.1)
     hashie (5.0.0)
@@ -523,6 +526,7 @@ DEPENDENCIES
   devise-two-factor
   dotenv-rails
   factory_bot_rails
+  flash_unified
   http_accept_language
   image_processing (~> 1.2)
   importmap-rails
