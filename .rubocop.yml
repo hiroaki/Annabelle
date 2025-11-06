@@ -18,8 +18,6 @@ AllCops:
     - 'config/environments/*'
     - 'config/puma.rb'
     - 'config/initializers/*'
-    - 'bin/*'
-
     - 'node_modules/**/*'
 
     - 'tmp/**/*'
