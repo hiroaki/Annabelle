@@ -95,6 +95,8 @@ en:
       taken: "has already been taken"
       too_long: "is too long (maximum is %{count} characters)"
       too_short: "is too short (minimum is %{count} characters)"
+  exports:
+    cable_disconnected: "Connection to the server has been lost. Please reload the page to reconnect."
   helpers:
     page_entries_info:
       more_pages:

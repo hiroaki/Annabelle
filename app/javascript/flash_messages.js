@@ -230,13 +230,18 @@ function initializeFlashMessageSystem(debugFlag) {
   })();
 }
 
-/* フラッシュ・メッセージの表示をすべてクリアします。
+/* フラッシュ・メッセージの表示をクリアします。
+    message が指定されている場合は、そのメッセージを含んだフラッシュ・メッセージをクリアします。
+    message が省略された場合は全てが対象です。
   */
-function clearFlashMessages(){
-  const containers = document.querySelectorAll('[data-flash-message-container]');
-  containers.forEach(container => {
-    container.innerHTML = '';
-  });
+function clearFlashMessages(message) {
+  Array.from(document.querySelectorAll('[data-flash-message-container]'))
+    .filter(container => {
+      if (typeof message === 'undefined') return true;
+      const text = container.querySelector('.flash-message-text');
+      return text && text.textContent.trim() === message;
+    })
+    .forEach(container => { container.innerHTML = ''; });
 }
 
 // --- utility functions ---

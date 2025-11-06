@@ -95,6 +95,8 @@ ja:
       taken: "は既に使用されています"
       too_long: "は%{count}文字以内で入力してください"
       too_short: "は%{count}文字以上で入力してください"
+  exports:
+    cable_disconnected: "サーバーとの接続が切れました。再接続するには画面をリロードしてください。"
   helpers:
     page_entries_info:
       more_pages:
