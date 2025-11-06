@@ -6,7 +6,7 @@ module LocaleConfigurationHelper
   def with_locale_config(config_overrides)
     # 現在の設定を取得し、上書き設定を適用
     merged_config = build_config_from_overrides(config_overrides)
-    
+
     # インスタンスの設定を一時的に上書き
     instance = LocaleConfiguration.instance
     original_config = instance.instance_variable_get(:@config)
@@ -24,16 +24,16 @@ module LocaleConfigurationHelper
       instance.instance_variable_set(:@default_locale, nil)
     end
   end
-  
+
   # オーバーライド設定からマージされた設定を生成
   def build_config_from_overrides(config_overrides)
     # デフォルト設定を取得する方法がないため、一時的にカレントの設定を使用
     current_config = nil
-    
+
     # 現在のキャッシュを取得（クラスメソッドを使用）
     current_locales = LocaleConfiguration.available_locales
     current_default = LocaleConfiguration.default_locale
-    
+
     # 設定を再構築する基本構造
     current_config = {
       'locales' => {
@@ -47,7 +47,7 @@ module LocaleConfigurationHelper
         'development_ttl' => 60
       }
     }
-    
+
     # LocaleConfiguration.locale_nameとlocale_native_nameを使ってmetadataを追加
     current_locales.each do |locale|
       current_config['locales']['metadata'][locale.to_s] = {
@@ -55,13 +55,13 @@ module LocaleConfigurationHelper
         'native_name' => LocaleConfiguration.locale_native_name(locale)
       }
     end
-    
+
     # 深いマージで設定をオーバーライド
     merged_config = current_config
     config_overrides.each do |key, value|
       merged_config = deep_merge_hash(merged_config, key_to_hash(key, value))
     end
-    
+
     merged_config
   end
 

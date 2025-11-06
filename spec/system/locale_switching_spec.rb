@@ -164,13 +164,13 @@ RSpec.describe 'LocaleSwitching', type: :system do
       it '直接ログイン画面でlangパラメータが機能する' do
         # 明示的ロケール必須化により、ロケール付きパスでアクセス
         visit '/ja/users/sign_in'
-        
+
         expect(page).to have_button('ログイン')
         expect(page).to have_field('メールアドレス')
 
         # 言語スイッチャーのリンクが存在する
         expect(page).to have_link('English')
-        
+
         # 英語に切り替え
         click_link 'English'
         expect(page).to have_button('Log in')
@@ -202,11 +202,11 @@ RSpec.describe 'LocaleSwitching', type: :system do
       it 'ルートページのロケールパスアクセスで適切にリダイレクトされる' do
         # 明示的ロケール必須化により、日本語ルートパスに直接アクセス
         visit '/ja'
-        
+
         # 未ログインユーザーは認証が必要なため、何らかのページが表示される
         # 重要なのは、ルーティングエラーにならないこと
         expect(page.status_code).not_to eq(404)
-        
+
         # ページが正常に表示されることを確認
         # （ログインページか、メッセージページのいずれかが表示される）
         expect(page).to have_css('body')

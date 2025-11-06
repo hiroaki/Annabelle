@@ -2,7 +2,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   skip_before_action :verify_authenticity_token, only: :github
 
   def github
-    auth = request.env["omniauth.auth"]
+    auth = request.env['omniauth.auth']
 
     if user_signed_in?
       user = current_user
@@ -34,22 +34,22 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     if Authorization.provider_uid_exists?(auth.provider, auth.uid)
       if user.provider_uid(auth.provider) == auth.uid
         # 正常：自身のuserでリンクされている
-        flash[:alert] = I18n.t("devise.omniauth_callbacks.provider.already_linked", provider: provider_name)
+        flash[:alert] = I18n.t('devise.omniauth_callbacks.provider.already_linked', provider: provider_name)
       else
         # 警戒：他のuserでリンクされている（ただし、flashメッセージでは区別しない）
-        flash[:alert] = I18n.t("devise.omniauth_callbacks.provider.already_linked", provider: provider_name)
+        flash[:alert] = I18n.t('devise.omniauth_callbacks.provider.already_linked', provider: provider_name)
         logger.warn("AUTHORIZATION_CONFLICT: (provider_uid_exists) provider=#{auth.provider} uid=#{auth.uid} user=#{user.id}")
       end
     else
       authorization = user.link_with(auth.provider, auth.uid)
       if authorization.errors.any?
         # 警戒：未リンクのチェックとリンク処理との間があるため、バリデーションによって ["UIDは既に使用されています"] が検出される可能性もあります。
-        flash[:alert] = I18n.t("devise.omniauth_callbacks.provider.already_linked", provider: provider_name)
+        flash[:alert] = I18n.t('devise.omniauth_callbacks.provider.already_linked', provider: provider_name)
         error_types = authorization.errors.details.flat_map { |attr, arr| arr.map { |h| "#{attr}:#{h[:error]}" } }.uniq.join(',')
         logger.warn("AUTHORIZATION_CONFLICT: (link_with) provider=#{auth.provider} uid=#{auth.uid} user=#{user.id} error_types=#{error_types}")
       else
         # 正常：リンク成功
-        flash[:notice] = I18n.t("devise.omniauth_callbacks.provider.linked", provider: provider_name)
+        flash[:notice] = I18n.t('devise.omniauth_callbacks.provider.linked', provider: provider_name)
       end
     end
 
@@ -68,11 +68,11 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       action = user.saved_change_to_id? ? :new_user : :existing_user
       redirect_to determine_redirect_path(action, locale)
 
-      flash[:notice] = I18n.t("devise.omniauth_callbacks.success", provider: provider_name) if is_navigational_format?
+      flash[:notice] = I18n.t('devise.omniauth_callbacks.success', provider: provider_name) if is_navigational_format?
     else
-      session["devise.github_data"] = auth.except(:extra)
+      session['devise.github_data'] = auth.except(:extra)
       redirect_to determine_redirect_path(:registration_failure, locale),
-                  alert: I18n.t("devise.omniauth_callbacks.failure", kind: provider_name)
+                  alert: I18n.t('devise.omniauth_callbacks.failure', kind: provider_name)
     end
   end
 
@@ -111,18 +111,18 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
   # エラー時のプロバイダー名を抽出
   def extract_provider_name_for_error
-    error_strategy = request.env["omniauth.error.strategy"]
+    error_strategy = request.env['omniauth.error.strategy']
     if error_strategy&.name
       OmniAuth::Utils.camelize(error_strategy.name.to_s)
     else
-      I18n.t("devise.omniauth_callbacks.unknown_provider")
+      I18n.t('devise.omniauth_callbacks.unknown_provider')
     end
   end
 
   # 認証失敗メッセージを生成
   def generate_failure_message(provider)
-    I18n.t("devise.omniauth_callbacks.failure", kind: provider)
+    I18n.t('devise.omniauth_callbacks.failure', kind: provider)
   rescue I18n::MissingInterpolationArgument
-    I18n.t("devise.omniauth_callbacks.failure_fallback")
+    I18n.t('devise.omniauth_callbacks.failure_fallback')
   end
 end

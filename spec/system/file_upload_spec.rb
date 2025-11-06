@@ -97,5 +97,4 @@ RSpec.describe 'File Upload and Preview', type: :system do
       # 基本的なファイルアップロード成功の確認
     end
   end
-
 end

@@ -1,6 +1,6 @@
-require_relative "boot"
+require_relative 'boot'
 
-require "rails/all"
+require 'rails/all'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -25,9 +25,9 @@ module Annabelle
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Secrets configured for ActiveRecord encrypted attributes
-    config.active_record.encryption.primary_key = ENV["ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY"]
-    config.active_record.encryption.deterministic_key = ENV["ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY"]
-    config.active_record.encryption.key_derivation_salt = ENV["ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT"]
+    config.active_record.encryption.primary_key = ENV['ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY']
+    config.active_record.encryption.deterministic_key = ENV['ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY']
+    config.active_record.encryption.key_derivation_salt = ENV['ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT']
 
     # activerecord-session_store (gem) settings
     ActiveRecord::SessionStore::Session.serializer = :json
@@ -39,7 +39,7 @@ module Annabelle
 
     # Use environment variable to select image processing backend (mini_magick or vips)
     valid_processors = [:mini_magick, :vips]
-    processor = ENV.fetch("ANNABELLE_VARIANT_PROCESSOR", "mini_magick").to_sym
+    processor = ENV.fetch('ANNABELLE_VARIANT_PROCESSOR', 'mini_magick').to_sym
     unless valid_processors.include?(processor)
       warn "[Annabelle] ANNABELLE_VARIANT_PROCESSOR='#{processor}' is invalid. Falling back to :mini_magick."
       processor = :mini_magick

@@ -37,7 +37,7 @@ class User < ApplicationRecord
       username = "user_#{SecureRandom.alphanumeric(8).downcase}"
       return username unless User.exists?(username: username)
     end
-    raise "Unable to generate unique username"
+    raise 'Unable to generate unique username'
   end
 
   # OAuth での登録時、初期パスワードはランダムな文字列にします。

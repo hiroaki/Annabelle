@@ -119,4 +119,3 @@ RSpec.describe JsonStringArrayType do
     end
   end
 end
-
