@@ -1,5 +1,5 @@
 import consumer from "channels/consumer"
-import { appendMessageToStorage, renderFlashMessages, clearFlashMessages } from "flash_messages"
+import { appendMessageToStorage, renderFlashMessages, clearFlashMessages } from "flash_unified/all"
 
 consumer.subscriptions.create("MessagesChannel", {
   connected() {
