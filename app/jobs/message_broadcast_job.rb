@@ -14,12 +14,12 @@ class MessageBroadcastJob < ApplicationJob
 
     if message.nil?
       ActionCable.server.broadcast('general_message_board', {
-        destroyed: message_id,
+        destroyed: message_id
       })
     else
       ActionCable.server.broadcast('general_message_board', {
         created: message_id,
-        rendered_message: render_message(message),
+        rendered_message: render_message(message)
       })
     end
   end

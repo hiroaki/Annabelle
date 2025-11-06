@@ -66,7 +66,7 @@ class ApplicationController < ActionController::Base
     email = Rails.configuration.x.auto_login.email.presence
     user = email ? User.find_by!(email: email) : User.admin_user
     if !user.present? || !user.active_for_authentication?
-      raise "conditional_auto_login failed"
+      raise 'conditional_auto_login failed'
     end
     sign_in(:user, user)
   end

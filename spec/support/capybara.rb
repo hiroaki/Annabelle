@@ -22,7 +22,7 @@ def cuprite_options
     browser_options.merge!({
       'no-sandbox' => nil,           # Required for Docker containers
       'disable-dev-shm-usage' => nil, # Overcome limited resource problems
-      'disable-gpu' => nil,          # Disable GPU hardware acceleration
+      'disable-gpu' => nil          # Disable GPU hardware acceleration
     })
 
     # Respect HEADLESS env: do not force headless here. Set inspector based on HEADLESS.

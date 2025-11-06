@@ -6,4 +6,3 @@ FactoryBot.define do
     uid { SecureRandom.uuid }
   end
 end
-

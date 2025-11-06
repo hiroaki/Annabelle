@@ -16,7 +16,6 @@ RSpec.describe 'Basic Auth', type: :request do
     subject { get '/', headers: headers }
 
     context 'when both BASIC_AUTH_USER and BASIC_AUTH_PASSWORD are not set' do
-
       before do
         allow_any_instance_of(ApplicationController).to receive(:valid_user).and_return(nil)
         allow_any_instance_of(ApplicationController).to receive(:valid_pswd).and_return(nil)
@@ -30,7 +29,6 @@ RSpec.describe 'Basic Auth', type: :request do
     end
 
     context 'when only BASIC_AUTH_USER is set' do
-
       before do
         allow_any_instance_of(ApplicationController).to receive(:valid_user).and_return(user)
         allow_any_instance_of(ApplicationController).to receive(:valid_pswd).and_return(nil)
@@ -44,7 +42,6 @@ RSpec.describe 'Basic Auth', type: :request do
     end
 
     context 'when only BASIC_AUTH_PASSWORD is set' do
-
       before do
         allow_any_instance_of(ApplicationController).to receive(:valid_user).and_return(nil)
         allow_any_instance_of(ApplicationController).to receive(:valid_pswd).and_return(password)
@@ -58,7 +55,6 @@ RSpec.describe 'Basic Auth', type: :request do
     end
 
     context 'when both BASIC_AUTH_USER and BASIC_AUTH_PASSWORD are set' do
-
       before do
         allow_any_instance_of(ApplicationController).to receive(:valid_user).and_return(user)
         allow_any_instance_of(ApplicationController).to receive(:valid_pswd).and_return(password)

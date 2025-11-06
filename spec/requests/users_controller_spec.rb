@@ -98,13 +98,13 @@ RSpec.describe UsersController, type: :request do
           ["en", "", "ja"], # empty means browser setting (ja)
           ["", "ja", "ja"],
           ["", "en", "en"],
-          ["", "", "ja"], # empty means browser setting (ja)
+          ["", "", "ja"] # empty means browser setting (ja)
         ].each do |user_setting, form_selection, expected_locale|
           it "redirects to correct path when user setting is '#{user_setting}' and form selection is '#{form_selection}'" do
             user.update(preferred_language: user_setting)
 
-            patch update_profile_path(locale: expected_locale), 
-                  params: { user: { preferred_language: form_selection } }, 
+            patch update_profile_path(locale: expected_locale),
+                  params: { user: { preferred_language: form_selection } },
                   headers: { 'HTTP_ACCEPT_LANGUAGE' => 'ja,en-US;q=0.9,en;q=0.8' }
 
             expect(user.reload.preferred_language).to eq(form_selection)
@@ -125,13 +125,13 @@ RSpec.describe UsersController, type: :request do
           ["en", "", "en"],
           ["", "ja", "ja"],
           ["", "en", "en"],
-          ["", "", "en"],
+          ["", "", "en"]
         ].each do |user_setting, form_selection, expected_locale|
           it "redirects to correct path when user setting is '#{user_setting}' and form_selection is '#{form_selection}'" do
             user.update(preferred_language: user_setting)
 
-            patch update_profile_path(locale: expected_locale), 
-                  params: { user: { preferred_language: form_selection } }, 
+            patch update_profile_path(locale: expected_locale),
+                  params: { user: { preferred_language: form_selection } },
                   headers: { 'HTTP_ACCEPT_LANGUAGE' => 'en-US,en;q=0.9' }
 
             expect(user.reload.preferred_language).to eq(form_selection)
@@ -160,7 +160,7 @@ RSpec.describe UsersController, type: :request do
       end
 
       it "redirects based on browser language when empty string is selected" do
-        patch update_profile_path(locale: I18n.locale), 
+        patch update_profile_path(locale: I18n.locale),
               params: { user: { preferred_language: "" } },
               headers: { 'HTTP_ACCEPT_LANGUAGE' => 'ja,en-US;q=0.9,en;q=0.8' }
         expect(response).to have_http_status(:redirect)

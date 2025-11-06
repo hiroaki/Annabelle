@@ -27,8 +27,8 @@ class OAuthLocaleService
 
   # OAuthパラメータからロケールを抽出
   def extract_from_omniauth_params
-    omniauth_params = request.env["omniauth.params"] || {}
-    oauth_locale = omniauth_params["lang"] || omniauth_params["locale"]
+    omniauth_params = request.env['omniauth.params'] || {}
+    oauth_locale = omniauth_params['lang'] || omniauth_params['locale']
     valid_locale_or_nil(oauth_locale)
   end
 

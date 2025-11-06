@@ -16,4 +16,3 @@ module OmniauthMacros
     OmniAuth.config.mock_auth[:github] = nil
   end
 end
-
