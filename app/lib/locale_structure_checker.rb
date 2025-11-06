@@ -6,7 +6,7 @@ class LocaleStructureChecker
     locale_files = load_app_locale_files
 
     if locale_files.empty?
-      puts "[INFO] No locale files found in config/locales/"
+      puts '[INFO] No locale files found in config/locales/'
       return true
     end
 
@@ -41,7 +41,7 @@ class LocaleStructureChecker
       raise StructureMismatchError, "Locale structure check failed:\n#{errors.join("\n")}"
     end
 
-    puts "[SUCCESS] All app-defined locale files have consistent structure"
+    puts '[SUCCESS] All app-defined locale files have consistent structure'
     true
   end
 
