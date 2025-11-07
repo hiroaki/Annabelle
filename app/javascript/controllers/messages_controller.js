@@ -1,112 +1,138 @@
-import { Controller } from "@hotwired/stimulus"
+import { Controller } from "@hotwired/stimulus";
+
+import imageHandler from "controllers/handlers/image";
+import videoHandler from "controllers/handlers/video";
+import gpxHandler from "controllers/handlers/gpx";
+import genericHandler from "controllers/handlers/generic";
+
+const REGISTRY = [
+  { match: (ct) => /^image\//.test(ct), handler: imageHandler },
+  { match: (ct) => /^video\//.test(ct), handler: videoHandler },
+  { match: (ct, fn) => ct === 'application/xml' && /\.gpx$/i.test(fn), handler: gpxHandler },
+  { match: () => true, handler: genericHandler }
+]
+
+function findHandler(contentType, filename) {
+  const entry = REGISTRY.find(e => e.match(contentType, filename));
+  return entry ? entry.handler : genericHandler;
+}
 
 export default class extends Controller {
-  static targets = ['preview', 'modal', 'modalBody']
+  static targets = ['preview', 'modal', 'modalBody'];
 
-  _generateMapContainer(mapId) {
-    const content = document.createElement('div');
-    content.id = mapId;
-    content.style.width = "800px";
-    content.style.height = "800px";
-    content.className = "object-contain max-h-full max-w-full mx-auto my-2";
-    content.setAttribute('data-guard-closing-preview', 'true');
-    return content;
+  initialize() {
+    // container(Element) -> instance ({ cleanup: fn })
+    this._previewInstances = new WeakMap();
   }
 
-  _activateMapContent(mapId, gpxUrl){
-    const map = L.map(mapId).setView([35.6812, 139.7671], 13); // 東京駅付近
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    new L.GPX(gpxUrl, {
-      async: true,
-      markers: {
-        startIcon: 'leaflet-gpx/icons/pin-icon-start.png',
-        endIcon: 'leaflet-gpx/icons/pin-icon-end.png',
-        wptIcons: {}
-      },
-      marker_options: {
-        iconSize: [24, 32],
-        iconAnchor: [12, 32],
-      }
-    }).on('loaded', function(e) {
-      map.fitBounds(e.target.getBounds());
-    }).addTo(map);
+  disconnect() {
+    // ensure cleanup when controller is torn down
+    this._cleanupFor(this.previewTarget);
+    this._cleanupFor(this.modalBodyTarget);
   }
 
-  changePreview(evt) {
+  async changePreview(evt) {
     evt.preventDefault();
 
-    if (this.isDisplayed(this.previewTarget)) {
-      this.clearPreview();
+    const elem = evt.currentTarget;
+    const data = {
+      sourceUrl: elem.dataset['sourceUrl'],
+      filename: elem.dataset['filename'],
+      contentType: elem.dataset['contentType'],
+    };
 
-      // WIP:
-      if (evt.currentTarget.dataset["contentType"] != "application/xml" || !evt.currentTarget.dataset["filename"].match("\.gpx$") ) {
-        const content = evt.currentTarget.querySelector('img, video').cloneNode(true);
-        this.previewTarget.appendChild(content);
-      } else {
-        const content = this._generateMapContainer("map");
-        this.previewTarget.appendChild(content);
-        const map = this._activateMapContent(content.id, evt.currentTarget.dataset["sourceUrl"]);
-        map.invalidateSize();
-      }
-    } else {
+    const isPreviewDisplayed = this.isDisplayed(this.previewTarget);
+    const display = isPreviewDisplayed ? 'preview' : 'modal';
+    const container = isPreviewDisplayed ? this.previewTarget : this.modalBodyTarget;
+
+    // cleanup existing preview for the chosen container BEFORE rendering new content
+    this._cleanupFor(container);
+
+    if (!isPreviewDisplayed) {
       this.clearModal();
       this.openModal();
-      if (evt.currentTarget.dataset["contentType"] != "application/xml" || !evt.currentTarget.dataset["filename"].match("\.gpx$") ) {
-        const content = evt.currentTarget.querySelector('img, video').cloneNode(true);
-        this.modalBodyTarget.appendChild(content);
-      } else {
-        const content = this._generateMapContainer("map");
-        this.modalBodyTarget.appendChild(content);
-        const map = this._activateMapContent(content.id, evt.currentTarget.dataset["sourceUrl"]);
-        map.invalidateSize();
+    } else {
+      this.clearPreview();
+    }
+
+    // extract a preview image from the thumbnail element and pass a simple string
+    // to handlers to avoid handing over DOM nodes (safer, lower coupling)
+    let previewUrl = null;
+    if (typeof elem.querySelector === 'function') {
+      const thumbVideo = elem.querySelector('video');
+      if (thumbVideo) previewUrl = thumbVideo.getAttribute('poster');
+      if (!previewUrl) {
+        const thumbImg = elem.querySelector('img');
+        if (thumbImg) previewUrl = thumbImg.dataset && thumbImg.dataset.src ? thumbImg.dataset.src : thumbImg.src;
       }
+    }
+
+    const context = { container, display, isPreview: isPreviewDisplayed };
+    const attachment = { ...data, previewUrl };
+
+    const handler = findHandler(data.contentType, data.filename);
+    try {
+      const result = await handler({ context, attachment });
+      const instance = (typeof result === 'function') ? { cleanup: result } : (result || {});
+      if (instance && typeof instance.cleanup === 'function') {
+        this._previewInstances.set(container, instance);
+      }
+    } catch (err) {
+      console.error('preview handler error', err);
+      // fallback: clone thumbnail img/video if present
+      const content = elem.querySelector('img, video');
+      if (content) container.appendChild(content.cloneNode(true));
     }
   }
 
   isDisplayed(elem) {
-    return elem.offsetParent !== null
+    return elem.offsetParent !== null;
   }
 
   handlerClearPreview(evt) {
-    // WIP:
-    if (evt.currentTarget.dataset["guardClosingPreview"]) {
-      console.log("guard by event currentTarget");
-      return;
-    }
-    // WIP:
-    if (evt.target.dataset["guardClosingPreview"]) {
-      console.log("guard by event target");
-      return;
+    // If any element in the event path has data-guard-closing-preview, do not close
+    try {
+      if (evt.currentTarget && evt.currentTarget.dataset && evt.currentTarget.dataset['guardClosingPreview']) return;
+      const path = evt.composedPath ? evt.composedPath() : (evt.path || []);
+      if (path && path.some(el => el && el.dataset && el.dataset['guardClosingPreview'])) return;
+    } catch (e) {
+      // fallback to previous behavior
+      if (evt.target && evt.target.dataset && evt.target.dataset['guardClosingPreview']) return;
     }
 
     this.clearPreview();
   }
 
   handlerCloseModal(evt) {
-    // WIP:
-    if (evt.currentTarget.dataset["guardClosingPreview"]) {
-      console.log("guard by event currentTarget");
-      return;
-    }
-    // WIP:
-    if (evt.target.dataset["guardClosingPreview"]) {
-      console.log("guard by event target");
-      return;
+    // If any element in the event path has data-guard-closing-preview, do not close
+    try {
+      if (evt.currentTarget && evt.currentTarget.dataset && evt.currentTarget.dataset['guardClosingPreview']) return;
+      const path = evt.composedPath ? evt.composedPath() : (evt.path || []);
+      if (path && path.some(el => el && el.dataset && el.dataset['guardClosingPreview'])) return;
+    } catch (e) {
+      if (evt.target && evt.target.dataset && evt.target.dataset['guardClosingPreview']) return;
     }
 
     this.closeModal();
   }
 
+  _cleanupFor(container) {
+    if (!container) return;
+    const prev = this._previewInstances.get(container);
+    if (prev) {
+      try { if (typeof prev.cleanup === 'function') prev.cleanup(); } catch (e) { console.error(e); }
+      this._previewInstances.delete(container);
+    }
+    // ensure DOM is cleared as a last resort
+    container.innerHTML = '';
+  }
+
   clearPreview() {
-    this.previewTarget.innerHTML = '';
+    this._cleanupFor(this.previewTarget);
   }
 
   clearModal() {
-    this.modalBodyTarget.innerHTML = '';
+    this._cleanupFor(this.modalBodyTarget);
   }
 
   openModal() {
