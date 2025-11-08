@@ -30,7 +30,12 @@
       <% message.attachements.each do |att| %>
         <div class="container flex-shrink-0 w-auto mx-2">
           <% if att.representable? %>
-            <div class="my-2 h-40 w-40 bg-gray-200 flex cursor-pointer" data-action="click->messages#changePreview">
+            <div class="my-2 h-40 w-40 bg-gray-200 flex cursor-pointer"
+              data-source-url="<%= url_for(att) %>"
+              data-filename="<%= att.filename %>"
+              data-content-type="<%= att.content_type %>"
+              data-action="click->messages#changePreview"
+            >
               <% if ['video/quicktime', 'video/mp4'].include?(att.content_type) %>
                 <div class="relative">
                 <%= video_tag([rails_blob_path(att)],
@@ -59,7 +64,12 @@
               <% end %>
             </div>
           <% else %>
-            <div class="my-2 h-40 w-40 bg-gray-200 flex">
+            <div class="my-2 h-40 w-40 bg-gray-200 flex cursor-pointer"
+              data-source-url="<%= url_for(att) %>"
+              data-filename="<%= att.filename %>"
+              data-content-type="<%= att.content_type %>"
+              data-action="click->messages#changePreview"
+            >
               <%# TODO: ほかの SVG の箇所も併せて、ヘルパーにしてください %>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#333333" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
