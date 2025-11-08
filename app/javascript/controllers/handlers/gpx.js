@@ -1,13 +1,14 @@
 export default function open({ context, attachment }) {
   const { container } = context || {};
   const { sourceUrl } = attachment || {};
+
   // create map container locally so handler does not depend on controller API
   const mapId = `map-${Date.now()}`;
   const el = document.createElement('div');
   el.id = mapId;
   el.style.width = '800px';
   el.style.height = '800px';
-  el.className = 'object-contain max-h-full max-w-full mx-auto my-2';
+  el.className = 'object-contain max-h-full max-w-full mx-auto p-4';
   el.setAttribute('data-guard-closing-preview', 'true');
   container.appendChild(el);
 
