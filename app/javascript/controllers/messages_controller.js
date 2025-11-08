@@ -4,11 +4,13 @@ import imageHandler from "controllers/handlers/image";
 import videoHandler from "controllers/handlers/video";
 import gpxHandler from "controllers/handlers/gpx";
 import genericHandler from "controllers/handlers/generic";
+import textHandler from "controllers/handlers/text";
 
 const REGISTRY = [
   { match: (ct) => /^image\//.test(ct), handler: imageHandler },
   { match: (ct) => /^video\//.test(ct), handler: videoHandler },
   { match: (ct, fn) => ct === 'application/xml' && /\.gpx$/i.test(fn), handler: gpxHandler },
+  { match: (ct) => /^text\//.test(ct), handler: textHandler },
   { match: () => true, handler: genericHandler }
 ]
 
