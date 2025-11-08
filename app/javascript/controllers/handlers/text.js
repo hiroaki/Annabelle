@@ -4,7 +4,7 @@ export default async function open({ context, attachment }) {
   const MAX_BYTES = 16 * 1024; // 16 KiB head preview
 
   const wrapper = document.createElement('div');
-  wrapper.className = 'my-2 relative mb-2 w-full min-w-0 p-4 bg-white rounded-lg shadow-xs';
+  wrapper.className = 'relative w-full p-4';
 
   // mark wrapper to guard closing when interacting with media controls
   wrapper.setAttribute('data-guard-closing-preview', 'true');

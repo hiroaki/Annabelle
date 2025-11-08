@@ -8,7 +8,7 @@ export default function open({ context, attachment }) {
   video.controls = true;
   video.muted = true;
   video.preload = 'none';
-  video.className = 'lazyload w-full object-contain max-h-full max-w-full my-2';
+  video.className = 'lazyload w-full object-contain max-h-full max-w-full';
 
   // Prefer poster URL passed from controller if provided
   if (previewUrl) video.setAttribute('poster', previewUrl);
