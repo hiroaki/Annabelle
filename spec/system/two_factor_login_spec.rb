@@ -31,7 +31,7 @@ RSpec.describe 'Two-factor authentication login', type: :system do
     it 'allows login with correct OTP' do
       # ロケール確認のためのデバッグ出力
       Rails.logger.debug "Test start: I18n.locale = #{I18n.locale}"
-      
+
       # 英語ロケールでアクセス
       visit new_user_session_path(locale: :en)
       fill_in 'user_email', with: user.email
@@ -52,7 +52,7 @@ RSpec.describe 'Two-factor authentication login', type: :system do
     it 'shows error with incorrect OTP' do
       # ロケール確認のためのデバッグ出力
       Rails.logger.debug "Test start: I18n.locale = #{I18n.locale}"
-      
+
       # 英語ロケールでアクセス
       visit new_user_session_path(locale: :en)
       fill_in 'user_email', with: user.email

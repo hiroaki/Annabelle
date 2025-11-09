@@ -14,7 +14,7 @@ class Users::SessionsController < Devise::SessionsController
   # また、ログアウト前の言語設定を可能な限り維持します。
   def after_sign_out_path_for(resource_or_scope)
     locale = determine_logout_locale
-    
+
     if locale && locale != I18n.default_locale.to_s
       new_session_path(resource_or_scope, locale: locale)
     else
@@ -42,7 +42,7 @@ class Users::SessionsController < Devise::SessionsController
   def determine_logout_locale
     # ログアウト後に使用する言語を決定
     logout_locale = session.delete(:logout_locale)
-    
+
     if LocaleValidator.valid_locale?(logout_locale)
       logout_locale
     else

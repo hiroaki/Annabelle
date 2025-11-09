@@ -14,7 +14,7 @@ Rails.application.routes.draw do
   end
 
   # ロケールをURLに必須化（オプショナルから必須へ変更）
-  scope ":locale", locale: /en|ja/ do
+  scope ':locale', locale: /en|ja/ do
     devise_for :users, skip: :omniauth_callbacks, controllers: {
       registrations: 'users/registrations',
       sessions: 'users/sessions',
@@ -52,5 +52,5 @@ Rails.application.routes.draw do
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  get 'up' => 'rails/health#show', as: :rails_health_check
 end

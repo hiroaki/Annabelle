@@ -38,20 +38,20 @@ describe LocaleConfiguration do
       expect(LocaleConfiguration.locale_native_name(:es)).to eq('Es')
     end
   end
-  
+
   describe 'with_locale_config helper' do
     it '一時的に設定を変更できる' do
       original_default = LocaleConfiguration.default_locale
-      
+
       # 設定を一時的に変更してテスト
       with_locale_config('locales.default' => 'ja') do
         expect(LocaleConfiguration.default_locale).to eq(:ja)
       end
-      
+
       # テスト後は元の設定に戻っている
       expect(LocaleConfiguration.default_locale).to eq(original_default)
     end
-    
+
     it '複数の設定を一度に変更できる' do
       with_locale_config(
         'locales.default' => 'ja',
@@ -62,7 +62,7 @@ describe LocaleConfiguration do
       end
     end
   end
-  
+
   describe 'validation errors' do
     context 'when configuration file validation fails' do
       it "raises an error when 'locales.available' is not an array" do
@@ -101,8 +101,8 @@ describe LocaleConfiguration do
     context 'when configuration file does not exist' do
       it 'raises an error when configuration file does not exist' do
         original_root = Rails.root
-        original_instance = LocaleConfiguration.instance_variable_defined?(:@instance) ? 
-                           LocaleConfiguration.instance_variable_get(:@instance) : 
+        original_instance = LocaleConfiguration.instance_variable_defined?(:@instance) ?
+                           LocaleConfiguration.instance_variable_get(:@instance) :
                            nil
 
         begin

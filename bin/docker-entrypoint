@@ -3,8 +3,8 @@ set -e
 
 if [ "$RAILS_ENV" = "development" ]; then
   echo "[docker-entrypoint] Skipping db:prepare in development. Please run manually if needed."
+  echo "[docker-entrypoint] mkdir -p log tmp"
   mkdir -p log tmp
-  ./bin/rails tailwindcss:build
 else
   echo "Preparing database..."
   ./bin/rails db:prepare

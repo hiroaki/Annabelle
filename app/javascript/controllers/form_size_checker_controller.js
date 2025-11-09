@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus";
-import { appendMessageToStorage, renderFlashMessages } from "flash_messages";
+import { appendMessageToStorage, renderFlashMessages } from "flash_unified/all";
 
 // Checks the total size of form data before submission.
 // If the size exceeds the specified limit, shows an error message and cancels submission.

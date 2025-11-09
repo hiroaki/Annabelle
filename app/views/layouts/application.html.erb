@@ -3,7 +3,7 @@
   current_user_presenter = CurrentUserPresenter.new(self, current_user)
 %>
 <!DOCTYPE html>
-<html>
+<html data-flash-unified-enable-network-errors="true">
   <head>
     <title>Annabelle</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -13,12 +13,16 @@
     <%= javascript_importmap_tags %>
 
     <%= current_user_presenter.meta_tag %>
+
+    <%# WIP: EXPERIMENTAL FEATURE %>
+    <%= stylesheet_link_tag "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" %>
+    <%= javascript_include_tag "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js", defer: true %>
+    <%= javascript_include_tag "https://unpkg.com/leaflet-gpx@2.2.0/gpx.js", defer: true %>
   </head>
 
   <body class="min-h-screen flex flex-col">
-    <%= flash_templates %>
-    <%= flash_general_error_messages %>
-    <%= flash_global_storage %>
+    <%= flash_unified_sources %>
+    <%= exported_locale_messages %>
 
     <header class="flex p-2 lg:px-6 text-xs text-center text-slate-400 items-center bg-gray-100">
       <div class="flex items-center">

@@ -38,7 +38,7 @@ class LocaleConfiguration
   def locale_name(locale)
     locale_str = locale.to_s
     metadata = @config.dig('locales', 'metadata', locale_str)
-    
+
     if metadata && metadata['name']
       metadata['name']
     else
@@ -50,7 +50,7 @@ class LocaleConfiguration
   def locale_native_name(locale)
     locale_str = locale.to_s
     metadata = @config.dig('locales', 'metadata', locale_str)
-    
+
     if metadata && metadata['native_name']
       metadata['native_name']
     else
@@ -66,25 +66,25 @@ class LocaleConfiguration
     unless config_path.exist?
       raise "Configuration file not found: #{config_path}. Please ensure 'config/locales.yml' exists."
     end
-    
+
     @config = YAML.load_file(config_path)
-    
+
     # 必須の設定キーが存在するか検証
     validate_config!
-    
+
     Rails.logger.debug "[LocaleConfiguration] Loaded config from #{config_path}"
   end
-  
+
   # 最低限必要な設定が含まれているか検証
   def validate_config!
     unless @config.dig('locales', 'available').is_a?(Array) && !@config.dig('locales', 'available').empty?
       raise "Missing or invalid 'locales.available' setting in config/locales.yml"
     end
-    
+
     unless @config.dig('locales', 'default').is_a?(String)
       raise "Missing or invalid 'locales.default' setting in config/locales.yml"
     end
-    
+
     unless @config.dig('locales', 'metadata').is_a?(Hash)
       raise "Missing or invalid 'locales.metadata' setting in config/locales.yml"
     end
