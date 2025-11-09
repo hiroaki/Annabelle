@@ -3,8 +3,6 @@ name: CI
 on:
   push:
     branches: [ develop ]
-  pull_request:
-    branches: [ develop ]
   workflow_dispatch:
 
 jobs:
@@ -31,6 +29,15 @@ jobs:
         with:
           ruby-version: ${{ env.RUBY_VERSION }}
           bundler-cache: true
+
+      - name: Run RuboCop
+        run: |
+          # Run lint early so failures are fast and avoid running full test setup when lint fails
+          if [ -x bin/rubocop ]; then
+            bin/rubocop
+          else
+            bundle exec rubocop
+          fi
 
       - name: Install tools (ImageMagick, SQLite3, etc.)
         run: |

@@ -213,95 +213,14 @@ For implementation details around locales, please refer to the documentation in 
 
 ## Flash Message / フラッシュ・メッセージ
 
-A unique implementation is used for flash messages, which are temporary messages displayed to users, in this application.
+フラッシュ・メッセージについては、 gem `flash_unified` を使用しています。この gem は、このプロジェクトで実験的に実装したものを切り出して gem として整えたものです。
 
-一時的に表示されるメッセージであるフラッシュ・メッセージについて、このアプリでは独特の実装をしています。
+くわしくは gem のプロジェクト・ページ [https://github.com/hiroaki/flash-unified](https://github.com/hiroaki/flash-unified) を参照してください。
 
-Normally, flash objects containing messages are expanded within templates and rendered as part of the page. In Annabelle, while the messages are still embedded in the page, the actual rendering (formatting) is handled on the client side (JavaScript).
+For flash messages, the gem `flash_unified` is used. This gem was originally developed experimentally in this project and then extracted and published as a standalone gem.
 
-通常であればメッセージがセットされた flash オブジェクトを、テンプレートの中で展開して、ページの一部として render させるように扱われます。それに対して Annabelle では、ページの一部に埋め込むのは同じではありますが、それをページの一部として描画（整形）するのはクライアント (JavaScript) 側の処理になっています。
+For more details, please refer to the gem's project page: [https://github.com/hiroaki/flash-unified](https://github.com/hiroaki/flash-unified).
 
-This client-side rendering approach solves the following issues:
-- Messages in response to error responses from proxies (before the request reaches Rails) can be displayed using the same mechanism.
-- Arbitrary messages originating from the client can also be displayed using the same process (and template).
-
-このクライアント・サイドによる描画の仕組みにより、次のことが解決されています：
-- （リクエストが Rails に到達する前の） Proxy によるエラー・レスポンスに応じたメッセージを同じ仕組みで表示させる
-- クライアント由来の任意のメッセージも同じ処理（同じテンプレート）で表示させる
-
-On the server side, flash messages are set as usual:
-
-サーバーのアクションは通常のとおり、フラッシュ・メッセージをセットします：
-
-```
-flash.now.alert = I18n.t("messages.errors.generic", error_message: "Something Wrong!")
-```
-
-For processing on the JavaScript side, the following HTML structure is output as a hidden element on the page. The element with the data attribute `data-flash-storage` is referred to here as "flash storage" or simply "storage":
-
-JavaScript での処理のために、ページに隠し要素として次の HTML 構造で書き出すようにします。なお、この data 属性 `data-flash-storage` を持った要素を、ここでは "フラッシュ・ストレージ" または単に "ストレージ" と呼称します：
-
-```
-<div data-flash-storage style="display: none;">
-  <ul>
-    <% flash.each do |type, message| %>
-      <li data-type="<%= type %>"><%= message %></li>
-    <% end %>
-  </ul>
-</div>
-```
-
-This is a standard structure and is provided as the partial 'shared/flash_storage'. By rendering this partial, the above HTML structure will be output:
-
-これは定型のものなので、パーシャル 'shared/flash_storage' として用意されています。つまりこのようにすれば、上記の HTML 構造が書き出されます：
-
-```
-<%= render 'shared/flash_storage' %>
-```
-
-Alternatively, with Turbo Stream:
-
-または Turbo Stream であればこのように：
-
-```
-render turbo_stream: turbo_stream.update('flash-storage', partial: 'shared/flash_storage')
-```
-
-To display messages, place an element with the data attribute `data-flash-message-container` (referred to as the "message container") where you want the messages to appear:
-
-そして、メッセージを表示させたい場所には、 data 属性 `data-flash-message-container` を持った要素（ "メッセージ・コンテナ" と呼称します）を配置します：
-
-```
-<div data-flash-message-container></div>
-```
-
-When a browser receives a page response containing these elements, events configured in advance by the initialization function `initializeFlashMessageSystem` are triggered. The event handler then reconstructs the HTML for the flash messages inside the message container based on the contents of the storage.
-
-これらが埋め込まれたページのレスポンスをブラウザが受け取ると、あらかじめ初期化関数 `initializeFlashMessageSystem` で設定していた、関連するイベントが発火します。そのイベント・ハンドラーがストレージの内容をもとに、メッセージ・コンテナの中のフラッシュ・メッセージの HTML 部分を再構成するようになっています。
-
-To explicitly display messages from JavaScript, use the storage creation function `appendMessageToStorage` to set a message in the storage, then execute the rendering function `renderFlashMessages`.
-
-また、 JavaScript から明示的に表示する場合は、ストレージ作成関数 `appendMessageToStorage` を用いてストレージにメッセージをセットしてから、描画関数 `renderFlashMessages` を実行します。
-
-```
-appendMessageToStorage('Something Wrong!', 'alert');
-renderFlashMessages();
-```
-
-In summary, this mechanism works as follows:
-(1) Set a message in the storage
-(2) Call the rendering function
-This is a two-step process. Since the rendering function handles the display templates, both server-side and client-side messages are displayed in the message container with the same HTML design.
-
-
-要するに、この仕組みは：
-(1) ストレージにメッセージをセットし
-(2) 描画関数を呼び出す
-という二段回の処理になっているということです。描画関数が表示のためのテンプレートを扱うので、サーバーサイド由来のメッセージも、クライアント由来のメッセージも、同様の HTML デザインでメッセージ・コンテナに表示することになります。
-
-For more details, please refer to the source code comments, which also include usage instructions.
-
-ソースコードのコメントに使い方の説明がありますので、そちらも参照してください。
 
 ## Testing / テスト
 

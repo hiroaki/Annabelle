@@ -2,7 +2,7 @@
 module LocaleHelper
   # ロケールパスのバリデーションエラー専用例外
   class LocalePathValidationError < StandardError
-    def initialize(message = "Invalid path format")
+    def initialize(message = 'Invalid path format')
       super(message)
     end
   end
@@ -32,7 +32,7 @@ module LocaleHelper
 
   # リンクのCSSクラス（選択中ロケールで強調）
   def base_link_classes(locale, additional_classes = nil)
-    classes = ["hover:text-slate-600"]
+    classes = ['hover:text-slate-600']
     classes << (I18n.locale == locale.to_sym ? 'font-bold' : '')
     classes << additional_classes if additional_classes.present?
     classes.compact.join(' ')

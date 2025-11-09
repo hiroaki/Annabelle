@@ -1,7 +1,6 @@
 <div class="container p-4 max-w-xl mx-auto">
   <%= content_tag :h2, t('devise.registrations.sign_up'), class: 'text-2xl font-bold mb-4', **data_with_testid('signup-title') %>
 
-  <%= flash_storage %>
   <%= flash_container %>
 
   <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-6" }) do |f| %>
