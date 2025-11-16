@@ -2,5 +2,4 @@
 import "@hotwired/turbo-rails"
 import "controllers"
 import "channels"
-import "lib/lazysizes.min"
 import "flash_unified/all"
