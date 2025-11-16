@@ -86,6 +86,7 @@
               link_to('&#x1F4BE;'.html_safe, rails_blob_path(att, disposition: 'attachment'),
                 class: 'tooltip-trigger inline-block ',
                 data: {
+                  turbo: false,
                   controller: 'tooltips',
                   tooltip: att.filename.to_s,
                 }
