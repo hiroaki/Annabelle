@@ -88,6 +88,14 @@ RSpec.describe User, type: :model do
         user = build(:user, email: 'invalid-email')
         expect(user).to be_invalid
       end
+
+      it "画像メタ情報の既定値が設定されていること" do
+        user = described_class.new
+
+        expect(user.default_strip_metadata).to be true
+        expect(user.default_allow_location_public).to be false
+        expect(user.show_image_location_on_preview).to be true
+      end
     end
   end
 
