@@ -25,7 +25,7 @@ RSpec.describe ActiveStorage::Analyzer::ExifAnalyzer do
 
       metadata = described_class.new(blob).metadata
 
-      expect(metadata).to include(:extracted_metadata)
+      expect(metadata).to include(:width, :height, :extracted_metadata)
       extracted = metadata[:extracted_metadata]
       expect(extracted[:gps][:latitude]).to be_within(0.000001).of(35.681236)
       expect(extracted[:gps][:longitude]).to be_within(0.000001).of(139.767125)
@@ -38,7 +38,9 @@ RSpec.describe ActiveStorage::Analyzer::ExifAnalyzer do
     it "returns an empty hash when no EXIF data exists" do
       blob = create_blob("test_image_proper.jpg")
 
-      expect(described_class.new(blob).metadata).to eq({})
+      metadata = described_class.new(blob).metadata
+      expect(metadata).to include(:width, :height)
+      expect(metadata).not_to include(:extracted_metadata)
     ensure
       blob.purge
     end
@@ -47,7 +49,9 @@ RSpec.describe ActiveStorage::Analyzer::ExifAnalyzer do
       blob = create_blob("image_with_gps.jpg")
       allow(::EXIFR::JPEG).to receive(:new).and_raise(::EXIFR::MalformedJPEG.new("bad data"))
 
-      expect(described_class.new(blob).metadata).to eq({})
+      metadata = described_class.new(blob).metadata
+      expect(metadata).to include(:width, :height)
+      expect(metadata).not_to include(:extracted_metadata)
     ensure
       blob.purge
     end

@@ -1,6 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe Message, type: :model do
+  include ActiveJob::TestHelper
+
+  around do |example|
+    perform_enqueued_jobs { example.run }
+  end
   describe "アソシエーション" do
     it "user に属していること" do
       association = described_class.reflect_on_association(:user)
@@ -19,6 +24,24 @@ RSpec.describe Message, type: :model do
       file = fixture_file_upload(Rails.root.join('spec', 'fixtures', 'files', 'sample.txt'), 'text/plain')
       message.attachements.attach(file)
       expect(message.attachements.count).to eq(1)
+    end
+
+    it "EXIF付き画像を添付した場合、blobのmetadataにEXIF情報が格納されること" do
+      message = create(:message)
+      image = fixture_file_upload(Rails.root.join('spec', 'fixtures', 'files', 'image_with_gps.jpg'), 'image/jpeg')
+      message.attachements.attach(image)
+
+      blob = message.attachements.last.blob
+      blob.analyze
+      blob.reload
+
+      extracted = blob.metadata.fetch('extracted_metadata', {})
+      expect(extracted).not_to be_empty
+      expect(extracted).to include('gps', 'datetime', 'camera')
+      expect(extracted['gps']['latitude']).to be_within(0.000001).of(35.681236)
+      expect(extracted['gps']['longitude']).to be_within(0.000001).of(139.767125)
+      expect(extracted['datetime']).to eq('2025-01-02T03:04:05+09:00')
+      expect(extracted['camera']).to eq({ 'make' => 'ExampleCam', 'model' => 'Imaginary 1' })
     end
   end
 end

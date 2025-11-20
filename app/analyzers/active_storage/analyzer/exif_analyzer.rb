@@ -14,15 +14,22 @@ class ActiveStorage::Analyzer::ExifAnalyzer < ActiveStorage::Analyzer
   def metadata
     return {} unless self.class.accept?(blob)
 
-    download_blob_to_tempfile do |file|
-      build_metadata(file)
-    end
+    base_metadata = default_analyzer_metadata
+    exif_metadata = extract_exif_metadata
+
+    base_metadata.merge(exif_metadata)
   rescue ::EXIFR::MalformedJPEG, ::EOFError, ::ArgumentError => error
     log_debug(error)
-    {}
+    base_metadata
   end
 
   private
+
+  def extract_exif_metadata
+    download_blob_to_tempfile do |file|
+      build_metadata(file)
+    end
+  end
 
   def build_metadata(file)
     exif = ::EXIFR::JPEG.new(file.path)
@@ -38,6 +45,21 @@ class ActiveStorage::Analyzer::ExifAnalyzer < ActiveStorage::Analyzer
     extracted[:camera] = camera if camera
 
     extracted.empty? ? {} : { extracted_metadata: extracted }
+  end
+
+  def default_analyzer_metadata
+    analyzer = default_analyzer_class
+    return {} unless analyzer
+
+    analyzer.new(blob).metadata
+  end
+
+  def default_analyzer_class
+    ActiveStorage.analyzers.detect do |klass|
+      next if klass == self.class
+
+      klass.accept?(blob)
+    end
   end
 
   def extract_gps(exif)
