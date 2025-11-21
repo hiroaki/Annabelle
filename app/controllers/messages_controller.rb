@@ -41,7 +41,12 @@ class MessagesController < ApplicationController
   private
 
     def message_params
-      params.permit(:content, attachements: [])
+      permitted = params.permit(:content, attachements: [])
+      if permitted.key?(:attachements)
+        # Remove empty file entries (browsers may submit "") to avoid treating them as uploads.
+        permitted[:attachements] = Array.wrap(permitted[:attachements]).compact_blank
+      end
+      permitted
     end
 
     def require_confirmed_user_for_non_safe_requests
