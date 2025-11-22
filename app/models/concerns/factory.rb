@@ -41,13 +41,29 @@ module Factory
   #   may rely on the message and attachments being present in the DB.
   # - Broadcasting (`MessageBroadcastJob`) is enqueued after creation so that
   #   consumers rendering the message can safely find the persisted attachments.
+  # - Image metadata handling: strip_metadata/allow_location_public settings are
+  #   recorded in blob.metadata['upload_settings'] and ImageMetadataAction audit log.
+  #   EXIF extraction runs asynchronously via ExtractImageMetadataJob.
   def create_message!(params)
+    # Extract metadata handling params (optional)
+    strip_metadata = params.delete(:strip_metadata)
+    allow_location_public = params.delete(:allow_location_public)
+    ip_address = params.delete(:ip_address)
+    user_agent = params.delete(:user_agent)
+
     attachments = extract_attachements(params)
 
     message = nil
     Message.transaction do
       message = Message.create!(params)
-      attach_files(message, attachments)
+      attach_files_with_metadata_handling(
+        message,
+        attachments,
+        strip_metadata: strip_metadata,
+        allow_location_public: allow_location_public,
+        ip_address: ip_address,
+        user_agent: user_agent
+      )
     end
 
     MessageBroadcastJob.perform_later(message.id)
@@ -115,6 +131,54 @@ module Factory
         next if attachable.nil?
 
         message.attachements.attach(attachable)
+      end
+    end
+
+    # Attach files with metadata handling (strip, audit log, EXIF extraction).
+    #
+    # This method extends attach_files with:
+    # - Recording upload_settings in blob.metadata
+    # - Creating ImageMetadataAction audit log
+    # - Enqueuing ExtractImageMetadataJob for async EXIF extraction
+    #
+    # Note: strip_metadata processing is not yet implemented (requires image_processing gem).
+    def attach_files_with_metadata_handling(message, attachments, strip_metadata:, allow_location_public:, ip_address:, user_agent:)
+      attachments.each do |upload|
+        attachable = normalize_attachment(upload)
+        next if attachable.nil?
+
+        # TODO: Implement strip_metadata processing here when image_processing is added
+        # if strip_metadata && image_file?(attachable)
+        #   attachable = strip_image_metadata(attachable)
+        # end
+
+        message.attachements.attach(attachable)
+        attachment = message.attachements.last
+        blob = attachment.blob
+
+        # Store upload settings in blob metadata
+        if strip_metadata || allow_location_public
+          blob.update(metadata: blob.metadata.merge(
+            'upload_settings' => {
+              'strip_metadata' => strip_metadata || false,
+              'allow_location_public' => allow_location_public || false
+            }
+          ))
+        end
+
+        # Record audit log
+        ImageMetadataAction.create!(
+          user: message.user,
+          blob_id: blob.key,
+          action: 'upload',
+          strip_metadata: strip_metadata || false,
+          allow_location_public: allow_location_public || false,
+          ip_address: ip_address,
+          user_agent: user_agent
+        )
+
+        # Enqueue EXIF extraction job
+        ExtractImageMetadataJob.perform_later(blob.id)
       end
     end
 

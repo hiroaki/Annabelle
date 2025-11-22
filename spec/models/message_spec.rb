@@ -35,7 +35,7 @@ RSpec.describe Message, type: :model do
       blob.analyze
       blob.reload
 
-      extracted = blob.metadata.fetch('extracted_metadata', {})
+      extracted = blob.metadata.fetch('exif', {})
       expect(extracted).not_to be_empty
       expect(extracted).to include('gps', 'datetime', 'camera')
       expect(extracted['gps']['latitude']).to be_within(0.000001).of(35.681236)

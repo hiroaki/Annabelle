@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_20_000000) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_21_000000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -47,6 +47,21 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_20_000000) do
     t.integer "user_id", null: false
     t.index ["provider", "uid"], name: "index_authorizations_on_provider_and_uid", unique: true
     t.index ["user_id"], name: "index_authorizations_on_user_id"
+  end
+
+  create_table "image_metadata_actions", force: :cascade do |t|
+    t.string "action", default: "upload", null: false
+    t.boolean "allow_location_public", default: false, null: false
+    t.string "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.boolean "strip_metadata", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.text "user_agent"
+    t.integer "user_id", null: false
+    t.index ["blob_id"], name: "index_image_metadata_actions_on_blob_id"
+    t.index ["user_id", "created_at"], name: "index_image_metadata_actions_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_image_metadata_actions_on_user_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -95,5 +110,6 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_20_000000) do
 
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "authorizations", "users"
+  add_foreign_key "image_metadata_actions", "users"
   add_foreign_key "messages", "users"
 end

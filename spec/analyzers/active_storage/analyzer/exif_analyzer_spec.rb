@@ -25,8 +25,8 @@ RSpec.describe ActiveStorage::Analyzer::ExifAnalyzer do
 
       metadata = described_class.new(blob).metadata
 
-      expect(metadata).to include(:width, :height, :extracted_metadata)
-      extracted = metadata[:extracted_metadata]
+      expect(metadata).to include(:width, :height, :exif)
+      extracted = metadata[:exif]
       expect(extracted[:gps][:latitude]).to be_within(0.000001).of(35.681236)
       expect(extracted[:gps][:longitude]).to be_within(0.000001).of(139.767125)
       expect(extracted[:datetime]).to eq("2025-01-02T03:04:05+09:00")
@@ -40,7 +40,7 @@ RSpec.describe ActiveStorage::Analyzer::ExifAnalyzer do
 
       metadata = described_class.new(blob).metadata
       expect(metadata).to include(:width, :height)
-      expect(metadata).not_to include(:extracted_metadata)
+      expect(metadata).not_to include(:exif)
     ensure
       blob.purge
     end
@@ -51,7 +51,7 @@ RSpec.describe ActiveStorage::Analyzer::ExifAnalyzer do
 
       metadata = described_class.new(blob).metadata
       expect(metadata).to include(:width, :height)
-      expect(metadata).not_to include(:extracted_metadata)
+      expect(metadata).not_to include(:exif)
     ensure
       blob.purge
     end

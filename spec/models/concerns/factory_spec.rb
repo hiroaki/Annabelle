@@ -49,6 +49,89 @@ RSpec.describe Factory, type: :model do
 
       factory.create_message!(params)
     end
+
+    context 'with metadata handling' do
+      before do
+        allow(ExtractImageMetadataJob).to receive(:perform_later)
+      end
+
+      it 'records upload_settings in blob metadata' do
+        file = fixture_file_upload('test_image.jpg', 'image/jpeg')
+        params = {
+          content: 'with metadata',
+          user_id: user.id,
+          attachements: [file],
+          strip_metadata: true,
+          allow_location_public: false
+        }
+
+        factory.create_message!(params)
+        blob = Message.last.attachements.last.blob
+
+        expect(blob.metadata['upload_settings']).to eq({
+          'strip_metadata' => true,
+          'allow_location_public' => false
+        })
+      end
+
+      it 'creates ImageMetadataAction audit log' do
+        file = fixture_file_upload('test_image.jpg', 'image/jpeg')
+        params = {
+          content: 'with audit',
+          user_id: user.id,
+          attachements: [file],
+          strip_metadata: true,
+          allow_location_public: false,
+          ip_address: '127.0.0.1',
+          user_agent: 'Test Browser'
+        }
+
+        expect {
+          factory.create_message!(params)
+        }.to change(ImageMetadataAction, :count).by(1)
+
+        action = ImageMetadataAction.last
+        expect(action.user).to eq(user)
+        expect(action.strip_metadata).to be true
+        expect(action.allow_location_public).to be false
+        expect(action.ip_address).to eq('127.0.0.1')
+        expect(action.user_agent).to eq('Test Browser')
+      end
+
+      it 'enqueues ExtractImageMetadataJob' do
+        file = fixture_file_upload('test_image.jpg', 'image/jpeg')
+        params = {
+          content: 'with exif job',
+          user_id: user.id,
+          attachements: [file]
+        }
+
+        factory.create_message!(params)
+        blob = Message.last.attachements.last.blob
+
+        expect(ExtractImageMetadataJob).to have_received(:perform_later).with(blob.id)
+      end
+    end
+  end
+
+  describe '#attach_files (private)' do
+    let(:message_without_metadata) { create(:message, user: user) }
+
+    it 'attaches normalized uploads without metadata handling' do
+      file = fixture_file_upload('test_image_proper.jpg', 'image/jpeg')
+
+      expect {
+        factory.send(:attach_files, message_without_metadata, [file])
+      }.to change(message_without_metadata.attachements, :count).by(1)
+    ensure
+      message_without_metadata.attachements.purge
+    end
+
+    it 'skips nil attachments gracefully' do
+      expect {
+        factory.send(:attach_files, message_without_metadata, [nil])
+      }.not_to change(message_without_metadata.attachements, :count)
+    end
   end
 
   describe '#destroy_message!' do

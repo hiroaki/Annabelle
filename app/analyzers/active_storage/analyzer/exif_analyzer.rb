@@ -44,7 +44,7 @@ class ActiveStorage::Analyzer::ExifAnalyzer < ActiveStorage::Analyzer
     camera = extract_camera(exif)
     extracted[:camera] = camera if camera
 
-    extracted.empty? ? {} : { extracted_metadata: extracted }
+    extracted.empty? ? {} : { exif: extracted }
   end
 
   def default_analyzer_metadata
