@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "exifr/jpeg"
+require 'exifr/jpeg'
 
 class ActiveStorage::Analyzer::ExifAnalyzer < ActiveStorage::Analyzer
   SUPPORTED_CONTENT_TYPES = %w[image/jpeg image/jpg image/pjpeg].freeze

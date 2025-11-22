@@ -9,7 +9,7 @@ class MessagesController < ApplicationController
   end
 
   def create
-    create_message!(message_params.merge(user: current_user))
+    create_message!(message_params.merge(user: current_user, ip_address: request.remote_ip, user_agent: request.user_agent))
   rescue => ex
     flash.now.alert = I18n.t('messages.errors.generic', error_message: ex.message)
     respond_to do |format|
@@ -41,7 +41,7 @@ class MessagesController < ApplicationController
   private
 
     def message_params
-      permitted = params.permit(:content, attachements: [])
+      permitted = params.permit(:content, :strip_metadata, :allow_location_public, attachements: [])
       if permitted.key?(:attachements)
         # Remove empty file entries (browsers may submit "") to avoid treating them as uploads.
         permitted[:attachements] = Array.wrap(permitted[:attachements]).compact_blank

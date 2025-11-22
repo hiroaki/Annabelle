@@ -147,10 +147,9 @@ module Factory
         attachable = normalize_attachment(upload)
         next if attachable.nil?
 
-        # TODO: Implement strip_metadata processing here when image_processing is added
-        # if strip_metadata && image_file?(attachable)
-        #   attachable = strip_image_metadata(attachable)
-        # end
+        if strip_metadata && image_file?(attachable)
+          attachable = ImageMetadata::Stripper.strip(attachable)
+        end
 
         message.attachements.attach(attachable)
         attachment = message.attachements.last
@@ -221,6 +220,19 @@ module Factory
       end
 
       nil
+    end
+
+    # Return true if the attachable appears to be an image based on content_type
+    def image_file?(attachable)
+      content_type = if attachable.is_a?(Hash)
+                       attachable[:content_type].to_s
+      elsif attachable.respond_to?(:content_type)
+                       attachable.content_type.to_s
+      else
+                       ''
+      end
+
+      content_type.start_with?('image')
     end
 
     # Resolve a signed blob id to an ActiveStorage::Blob.

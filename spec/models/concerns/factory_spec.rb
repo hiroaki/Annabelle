@@ -111,6 +111,22 @@ RSpec.describe Factory, type: :model do
 
         expect(ExtractImageMetadataJob).to have_received(:perform_later).with(blob.id)
       end
+
+      it 'invokes ImageMetadata::Stripper when strip_metadata is requested' do
+        file = fixture_file_upload('test_image.jpg', 'image/jpeg')
+        params = {
+          content: 'with stripper call',
+          user_id: user.id,
+          attachements: [file],
+          strip_metadata: true
+        }
+
+        allow(ImageMetadata::Stripper).to receive(:strip).and_call_original
+
+        factory.create_message!(params)
+
+        expect(ImageMetadata::Stripper).to have_received(:strip).at_least(:once)
+      end
     end
   end
 
@@ -171,14 +187,14 @@ RSpec.describe Factory, type: :model do
 
   describe '#normalize_attachment (private)' do
     # Test the private method indirectly through create_message!
-    
+
     it 'accepts and attaches an ActiveStorage::Blob directly' do
       blob = ActiveStorage::Blob.create_and_upload!(
         io: File.open(Rails.root.join('spec/fixtures/files/test_image.jpg')),
         filename: 'blob_test.jpg',
         content_type: 'image/jpeg'
       )
-      
+
       params = {
         content: 'with blob',
         user_id: user.id,
@@ -211,7 +227,7 @@ RSpec.describe Factory, type: :model do
 
     it 'accepts and attaches a Hash with io and filename' do
       file_path = Rails.root.join('spec/fixtures/files/test_image.jpg')
-      
+
       attachable_hash = {
         'io' => File.open(file_path),
         'filename' => 'hash_test.jpg',
@@ -251,6 +267,18 @@ RSpec.describe Factory, type: :model do
         msg = factory.create_message!(params)
         expect(msg.attachements.size).to eq(0)
       }.not_to raise_error
+    end
+  end
+
+  describe '#image_file? (private)' do
+    it 'returns true when attachable responds to content_type with an image MIME' do
+      attachable = double('Attachable', content_type: 'image/png')
+      expect(factory.send(:image_file?, attachable)).to be true
+    end
+
+    it 'returns false when attachable lacks content_type information' do
+      attachable = Object.new
+      expect(factory.send(:image_file?, attachable)).to be false
     end
   end
 end
