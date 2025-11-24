@@ -46,6 +46,26 @@
                   required: true,
                 ) %>
               </div>
+              <div class="px-4 py-3 border-t bg-gray-50 space-y-4">
+                <label class="flex items-start gap-3">
+                  <%= form.check_box(:strip_metadata,
+                    { checked: strip_metadata_preference, id: 'message_strip_metadata', class: 'mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded' }
+                  ) %>
+                  <span class="text-sm">
+                    <span class="font-medium text-gray-900 block"><%= t('messages.form.strip_metadata_label') %></span>
+                    <span class="text-gray-600"><%= t('messages.form.strip_metadata_help') %></span>
+                  </span>
+                </label>
+                <label class="flex items-start gap-3">
+                  <%= form.check_box(:allow_location_public,
+                    { checked: allow_location_public_preference, id: 'message_allow_location_public', class: 'mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded' }
+                  ) %>
+                  <span class="text-sm">
+                    <span class="font-medium text-gray-900 block"><%= t('messages.form.allow_location_public_label') %></span>
+                    <span class="text-gray-600"><%= t('messages.form.allow_location_public_help') %></span>
+                  </span>
+                </label>
+              </div>
               <div class="flex items-center justify-between px-3 py-2 border-t">
 
                 <div class="my-0 text-left">
@@ -66,6 +86,7 @@
                     <%=
                       form.file_field(:attachements,
                         multiple: true,
+                        id: 'message_attachements',
                         class: 'hidden',
                         data: {
                           'file-upload-target' => 'fileInput',

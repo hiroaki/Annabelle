@@ -127,26 +127,87 @@ RSpec.describe Factory, type: :model do
 
         expect(ImageMetadata::Stripper).to have_received(:strip).at_least(:once)
       end
-    end
-  end
 
-  describe '#attach_files (private)' do
-    let(:message_without_metadata) { create(:message, user: user) }
+      context 'when strip_and_upload fails' do
+        before do
+          allow(ImageMetadata::Stripper).to receive(:strip_and_upload).and_raise(StandardError, "Simulated failure")
+          allow(ImageMetadata::Stripper).to receive(:strip).and_call_original
+        end
 
-    it 'attaches normalized uploads without metadata handling' do
-      file = fixture_file_upload('test_image_proper.jpg', 'image/jpeg')
+        it 'logs warning and falls back to in-memory strip for Hash attachables' do
+          file = fixture_file_upload('test_image.jpg', 'image/jpeg')
+          params = {
+            content: 'fallback hash',
+            user_id: user.id,
+            attachements: [file],
+            strip_metadata: true
+          }
 
-      expect {
-        factory.send(:attach_files, message_without_metadata, [file])
-      }.to change(message_without_metadata.attachements, :count).by(1)
-    ensure
-      message_without_metadata.attachements.purge
-    end
+          expect(Rails.logger).to receive(:warn).with(/strip_and_upload failed/)
+          factory.create_message!(params)
+          expect(ImageMetadata::Stripper).to have_received(:strip)
+        end
 
-    it 'skips nil attachments gracefully' do
-      expect {
-        factory.send(:attach_files, message_without_metadata, [nil])
-      }.not_to change(message_without_metadata.attachements, :count)
+        it 'logs warning and falls back to in-memory strip for Blob attachables' do
+          blob = ActiveStorage::Blob.create_and_upload!(
+            io: File.open(Rails.root.join('spec/fixtures/files/test_image.jpg')),
+            filename: 'blob_test.jpg',
+            content_type: 'image/jpeg'
+          )
+          params = {
+            content: 'fallback blob',
+            user_id: user.id,
+            attachements: [blob],
+            strip_metadata: true
+          }
+
+          expect(Rails.logger).to receive(:warn).with(/strip_and_upload failed/)
+          factory.create_message!(params)
+          expect(ImageMetadata::Stripper).to have_received(:strip)
+        end
+
+        it 'logs warning and falls back to in-memory strip for Attachment attachables' do
+          blob = ActiveStorage::Blob.create_and_upload!(
+            io: File.open(Rails.root.join('spec/fixtures/files/test_image.jpg')),
+            filename: 'attachment_test.jpg',
+            content_type: 'image/jpeg'
+          )
+          message.attachements.attach(blob)
+          attachment = message.attachements.last
+
+          params = {
+            content: 'fallback attachment',
+            user_id: user.id,
+            attachements: [attachment],
+            strip_metadata: true
+          }
+
+          expect(Rails.logger).to receive(:warn).with(/strip_and_upload failed/)
+          factory.create_message!(params)
+          expect(ImageMetadata::Stripper).to have_received(:strip)
+        end
+      end
+
+      it 'updates metadata for existing blobs when settings are provided (Case 3)' do
+        blob = ActiveStorage::Blob.create_and_upload!(
+          io: File.open(Rails.root.join('spec/fixtures/files/test_image.jpg')),
+          filename: 'existing_blob.jpg',
+          content_type: 'image/jpeg'
+        )
+
+        params = {
+          content: 'existing blob update',
+          user_id: user.id,
+          attachements: [blob],
+          strip_metadata: false,
+          allow_location_public: true
+        }
+
+        factory.create_message!(params)
+
+        blob.reload
+        expect(blob.metadata['upload_settings']['allow_location_public']).to be true
+      end
     end
   end
 

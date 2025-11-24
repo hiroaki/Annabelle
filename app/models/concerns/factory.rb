@@ -46,8 +46,9 @@ module Factory
   #   EXIF extraction runs asynchronously via ExtractImageMetadataJob.
   def create_message!(params)
     # Extract metadata handling params (optional)
-    strip_metadata = params.delete(:strip_metadata)
-    allow_location_public = params.delete(:allow_location_public)
+    # Normalize to boolean (nil becomes false) to ensure consistency between processing and audit log
+    strip_metadata = params.delete(:strip_metadata) || false
+    allow_location_public = params.delete(:allow_location_public) || false
     ip_address = params.delete(:ip_address)
     user_agent = params.delete(:user_agent)
 
@@ -56,14 +57,32 @@ module Factory
     message = nil
     Message.transaction do
       message = Message.create!(params)
-      attach_files_with_metadata_handling(
-        message,
-        attachments,
-        strip_metadata: strip_metadata,
-        allow_location_public: allow_location_public,
-        ip_address: ip_address,
-        user_agent: user_agent
-      )
+      attachments.each do |attachment|
+        blob = attach_file_with_metadata_handling(
+          message,
+          attachment,
+          strip_metadata: strip_metadata,
+          allow_location_public: allow_location_public
+        )
+
+        next unless blob
+
+        # Record audit log
+        ImageMetadataAction.create!(
+          user: message.user,
+          blob_id: blob.key,
+          action: 'upload',
+          strip_metadata: strip_metadata,
+          allow_location_public: allow_location_public,
+          ip_address: ip_address,
+          user_agent: user_agent
+        )
+      end
+    end
+
+    # Enqueue EXIF extraction jobs for all attachments after transaction commits
+    message.attachements.each do |attachment|
+      ExtractImageMetadataJob.perform_later(attachment.blob_id) if attachment.blob.content_type.start_with?('image')
     end
 
     MessageBroadcastJob.perform_later(message.id)
@@ -117,68 +136,79 @@ module Factory
       Array.wrap(raw)
     end
 
-    # Iterate over provided uploads and attach them to the message.
+    # Attach a file with metadata handling (strip, EXIF extraction).
     #
-    # Why this explicit loop?
-    # - We convert a few common upload shapes (UploadedFile, signed
-    #   blob ids, already-built attachable hashes) into the attachable forms
-    #   Active Storage expects. Doing this explicitly prevents accidental
-    #   creation of empty/invalid blobs and makes the behavior deterministic for
-    #   downstream jobs and tests.
-    def attach_files(message, attachments)
-      attachments.each do |upload|
-        attachable = normalize_attachment(upload)
-        next if attachable.nil?
-
-        message.attachements.attach(attachable)
-      end
-    end
-
-    # Attach files with metadata handling (strip, audit log, EXIF extraction).
-    #
-    # This method extends attach_files with:
+    # This method handles:
     # - Recording upload_settings in blob.metadata
-    # - Creating ImageMetadataAction audit log
     # - Enqueuing ExtractImageMetadataJob for async EXIF extraction
     #
+    # Returns the attached ActiveStorage::Blob, or nil if attachment failed/skipped.
+    #
     # Note: strip_metadata processing is not yet implemented (requires image_processing gem).
-    def attach_files_with_metadata_handling(message, attachments, strip_metadata:, allow_location_public:, ip_address:, user_agent:)
-      attachments.each do |upload|
-        attachable = normalize_attachment(upload)
-        next if attachable.nil?
+    def attach_file_with_metadata_handling(message, upload, strip_metadata:, allow_location_public:)
+      attachable = normalize_attachment(upload)
+      return nil if attachable.nil?
 
-        if strip_metadata && image_file?(attachable)
-          attachable = ImageMetadata::Stripper.strip(attachable)
+      # Prepare upload settings metadata to persist into the blob when needed
+      upload_settings = if strip_metadata || allow_location_public
+                          {
+                            'upload_settings' => {
+                              'strip_metadata' => strip_metadata,
+                              'allow_location_public' => allow_location_public
+                            }
+                          }
+                        end
+
+      # Will hold the final ActiveStorage::Blob object (either newly created or existing)
+      # for use in the audit log creation at the end of the method.
+      blob = nil
+
+      # Try strip_and_upload if requested
+      if strip_metadata && image_file?(attachable)
+        begin
+          blob = ImageMetadata::Stripper.strip_and_upload(attachable, metadata: upload_settings)
+        rescue => e
+          Rails.logger.warn("[Factory] strip_and_upload failed: #{e.class}: #{e.message}")
+          # Fallback: perform in-memory strip and update attachable to the stripped Hash
+          if attachable.is_a?(::ActiveStorage::Blob) || attachable.is_a?(::ActiveStorage::Attachment)
+            source_blob = attachable.is_a?(::ActiveStorage::Attachment) ? attachable.blob : attachable
+            source_blob.open do |file|
+              temp_attachable = { io: file, filename: source_blob.filename.to_s, content_type: source_blob.content_type }
+              attachable = ImageMetadata::Stripper.strip(temp_attachable)
+            end
+          else
+            attachable = ImageMetadata::Stripper.strip(attachable)
+          end
         end
-
-        message.attachements.attach(attachable)
-        attachment = message.attachements.last
-        blob = attachment.blob
-
-        # Store upload settings in blob metadata
-        if strip_metadata || allow_location_public
-          blob.update(metadata: blob.metadata.merge(
-            'upload_settings' => {
-              'strip_metadata' => strip_metadata || false,
-              'allow_location_public' => allow_location_public || false
-            }
-          ))
-        end
-
-        # Record audit log
-        ImageMetadataAction.create!(
-          user: message.user,
-          blob_id: blob.key,
-          action: 'upload',
-          strip_metadata: strip_metadata || false,
-          allow_location_public: allow_location_public || false,
-          ip_address: ip_address,
-          user_agent: user_agent
-        )
-
-        # Enqueue EXIF extraction job
-        ExtractImageMetadataJob.perform_later(blob.id)
       end
+
+      # Attach the blob or attachable
+      if blob
+        # Case 1: New stripped blob created successfully
+        message.attachements.attach(blob)
+      elsif attachable.is_a?(Hash) && attachable[:io]
+        # Case 2: Hash attachable (original upload or fallback stripped result)
+        # Create new blob with metadata included
+        attachable[:io].rewind if attachable[:io].respond_to?(:rewind)
+        blob = ActiveStorage::Blob.create_and_upload!(
+          io: attachable[:io],
+          filename: attachable[:filename] || 'upload',
+          content_type: attachable[:content_type],
+          metadata: (upload_settings || {})
+        )
+        message.attachements.attach(blob)
+      else
+        # Case 3: Existing Blob/Attachment or Signed ID
+        message.attachements.attach(attachable)
+        blob = message.attachements.last.blob
+
+        # Only update metadata for existing blobs if settings are present
+        if upload_settings
+          blob.update(metadata: blob.metadata.merge(upload_settings))
+        end
+      end
+
+      blob
     end
 
     # Convert an incoming upload representation into an Active Storage

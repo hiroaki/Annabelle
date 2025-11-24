@@ -46,7 +46,13 @@ class UsersController < ApplicationController
   end
 
   def user_params_for_profile
-    params.require(:user).permit(:username, :preferred_language)
+    params.require(:user).permit(
+      :username,
+      :preferred_language,
+      :default_strip_metadata,
+      :default_allow_location_public,
+      :show_image_location_on_preview
+    )
   end
 
   # Returns the effective locale based on form selection or browser settings

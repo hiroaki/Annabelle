@@ -1,4 +1,71 @@
 require 'rails_helper'
+
+RSpec.describe ImageMetadata::Stripper, type: :service do
+  describe '.strip_and_upload' do
+    let(:user) { create(:user) }
+
+    it 'uploads a large in-memory file without raising and persists metadata' do
+      # Create a temporary large binary file at test runtime (5 MB)
+      size_mb = 5
+      tmp = Tempfile.new(['large_test', '.jpg'])
+      tmp.binmode
+      size_mb.times { tmp.write("\0" * 1_048_576) } # write 1MB chunks
+      tmp.rewind
+
+      metadata = { 'upload_settings' => { 'strip_metadata' => true, 'allow_location_public' => false } }
+
+      attachable = { io: tmp, filename: 'large_test.jpg', content_type: 'image/jpeg' }
+
+      blob = nil
+      expect {
+        blob = ImageMetadata::Stripper.strip_and_upload(attachable, metadata: metadata)
+      }.not_to raise_error
+
+      expect(blob).to be_present
+      expect(blob.byte_size).to eq(size_mb * 1_048_576)
+      expect(blob.metadata['upload_settings']).to eq(metadata['upload_settings'])
+
+      # Clean up uploaded blob and tempfile
+      blob.purge if blob
+      tmp.close!
+    end
+
+    it 'accepts an existing blob and creates a new stripped blob' do
+      # Create a small source blob to simulate existing upload
+      source_blob = ActiveStorage::Blob.create_and_upload!(io: File.open(Rails.root.join('spec/fixtures/files/test_image.jpg')), filename: 'src.jpg', content_type: 'image/jpeg')
+
+      metadata = { 'upload_settings' => { 'strip_metadata' => true } }
+      new_blob = ImageMetadata::Stripper.strip_and_upload(source_blob, metadata: metadata)
+
+      expect(new_blob).to be_present
+      expect(new_blob.id).not_to eq(source_blob.id)
+      expect(new_blob.metadata['upload_settings']).to eq(metadata['upload_settings'])
+
+      # cleanup
+      new_blob.purge if new_blob
+      source_blob.purge if source_blob
+    end
+
+    context 'error handling' do
+      it 'logs a warning and returns nil if an exception occurs' do
+        attachable = { io: StringIO.new('test'), filename: 'test.jpg', content_type: 'image/jpeg' }
+        allow(described_class).to receive(:strip).and_raise(StandardError, 'Simulated failure')
+
+        expect(Rails.logger).to receive(:warn).with(/strip_and_upload failed: StandardError: Simulated failure/)
+        expect(described_class.strip_and_upload(attachable)).to be_nil
+      end
+
+      it 'returns nil if stripping fails to produce a valid IO' do
+        attachable = { io: StringIO.new('test'), filename: 'test.jpg', content_type: 'image/jpeg' }
+        # Simulate strip returning something invalid or nil so it falls through to the final nil return
+        allow(described_class).to receive(:strip).and_return(nil)
+
+        expect(described_class.strip_and_upload(attachable)).to be_nil
+      end
+    end
+  end
+end
+require 'rails_helper'
 require 'stringio'
 
 describe ImageMetadata::Stripper do

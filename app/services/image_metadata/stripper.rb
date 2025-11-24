@@ -39,6 +39,41 @@ module ImageMetadata
       attachable
     end
 
+    # Strip and upload: process the attachable to remove metadata, then
+    # create and upload a new ActiveStorage::Blob from the stripped IO.
+    # Returns the created ActiveStorage::Blob on success, otherwise nil.
+    def strip_and_upload(attachable, metadata: nil)
+      return nil unless strip_target?(attachable) || attachable.is_a?(::ActiveStorage::Blob) || attachable.is_a?(::ActiveStorage::Attachment)
+
+      begin
+        if attachable.is_a?(::ActiveStorage::Blob) || attachable.is_a?(::ActiveStorage::Attachment)
+          source_blob = attachable.is_a?(::ActiveStorage::Attachment) ? attachable.blob : attachable
+
+          # Use streamed open to avoid loading whole file into memory
+          source_blob.open do |file|
+            temp_attachable = { io: file, filename: source_blob.filename.to_s, content_type: source_blob.content_type }
+            stripped = strip(temp_attachable)
+
+            if stripped && stripped[:io]
+              stripped[:io].rewind if stripped[:io].respond_to?(:rewind)
+              return ::ActiveStorage::Blob.create_and_upload!(io: stripped[:io], filename: stripped[:filename] || source_blob.filename.to_s, content_type: stripped[:content_type] || source_blob.content_type, metadata: (metadata || {}))
+            end
+          end
+        else
+          stripped = strip(attachable)
+          if stripped && stripped[:io]
+            stripped[:io].rewind if stripped[:io].respond_to?(:rewind)
+            return ::ActiveStorage::Blob.create_and_upload!(io: stripped[:io], filename: stripped[:filename] || 'upload', content_type: stripped[:content_type], metadata: (metadata || {}))
+          end
+        end
+      rescue => e
+        Rails.logger.warn("[ImageMetadata::Stripper] strip_and_upload failed: #{e.class}: #{e.message}")
+        return nil
+      end
+
+      nil
+    end
+
     def strip_target?(attachable)
       attachable.is_a?(Hash) && attachable[:io]
     end

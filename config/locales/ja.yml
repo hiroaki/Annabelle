@@ -124,6 +124,10 @@ ja:
       comment_label: "コメント"
       post: "投稿"
       size_limit_exceeded: "送信データが許可されたサイズ（%{max_size}）を超えています。"
+      strip_metadata_label: "メタ情報を削除する（推奨）"
+      strip_metadata_help: "撮影日時や位置情報などのEXIF/IPTCデータを保存前に削除します。"
+      allow_location_public_label: "位置情報の表示を許可する"
+      allow_location_public_help: "メタ情報を残した場合のみ有効。他の利用者に地図として位置が表示されます。"
   two_factor_settings:
     already_enabled: "二要素認証は既に有効になっています。"
     backup_codes_already_seen: "バックアップコードは既に表示済みです。"
@@ -141,8 +145,16 @@ ja:
     title: "二要素認証"
   users:
     edit:
+      default_allow_location_public_help: "メタ情報を残した場合に共有相手が地図で位置を確認できるようにします。"
+      default_allow_location_public_label: "他の人に位置情報の表示を許可する"
+      default_strip_metadata_help: "各メッセージでオフにしない限り、EXIF/IPTC情報を毎回削除します。"
+      default_strip_metadata_label: "アップロード時にメタ情報を削除する（推奨）"
+      image_privacy_description: "アップロード時やプレビュー表示でメタ情報をどう扱うか設定します。"
+      image_privacy_heading: "画像メタ情報の既定値"
       preferred_language_help: "このアプリケーションの表示言語を選択してください。未設定の場合はブラウザの設定に従います。"
       profile: "プロフィール"
+      show_image_location_on_preview_help: "送信者が許可しGPS情報がある場合に、画像の横に地図を表示します。"
+      show_image_location_on_preview_label: "プレビューで位置情報を表示する"
       update: "更新"
       use_browser_language: "ブラウザの言語設定を使用"
       username: "ユーザー名"
