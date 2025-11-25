@@ -38,11 +38,8 @@ export default function open({ context, attachment }) {
         const iframe = document.createElement('iframe');
         iframe.width = '100%';
         iframe.height = '100%';
-        iframe.frameBorder = '0';
-        iframe.scrolling = 'no';
-        iframe.marginHeight = '0';
-        iframe.marginWidth = '0';
-
+        // Use modern CSS for overflow and spacing instead of deprecated attributes
+        iframe.style.overflow = 'hidden';
         // OpenStreetMap Embed
         const delta = 0.005; // Approx 500m-1km depending on latitude
         const bbox = `${lon - delta},${lat - delta},${lon + delta},${lat + delta}`;
