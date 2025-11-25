@@ -1,7 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe ImageMetadata::Stripper, type: :service do
-  describe '.strip_and_upload' do
+RSpec.describe ImageMetadata::Stripper do
+  context 'as a service', type: :service do
+    describe '.strip_and_upload' do
     let(:user) { create(:user) }
 
     it 'uploads a large in-memory file without raising and persists metadata' do
@@ -64,9 +65,7 @@ RSpec.describe ImageMetadata::Stripper, type: :service do
       end
     end
   end
-end
 
-describe ImageMetadata::Stripper do
   describe '.strip' do
     let(:fixture_path) { Rails.root.join('spec/fixtures/files/image_with_gps.jpg') }
 
@@ -191,6 +190,7 @@ describe ImageMetadata::Stripper do
 
         expect(result).to eq(attachable)
       end
+    end
     end
   end
 end
