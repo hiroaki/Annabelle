@@ -58,12 +58,21 @@ class ActiveStorage::Analyzer::ExifAnalyzer < ActiveStorage::Analyzer
     # Prioritize the analyzer that matches the configured variant processor
     processor = Rails.application.config.active_storage.variant_processor
     preferred_name = case processor
-                     when :vips then 'ActiveStorage::Analyzer::ImageAnalyzer::Vips'
-                     when :mini_magick then 'ActiveStorage::Analyzer::ImageAnalyzer::ImageMagick'
+                     when :vips
+                       'ActiveStorage::Analyzer::ImageAnalyzer::Vips'
+                     when :mini_magick
+                       'ActiveStorage::Analyzer::ImageAnalyzer::ImageMagick'
+                     else
+                       log_warn("Unknown variant processor: #{processor}")
+                       nil
                      end
 
-    preferred = ActiveStorage.analyzers.find { |klass| klass.name == preferred_name }
-    return preferred if preferred && preferred != self.class && preferred.accept?(blob)
+    if preferred_name
+      preferred = ActiveStorage.analyzers.find { |klass| klass.name == preferred_name }
+      return preferred if preferred && preferred != self.class && preferred.accept?(blob)
+
+      log_warn("Preferred analyzer #{preferred_name} for processor #{processor} not found or not accepted. Falling back to detection.")
+    end
 
     # Fallback to the first available analyzer
     ActiveStorage.analyzers.detect do |klass|
@@ -102,5 +111,11 @@ class ActiveStorage::Analyzer::ExifAnalyzer < ActiveStorage::Analyzer
     return unless defined?(Rails) && Rails.respond_to?(:logger) && Rails.logger
 
     Rails.logger.debug { "[ExifAnalyzer] #{error.class}: #{error.message}" }
+  end
+
+  def log_warn(message)
+    return unless defined?(Rails) && Rails.respond_to?(:logger) && Rails.logger
+
+    Rails.logger.warn("[ExifAnalyzer] #{message}")
   end
 end

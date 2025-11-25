@@ -89,6 +89,37 @@ RSpec.describe ActiveStorage::Analyzer::ExifAnalyzer do
       expect(magick_analyzer).to have_received(:new).with(blob)
       expect(vips_analyzer).not_to have_received(:new)
     end
+
+    context "when variant processor is unknown" do
+      before do
+        allow(Rails.application.config.active_storage).to receive(:variant_processor).and_return(:unknown_processor)
+        allow(Rails.logger).to receive(:warn)
+      end
+
+      it "logs a warning and falls back to the first available analyzer" do
+        described_class.new(blob).metadata
+
+        expect(Rails.logger).to have_received(:warn).with(/Unknown variant processor: unknown_processor/)
+        # Should fall back to the first one in the list (vips_analyzer in the setup)
+        expect(vips_analyzer).to have_received(:new).with(blob)
+      end
+    end
+
+    context "when preferred analyzer is not found" do
+      before do
+        allow(Rails.application.config.active_storage).to receive(:variant_processor).and_return(:vips)
+        # Remove Vips from analyzers list so it falls back
+        allow(ActiveStorage).to receive(:analyzers).and_return([described_class, magick_analyzer])
+        allow(Rails.logger).to receive(:warn)
+      end
+
+      it "logs a warning and falls back to available analyzer" do
+        described_class.new(blob).metadata
+
+        expect(Rails.logger).to have_received(:warn).with(/Preferred analyzer .* not found or not accepted/)
+        expect(magick_analyzer).to have_received(:new).with(blob)
+      end
+    end
   end
 
   def create_blob(filename, content_type: "image/jpeg")
