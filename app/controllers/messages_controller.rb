@@ -43,7 +43,7 @@ class MessagesController < ApplicationController
   private
 
     def message_params
-      permitted = params.permit(:content, :strip_metadata, :allow_location_public, attachements: [])
+      permitted = params.permit(:content, attachements: [])
       if permitted.key?(:attachements)
         # Remove empty file entries (browsers may submit "") to avoid treating them as uploads.
         permitted[:attachements] = Array.wrap(permitted[:attachements]).compact_blank
