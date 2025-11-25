@@ -126,8 +126,10 @@ en:
       size_limit_exceeded: "The data you are trying to submit exceeds the allowed size (%{max_size})."
       strip_metadata_label: "Remove metadata from uploaded images (recommended)"
       strip_metadata_help: "Removes timestamps, GPS coordinates, and other EXIF/IPTC information before storing the file."
+      strip_metadata_short: "Strip metadata"
       allow_location_public_label: "Allow others to see location data"
       allow_location_public_help: "When enabled and metadata is kept, viewers may see a map pin for this upload."
+      allow_location_public_short: "Show location"
   two_factor_settings:
     already_enabled: "Two factor authentication is already enabled."
     backup_codes_already_seen: "You have already seen your backup codes."

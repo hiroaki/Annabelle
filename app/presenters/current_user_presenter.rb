@@ -20,7 +20,10 @@ class CurrentUserPresenter < ModelPresenterBase
   def meta_tag
     return '' unless view_context.user_signed_in?
 
-    view_context.tag.meta(name: 'current-user-id', content: user.id)
+    view_context.safe_join([
+      view_context.tag.meta(name: 'current-user-id', content: user.id),
+      view_context.tag.meta(name: 'current-user-show-location-preview', content: user.show_image_location_on_preview)
+    ])
   end
 
   def links

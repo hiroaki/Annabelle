@@ -57,6 +57,40 @@ RSpec.describe ActiveStorage::Analyzer::ExifAnalyzer do
     end
   end
 
+  describe "analyzer selection" do
+    let(:blob) { create_blob("test_image_proper.jpg") }
+    let(:vips_analyzer) { double("VipsClass", name: "ActiveStorage::Analyzer::ImageAnalyzer::Vips") }
+    let(:magick_analyzer) { double("MagickClass", name: "ActiveStorage::Analyzer::ImageAnalyzer::ImageMagick") }
+
+    before do
+      allow(vips_analyzer).to receive(:accept?).and_return(true)
+      allow(vips_analyzer).to receive(:new).and_return(double(metadata: { width: 100, height: 100 }))
+
+      allow(magick_analyzer).to receive(:accept?).and_return(true)
+      allow(magick_analyzer).to receive(:new).and_return(double(metadata: { width: 100, height: 100 }))
+
+      allow(ActiveStorage).to receive(:analyzers).and_return([described_class, vips_analyzer, magick_analyzer])
+    end
+
+    it "prioritizes Vips when configured" do
+      allow(Rails.application.config.active_storage).to receive(:variant_processor).and_return(:vips)
+
+      described_class.new(blob).metadata
+
+      expect(vips_analyzer).to have_received(:new).with(blob)
+      expect(magick_analyzer).not_to have_received(:new)
+    end
+
+    it "prioritizes ImageMagick when configured" do
+      allow(Rails.application.config.active_storage).to receive(:variant_processor).and_return(:mini_magick)
+
+      described_class.new(blob).metadata
+
+      expect(magick_analyzer).to have_received(:new).with(blob)
+      expect(vips_analyzer).not_to have_received(:new)
+    end
+  end
+
   def create_blob(filename, content_type: "image/jpeg")
     path = Rails.root.join("spec/fixtures/files", filename)
     File.open(path, "rb") do |file|

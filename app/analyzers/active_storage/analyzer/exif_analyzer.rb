@@ -55,6 +55,17 @@ class ActiveStorage::Analyzer::ExifAnalyzer < ActiveStorage::Analyzer
   end
 
   def default_analyzer_class
+    # Prioritize the analyzer that matches the configured variant processor
+    processor = Rails.application.config.active_storage.variant_processor
+    preferred_name = case processor
+                     when :vips then 'ActiveStorage::Analyzer::ImageAnalyzer::Vips'
+                     when :mini_magick then 'ActiveStorage::Analyzer::ImageAnalyzer::ImageMagick'
+                     end
+
+    preferred = ActiveStorage.analyzers.find { |klass| klass.name == preferred_name }
+    return preferred if preferred && preferred != self.class && preferred.accept?(blob)
+
+    # Fallback to the first available analyzer
     ActiveStorage.analyzers.detect do |klass|
       next if klass == self.class
 

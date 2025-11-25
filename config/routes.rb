@@ -40,6 +40,11 @@ Rails.application.routes.draw do
     get '/profile/two_factor_authentication', to: 'users#two_factor_authentication', as: :two_factor_authentication
 
     resources :messages, only: [:index, :create, :destroy]
+    resources :attachments, only: [] do
+      member do
+        get :metadata
+      end
+    end
 
     # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

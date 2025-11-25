@@ -43,7 +43,7 @@ module Factory
   #   consumers rendering the message can safely find the persisted attachments.
   # - Image metadata handling: strip_metadata/allow_location_public settings are
   #   recorded in blob.metadata['upload_settings'] and ImageMetadataAction audit log.
-  #   EXIF extraction runs asynchronously via ExtractImageMetadataJob.
+  #   EXIF extraction runs asynchronously via Active Storage Analyzers.
   def create_message!(params)
     # Extract metadata handling params (optional)
     # Normalize to boolean (nil becomes false) to ensure consistency between processing and audit log
@@ -78,11 +78,6 @@ module Factory
           user_agent: user_agent
         )
       end
-    end
-
-    # Enqueue EXIF extraction jobs for all attachments after transaction commits
-    message.attachements.each do |attachment|
-      ExtractImageMetadataJob.perform_later(attachment.blob_id) if attachment.blob.content_type.start_with?('image')
     end
 
     MessageBroadcastJob.perform_later(message.id)
@@ -140,7 +135,7 @@ module Factory
     #
     # This method handles:
     # - Recording upload_settings in blob.metadata
-    # - Enqueuing ExtractImageMetadataJob for async EXIF extraction
+    # - Active Storage Analyzers handle async EXIF extraction
     #
     # Returns the attached ActiveStorage::Blob, or nil if attachment failed/skipped.
     #

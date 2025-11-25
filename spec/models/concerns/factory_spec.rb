@@ -51,10 +51,6 @@ RSpec.describe Factory, type: :model do
     end
 
     context 'with metadata handling' do
-      before do
-        allow(ExtractImageMetadataJob).to receive(:perform_later)
-      end
-
       it 'records upload_settings in blob metadata' do
         file = fixture_file_upload('test_image.jpg', 'image/jpeg')
         params = {
@@ -96,20 +92,6 @@ RSpec.describe Factory, type: :model do
         expect(action.allow_location_public).to be false
         expect(action.ip_address).to eq('127.0.0.1')
         expect(action.user_agent).to eq('Test Browser')
-      end
-
-      it 'enqueues ExtractImageMetadataJob' do
-        file = fixture_file_upload('test_image.jpg', 'image/jpeg')
-        params = {
-          content: 'with exif job',
-          user_id: user.id,
-          attachements: [file]
-        }
-
-        factory.create_message!(params)
-        blob = Message.last.attachements.last.blob
-
-        expect(ExtractImageMetadataJob).to have_received(:perform_later).with(blob.id)
       end
 
       it 'invokes ImageMetadata::Stripper when strip_metadata is requested' do

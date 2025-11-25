@@ -126,8 +126,10 @@ ja:
       size_limit_exceeded: "送信データが許可されたサイズ（%{max_size}）を超えています。"
       strip_metadata_label: "メタ情報を削除する（推奨）"
       strip_metadata_help: "撮影日時や位置情報などのEXIF/IPTCデータを保存前に削除します。"
+      strip_metadata_short: "メタ情報削除"
       allow_location_public_label: "位置情報の表示を許可する"
       allow_location_public_help: "メタ情報を残した場合のみ有効。他の利用者に地図として位置が表示されます。"
+      allow_location_public_short: "位置表示可"
   two_factor_settings:
     already_enabled: "二要素認証は既に有効になっています。"
     backup_codes_already_seen: "バックアップコードは既に表示済みです。"
