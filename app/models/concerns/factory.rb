@@ -139,7 +139,7 @@ module Factory
     #
     # Returns the attached ActiveStorage::Blob, or nil if attachment failed/skipped.
     #
-    # Note: strip_metadata processing is not yet implemented (requires image_processing gem).
+    # Note: strip_metadata processing is implemented below using the image_processing gem.
     def attach_file_with_metadata_handling(message, upload, strip_metadata:, allow_location_public:)
       attachable = normalize_attachment(upload)
       return nil if attachable.nil?
