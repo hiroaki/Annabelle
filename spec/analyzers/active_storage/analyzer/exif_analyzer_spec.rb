@@ -29,8 +29,7 @@ RSpec.describe ActiveStorage::Analyzer::ExifAnalyzer do
       extracted = metadata[:exif]
       expect(extracted[:gps][:latitude]).to be_within(0.000001).of(35.681236)
       expect(extracted[:gps][:longitude]).to be_within(0.000001).of(139.767125)
-      # Compare datetimes in a timezone-independent way to avoid CI failures
-      # caused by differing system timezones. Parse ISO8601 and compare UTC.
+      # Compare datetimes in a timezone-independent way to avoid CI failures.
       # EXIF datetime strings use the `YYYY:MM:DD HH:MM:SS` format.
       # The analyzer preserves the EXIF textual value; assert it directly.
       expect(extracted[:datetime]).to eq('2025:01:02 03:04:05')
