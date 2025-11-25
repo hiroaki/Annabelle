@@ -81,6 +81,31 @@ RSpec.describe ActiveStorage::Analyzer::ExifAnalyzer do
     ensure
       blob.purge
     end
+
+    it "formats Time/DateTime EXIF datetime using strftime when analyzer returns a Time-like object" do
+      blob = create_blob("test_image_proper.jpg")
+
+      time = Time.new(2025, 1, 2, 3, 4, 5, "+09:00")
+      fake_exif = double(
+        "Exif",
+        gps: nil,
+        make: nil,
+        model: nil,
+        date_time_original: time,
+        date_time: nil,
+        date_time_digitized: nil
+      )
+
+      allow(::EXIFR::JPEG).to receive(:new).and_return(fake_exif)
+
+      metadata = described_class.new(blob).metadata
+
+      expect(metadata).to include(:exif)
+      # Should be formatted to EXIF textual representation
+      expect(metadata[:exif][:datetime]).to eq('2025:01:02 03:04:05')
+    ensure
+      blob.purge
+    end
   end
 
   describe "analyzer selection" do
