@@ -152,7 +152,7 @@ module Factory
                               'allow_location_public' => allow_location_public
                             }
                           }
-                        end
+      end
 
       # Will hold the final ActiveStorage::Blob object (either newly created or existing)
       # for use in the audit log creation at the end of the method.

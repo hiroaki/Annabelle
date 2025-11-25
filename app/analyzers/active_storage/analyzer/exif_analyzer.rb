@@ -58,14 +58,14 @@ class ActiveStorage::Analyzer::ExifAnalyzer < ActiveStorage::Analyzer
     # Prioritize the analyzer that matches the configured variant processor
     processor = Rails.application.config.active_storage.variant_processor
     preferred_name = case processor
-                     when :vips
+    when :vips
                        'ActiveStorage::Analyzer::ImageAnalyzer::Vips'
-                     when :mini_magick
+    when :mini_magick
                        'ActiveStorage::Analyzer::ImageAnalyzer::ImageMagick'
-                     else
+    else
                        log_warn("Unknown variant processor: #{processor}")
                        nil
-                     end
+    end
 
     if preferred_name
       preferred = ActiveStorage.analyzers.find { |klass| klass.name == preferred_name }
