@@ -124,6 +124,7 @@ RSpec.configure do |config|
 
   # Deviseのテストヘルパーを使用可能にする
   config.include Devise::Test::IntegrationHelpers, type: :request
+  config.include Devise::Test::ControllerHelpers, type: :controller
 
   # Capybara 用の自作ヘルパー
   config.include CapybaraHelpers, type: :system

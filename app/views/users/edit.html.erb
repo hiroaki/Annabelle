@@ -22,6 +22,36 @@
       </p>
     </div>
 
+    <div class="mb-6">
+      <h2 class="text-base font-semibold text-gray-900 mb-2"><%= t('users.edit.image_privacy_heading') %></h2>
+      <p class="text-sm text-gray-500 mb-4"><%= t('users.edit.image_privacy_description') %></p>
+      <div class="space-y-4">
+        <label class="flex items-start gap-3">
+          <%= f.check_box :default_strip_metadata, class: 'mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded' %>
+          <span class="text-sm text-gray-900">
+            <span class="font-medium block"><%= t('users.edit.default_strip_metadata_label') %></span>
+            <span class="text-gray-600"><%= t('users.edit.default_strip_metadata_help') %></span>
+          </span>
+        </label>
+
+        <label class="flex items-start gap-3">
+          <%= f.check_box :default_allow_location_public, class: 'mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded' %>
+          <span class="text-sm text-gray-900">
+            <span class="font-medium block"><%= t('users.edit.default_allow_location_public_label') %></span>
+            <span class="text-gray-600"><%= t('users.edit.default_allow_location_public_help') %></span>
+          </span>
+        </label>
+
+        <label class="flex items-start gap-3">
+          <%= f.check_box :show_image_location_on_preview, class: 'mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded' %>
+          <span class="text-sm text-gray-900">
+            <span class="font-medium block"><%= t('users.edit.show_image_location_on_preview_label') %></span>
+            <span class="text-gray-600"><%= t('users.edit.show_image_location_on_preview_help') %></span>
+          </span>
+        </label>
+      </div>
+    </div>
+
     <div class="flex items-center justify-between">
       <%= f.submit t('users.edit.update'), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
     </div>

@@ -111,6 +111,24 @@ RSpec.describe 'Messages Form', type: :system do
       expect(page).not_to have_content('my message')
       expect(page).not_to have_selector("[data-testid='delete-message-#{message.id}']")
     end
+
+    it 'renders metadata checkboxes using user defaults' do
+      confirmed_user.update(default_strip_metadata: false, default_allow_location_public: true)
+      visit current_path
+
+      expect(page).to have_unchecked_field('message_strip_metadata')
+      expect(page).to have_checked_field('message_allow_location_public')
+    end
+
+    it 'allows posting after toggling metadata options' do
+      visit current_path
+      uncheck 'message_strip_metadata'
+      check 'message_allow_location_public'
+      fill_in 'comment', with: 'Metadata aware message'
+      click_button I18n.t('messages.form.post')
+
+      expect(page).to have_content('Metadata aware message')
+    end
   end
 
   context 'when form size exceeds the limit' do

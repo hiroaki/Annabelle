@@ -34,7 +34,15 @@
               data-source-url="<%= url_for(att) %>"
               data-filename="<%= att.filename %>"
               data-content-type="<%= att.content_type %>"
-              data-action="click->messages#changePreview"
+              data-controller="metadata-fetcher"
+              data-metadata-fetcher-attachment-id-value="<%= att.id %>"
+              data-metadata-fetcher-metadata-url-value="<%= metadata_attachment_path(att, locale: params[:locale] || I18n.locale) %>"
+              data-action="click->metadata-fetcher#prepare click->messages#changePreview"
+              <% opts = image_location_options(att) %>
+              <% if opts[:data] %>
+                data-metadata-fetcher-latitude-value="<%= opts[:data][:latitude] %>"
+                data-metadata-fetcher-longitude-value="<%= opts[:data][:longitude] %>"
+              <% end %>
             >
               <% if ['video/quicktime', 'video/mp4'].include?(att.content_type) %>
                 <div class="relative">
