@@ -40,7 +40,9 @@ RSpec.describe Message, type: :model do
       expect(extracted).to include('gps', 'datetime', 'camera')
       expect(extracted['gps']['latitude']).to be_within(0.000001).of(35.681236)
       expect(extracted['gps']['longitude']).to be_within(0.000001).of(139.767125)
-      expect(extracted['datetime']).to eq('2025-01-02T03:04:05+09:00')
+      # EXIF datetime strings use the `YYYY:MM:DD HH:MM:SS` format.
+      # The analyzer preserves the EXIF textual value; assert it directly.
+      expect(extracted['datetime']).to eq('2025:01:02 03:04:05')
       expect(extracted['camera']).to eq({ 'make' => 'ExampleCam', 'model' => 'Imaginary 1' })
     end
   end

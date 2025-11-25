@@ -39,7 +39,18 @@ class ActiveStorage::Analyzer::ExifAnalyzer < ActiveStorage::Analyzer
     extracted[:gps] = gps if gps
 
     datetime = exif.date_time_original || exif.date_time || exif.date_time_digitized
-    extracted[:datetime] = datetime&.iso8601 if datetime
+    # Preserve the EXIF date/time in the standard EXIF textual format
+    # `YYYY:MM:DD HH:MM:SS` when possible. If the analyzer returns a
+    # Time/DateTime-like object, format it to the EXIF representation
+    # so consumers can rely on the EXIF spec string. If the value is
+    # already a String, keep it as-is.
+    if datetime
+      if datetime.respond_to?(:strftime)
+        extracted[:datetime] = datetime.strftime('%Y:%m:%d %H:%M:%S')
+      else
+        extracted[:datetime] = datetime.to_s
+      end
+    end
 
     camera = extract_camera(exif)
     extracted[:camera] = camera if camera

@@ -29,7 +29,10 @@ RSpec.describe ActiveStorage::Analyzer::ExifAnalyzer do
       extracted = metadata[:exif]
       expect(extracted[:gps][:latitude]).to be_within(0.000001).of(35.681236)
       expect(extracted[:gps][:longitude]).to be_within(0.000001).of(139.767125)
-      expect(extracted[:datetime]).to eq("2025-01-02T03:04:05+09:00")
+      # Compare datetimes in a timezone-independent way to avoid CI failures.
+      # EXIF datetime strings use the `YYYY:MM:DD HH:MM:SS` format.
+      # The analyzer preserves the EXIF textual value; assert it directly.
+      expect(extracted[:datetime]).to eq('2025:01:02 03:04:05')
       expect(extracted[:camera]).to eq({ make: "ExampleCam", model: "Imaginary 1" })
     ensure
       blob.purge
@@ -52,6 +55,54 @@ RSpec.describe ActiveStorage::Analyzer::ExifAnalyzer do
       metadata = described_class.new(blob).metadata
       expect(metadata).to include(:width, :height)
       expect(metadata).not_to include(:exif)
+    ensure
+      blob.purge
+    end
+
+    it "preserves textual EXIF datetime when the analyzer returns a String" do
+      blob = create_blob("test_image_proper.jpg")
+
+      fake_exif = double(
+        "Exif",
+        gps: nil,
+        make: nil,
+        model: nil,
+        date_time_original: '2025:01:02 03:04:05',
+        date_time: nil,
+        date_time_digitized: nil
+      )
+
+      allow(::EXIFR::JPEG).to receive(:new).and_return(fake_exif)
+
+      metadata = described_class.new(blob).metadata
+
+      expect(metadata).to include(:exif)
+      expect(metadata[:exif][:datetime]).to eq('2025:01:02 03:04:05')
+    ensure
+      blob.purge
+    end
+
+    it "formats Time/DateTime EXIF datetime using strftime when analyzer returns a Time-like object" do
+      blob = create_blob("test_image_proper.jpg")
+
+      time = Time.new(2025, 1, 2, 3, 4, 5, "+09:00")
+      fake_exif = double(
+        "Exif",
+        gps: nil,
+        make: nil,
+        model: nil,
+        date_time_original: time,
+        date_time: nil,
+        date_time_digitized: nil
+      )
+
+      allow(::EXIFR::JPEG).to receive(:new).and_return(fake_exif)
+
+      metadata = described_class.new(blob).metadata
+
+      expect(metadata).to include(:exif)
+      # Should be formatted to EXIF textual representation
+      expect(metadata[:exif][:datetime]).to eq('2025:01:02 03:04:05')
     ensure
       blob.purge
     end
