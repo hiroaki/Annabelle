@@ -144,15 +144,16 @@ module Factory
       attachable = normalize_attachment(upload)
       return nil if attachable.nil?
 
-      # Prepare upload settings metadata to persist into the blob when needed
-      upload_settings = if strip_metadata || allow_location_public
-                          {
-                            'upload_settings' => {
-                              'strip_metadata' => strip_metadata,
-                              'allow_location_public' => allow_location_public
-                            }
-                          }
-      end
+      # Prepare upload settings metadata to persist into the blob.
+      # Always record the uploader's explicit choices as booleans so that
+      # downstream consumers can distinguish "user chose false for both"
+      # from "no settings were provided".
+      upload_settings = {
+        'upload_settings' => {
+          'strip_metadata' => !!strip_metadata,
+          'allow_location_public' => !!allow_location_public
+        }
+      }
 
       # Will hold the final ActiveStorage::Blob object (either newly created or existing)
       # for use in the audit log creation at the end of the method.
