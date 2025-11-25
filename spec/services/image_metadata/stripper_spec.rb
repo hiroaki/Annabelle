@@ -65,8 +65,6 @@ RSpec.describe ImageMetadata::Stripper, type: :service do
     end
   end
 end
-require 'rails_helper'
-require 'stringio'
 
 describe ImageMetadata::Stripper do
   describe '.strip' do
