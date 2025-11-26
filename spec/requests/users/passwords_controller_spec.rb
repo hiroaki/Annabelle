@@ -19,7 +19,7 @@ RSpec.describe Users::PasswordsController, type: :request do
       it 'パスワードリセット画面が表示される' do
         get new_user_password_path
         expect(response).to have_http_status(:ok)
-        expect(response.body).not_to include('パスワード再設定のためログアウトしました。')
+        expect(response.body).not_to include('You have been signed out to reset your password.')
       end
     end
   end
