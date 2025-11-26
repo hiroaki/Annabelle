@@ -47,6 +47,7 @@ ja:
       send_instructions: "パスワードの再設定について数分以内にメールでご連絡いたします。"
       send_paranoid_instructions: "あなたのメールアドレスが登録済みの場合、パスワード再設定用のメールが数分以内に送信されます。"
       send_reset_password_instructions: "パスワード再設定用メールを送信"
+      signed_out_for_reset: "パスワード再設定のためにログアウトしました。"
       updated: "パスワードが正しく変更されました。"
       updated_not_active: "パスワードが正しく変更されました。"
     registrations:

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class Users::PasswordsController < Devise::PasswordsController
   prepend_before_action :sign_out_if_signed_in, only: [:new]
 
@@ -21,7 +19,7 @@ class Users::PasswordsController < Devise::PasswordsController
   def sign_out_if_signed_in
     if user_signed_in?
       sign_out(current_user)
-      flash[:notice] = I18n.t('devise.passwords.signed_out_for_reset', default: 'You have been signed out to reset your password.')
+      flash[:notice] = I18n.t('devise.passwords.signed_out_for_reset')
     end
   end
 end
