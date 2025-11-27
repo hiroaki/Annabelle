@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe 'N+1 Detection', type: :system do
-  let(:confirmed_user) { create(:user, :confirmed) }
-
   def login_as(user)
     visit new_user_session_path
     fill_in 'Email', with: user.email
@@ -23,7 +21,7 @@ RSpec.describe 'N+1 Detection', type: :system do
         controller.instance_variable_set(:@messages, Message.order(created_at: :desc).page(controller.params[:page]))
       end
 
-      login_as confirmed_user
+      login_as users.first
 
       # Prosopiteが有効なら、N+1が検出されてエラーが発生する
       expect {
@@ -38,7 +36,7 @@ RSpec.describe 'N+1 Detection', type: :system do
         create(:message, user: user, content: "Message from #{user.username}")
       end
 
-      login_as confirmed_user
+      login_as users.first
       visit messages_path
 
       # eager loadingが有効なのでN+1は発生しない
