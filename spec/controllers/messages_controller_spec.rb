@@ -20,11 +20,11 @@ RSpec.describe MessagesController, type: :controller do
       post :create, params: {
         locale: :en,
         content: 'with attachment',
-        attachements: ['', file]
+        attachments: ['', file]
       }, format: :turbo_stream
 
       expect(captured).not_to be_nil
-      attachments = Array.wrap(captured[:attachements])
+      attachments = Array.wrap(captured[:attachments])
       expect(attachments.length).to eq(1)
       expect(attachments.first).to be_a(ActionDispatch::Http::UploadedFile)
     end

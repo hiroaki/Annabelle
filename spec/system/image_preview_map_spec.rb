@@ -20,7 +20,7 @@ RSpec.describe 'Image Preview Map', type: :system do
         'upload_settings' => { 'allow_location_public' => true }
       })
       blob.save!
-      message.attachements.attach(blob)
+      message.attachments.attach(blob)
     end
 
     it 'shows the map in preview' do
@@ -45,7 +45,7 @@ RSpec.describe 'Image Preview Map', type: :system do
         'upload_settings' => { 'allow_location_public' => false }
       })
       blob.save!
-      message.attachements.attach(blob)
+      message.attachments.attach(blob)
     end
 
     it 'does not show the map' do
@@ -69,7 +69,7 @@ RSpec.describe 'Image Preview Map', type: :system do
         'upload_settings' => { 'allow_location_public' => true }
       })
       blob.save!
-      message.attachements.attach(blob)
+      message.attachments.attach(blob)
     end
 
     it 'does not show the map' do

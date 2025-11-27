@@ -13,7 +13,7 @@ RSpec.describe 'Attachments metadata endpoint', type: :request do
 
     # attach to a record (Message) so we have an attachment record
     message = Message.create!(content: 'hello', user: user)
-    attachment = ActiveStorage::Attachment.create!(name: 'attachements', record: message, blob: blob)
+    attachment = ActiveStorage::Attachment.create!(name: 'attachments', record: message, blob: blob)
 
     # set metadata as server would
     blob.update!(metadata: {
@@ -33,7 +33,7 @@ RSpec.describe 'Attachments metadata endpoint', type: :request do
     path = Rails.root.join('spec/fixtures/files/test_image.jpg')
     blob = ActiveStorage::Blob.create_and_upload!(io: File.open(path, 'rb'), filename: 'test_image.jpg', content_type: 'image/jpeg')
     message = Message.create!(content: 'hello', user: user)
-    attachment = ActiveStorage::Attachment.create!(name: 'attachements', record: message, blob: blob)
+    attachment = ActiveStorage::Attachment.create!(name: 'attachments', record: message, blob: blob)
 
     blob.update!(metadata: {
       'exif' => { 'gps' => { 'latitude' => 35.0, 'longitude' => 139.0 } },
@@ -59,7 +59,7 @@ RSpec.describe 'Attachments metadata endpoint', type: :request do
     path = Rails.root.join('spec/fixtures/files/test_image.jpg')
     blob = ActiveStorage::Blob.create_and_upload!(io: File.open(path, 'rb'), filename: 'test_image.jpg', content_type: 'image/jpeg')
     message = Message.create!(content: 'hello', user: user)
-    attachment = ActiveStorage::Attachment.create!(name: 'attachements', record: message, blob: blob)
+    attachment = ActiveStorage::Attachment.create!(name: 'attachments', record: message, blob: blob)
 
     # sign out the current user to simulate unauthenticated access
     sign_out user

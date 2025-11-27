@@ -10,7 +10,7 @@ class MessageBroadcastJob < ApplicationJob
     # Message.find が実行されるため削除されているオブジェクトを再利用できません。
     # また保存される内容も id だけで足りるため、args[0] には Message.id を受けるようにしています。
     message_id = args[0]
-    message = Message.includes(:user, attachements_attachments: :blob).find_by_id(message_id)
+    message = Message.includes(:user, attachments_attachments: :blob).find_by_id(message_id)
 
     if message.nil?
       ActionCable.server.broadcast('general_message_board', {
