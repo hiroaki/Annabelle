@@ -148,4 +148,14 @@ RSpec.configure do |config|
     OmniAuth.config.test_mode = true
     OmniAuth.config.mock_auth[:github] = nil
   end
+
+  # 各テストを Prosopite でスキャンします。
+  # スイート全体ではなく各テストで scan/finish を実行する必要があります。
+  config.before(:each) do
+    Prosopite.scan
+  end
+
+  config.after(:each) do
+    Prosopite.finish
+  end
 end
