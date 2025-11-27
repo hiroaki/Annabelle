@@ -56,6 +56,10 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem 'rubocop-rails-omakase', require: false
+
+  # Prosopite is able to auto-detect Rails N+1 queries with zero false positives / false negatives.
+  gem 'prosopite'
+  gem 'pg_query'
 end
 
 group :development do
