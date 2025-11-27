@@ -43,10 +43,10 @@ class MessagesController < ApplicationController
   private
 
     def message_params
-      permitted = params.permit(:content, attachements: [])
-      if permitted.key?(:attachements)
+      permitted = params.permit(:content, attachments: [])
+      if permitted.key?(:attachments)
         # Remove empty file entries (browsers may submit "") to avoid treating them as uploads.
-        permitted[:attachements] = Array.wrap(permitted[:attachements]).compact_blank
+        permitted[:attachments] = Array.wrap(permitted[:attachments]).compact_blank
       end
       permitted[:strip_metadata] = strip_metadata_preference
       permitted[:allow_location_public] = allow_location_public_preference
@@ -61,7 +61,7 @@ class MessagesController < ApplicationController
     end
 
     def set_messages
-      @messages = Message.includes(:user, attachements_attachments: :blob).order(created_at: :desc).page(params[:page])
+      @messages = Message.includes(:user, attachments_attachments: :blob).order(created_at: :desc).page(params[:page])
     end
 
     def strip_metadata_preference
