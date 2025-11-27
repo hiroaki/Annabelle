@@ -20,7 +20,7 @@ RSpec.describe 'File Upload and Preview', type: :system do
       # テスト用画像ファイル
       image_path = Rails.root.join('spec', 'fixtures', 'files', 'test_image_proper.jpg')
 
-      attach_file 'attachements[]', image_path, make_visible: true
+      attach_file 'attachments[]', image_path, make_visible: true
 
       # ファイル選択後、プレビューが表示されることを確認（ファイルアップロードのJavaScriptが動作しているか）
       expect(page).to have_css('[data-file-upload-target="standbyFilesZone"] img', wait: 3)
@@ -40,7 +40,7 @@ RSpec.describe 'File Upload and Preview', type: :system do
       # テスト用動画ファイル
       video_path = Rails.root.join('spec', 'fixtures', 'files', 'test_video.mp4')
 
-      attach_file 'attachements[]', video_path, make_visible: true
+      attach_file 'attachments[]', video_path, make_visible: true
       fill_in 'content', with: 'Test message with video'
       click_button 'Post'
 
@@ -54,7 +54,7 @@ RSpec.describe 'File Upload and Preview', type: :system do
     it 'uploads text file without thumbnail' do
       text_path = Rails.root.join('spec', 'fixtures', 'files', 'test_document.txt')
 
-      attach_file 'attachements[]', text_path, make_visible: true
+      attach_file 'attachments[]', text_path, make_visible: true
       fill_in 'content', with: 'Test message with text file'
       click_button 'Post'
 
@@ -70,7 +70,7 @@ RSpec.describe 'File Upload and Preview', type: :system do
       text_path = Rails.root.join('spec', 'fixtures', 'files', 'test_document.txt')
 
       # 複数ファイル選択
-      page.attach_file('attachements[]', [image_path, text_path], make_visible: true)
+      page.attach_file('attachments[]', [image_path, text_path], make_visible: true)
       fill_in 'content', with: 'Multiple files test'
       click_button 'Post'
 
@@ -84,7 +84,7 @@ RSpec.describe 'File Upload and Preview', type: :system do
     it 'triggers preview when clicking on image thumbnail' do
       image_path = Rails.root.join('spec', 'fixtures', 'files', 'test_image_proper.jpg')
 
-      attach_file 'attachements[]', image_path, make_visible: true
+      attach_file 'attachments[]', image_path, make_visible: true
 
       # ファイル選択後、プレビューが表示されることを確認
       expect(page).to have_css('[data-file-upload-target="standbyFilesZone"] img', wait: 3)

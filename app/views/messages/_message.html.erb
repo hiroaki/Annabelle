@@ -26,8 +26,8 @@
     **data_with_testid("message-content-#{message.id}") %>
 
   <div class="container flex">
-    <% if message.attachements.attached? %>
-      <% message.attachements.each do |att| %>
+    <% if message.attachments.attached? %>
+      <% message.attachments.each do |att| %>
         <div class="container flex-shrink-0 w-auto mx-2">
           <% if att.representable? %>
             <div class="my-2 h-40 w-40 bg-gray-200 flex cursor-pointer"

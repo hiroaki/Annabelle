@@ -12,9 +12,9 @@ RSpec.describe Message, type: :model do
       expect(association.macro).to eq(:belongs_to)
     end
 
-    it "attachements を持っていること" do
+    it "attachments を持っていること" do
       message = build(:message)
-      expect(message).to respond_to(:attachements)
+      expect(message).to respond_to(:attachments)
     end
   end
 
@@ -22,16 +22,16 @@ RSpec.describe Message, type: :model do
     it "ファイルを添付できること" do
       message = create(:message)
       file = fixture_file_upload(Rails.root.join('spec', 'fixtures', 'files', 'sample.txt'), 'text/plain')
-      message.attachements.attach(file)
-      expect(message.attachements.count).to eq(1)
+      message.attachments.attach(file)
+      expect(message.attachments.count).to eq(1)
     end
 
     it "EXIF付き画像を添付した場合、blobのmetadataにEXIF情報が格納されること" do
       message = create(:message)
       image = fixture_file_upload(Rails.root.join('spec', 'fixtures', 'files', 'image_with_gps.jpg'), 'image/jpeg')
-      message.attachements.attach(image)
+      message.attachments.attach(image)
 
-      blob = message.attachements.last.blob
+      blob = message.attachments.last.blob
       blob.analyze
       blob.reload
 

@@ -28,7 +28,7 @@ RSpec.describe Factory, type: :model do
       params = {
         content: 'with attachment',
         user_id: user.id,
-        attachements: [file]
+        attachments: [file]
       }
 
       expect {
@@ -36,11 +36,11 @@ RSpec.describe Factory, type: :model do
       }.to change(ActiveStorage::Attachment, :count).by(1)
 
       message = Message.order(created_at: :desc).first
-      expect(message.attachements.size).to eq(1)
+      expect(message.attachments.size).to eq(1)
     end
 
     it 'logs a warning when an invalid signed blob id is provided' do
-      params = attributes_for(:message).merge(user_id: user.id, attachements: ['invalid-signed-id'])
+      params = attributes_for(:message).merge(user_id: user.id, attachments: ['invalid-signed-id'])
 
       # Force the blob lookup to raise so we exercise the rescue/logging path
       allow(ActiveStorage::Blob).to receive(:find_signed).and_raise(ActiveSupport::MessageVerifier::InvalidSignature)
@@ -56,13 +56,13 @@ RSpec.describe Factory, type: :model do
         params = {
           content: 'with metadata',
           user_id: user.id,
-          attachements: [file],
+          attachments: [file],
           strip_metadata: true,
           allow_location_public: false
         }
 
         factory.create_message!(params)
-        blob = Message.last.attachements.last.blob
+        blob = Message.last.attachments.last.blob
 
         expect(blob.metadata['upload_settings']).to eq({
           'strip_metadata' => true,
@@ -75,7 +75,7 @@ RSpec.describe Factory, type: :model do
         params = {
           content: 'with audit',
           user_id: user.id,
-          attachements: [file],
+          attachments: [file],
           strip_metadata: true,
           allow_location_public: false,
           ip_address: '127.0.0.1',
@@ -99,7 +99,7 @@ RSpec.describe Factory, type: :model do
         params = {
           content: 'with stripper call',
           user_id: user.id,
-          attachements: [file],
+          attachments: [file],
           strip_metadata: true
         }
 
@@ -121,7 +121,7 @@ RSpec.describe Factory, type: :model do
           params = {
             content: 'fallback hash',
             user_id: user.id,
-            attachements: [file],
+            attachments: [file],
             strip_metadata: true
           }
 
@@ -139,7 +139,7 @@ RSpec.describe Factory, type: :model do
           params = {
             content: 'fallback blob',
             user_id: user.id,
-            attachements: [blob],
+            attachments: [blob],
             strip_metadata: true
           }
 
@@ -154,13 +154,13 @@ RSpec.describe Factory, type: :model do
             filename: 'attachment_test.jpg',
             content_type: 'image/jpeg'
           )
-          message.attachements.attach(blob)
-          attachment = message.attachements.last
+          message.attachments.attach(blob)
+          attachment = message.attachments.last
 
           params = {
             content: 'fallback attachment',
             user_id: user.id,
-            attachements: [attachment],
+            attachments: [attachment],
             strip_metadata: true
           }
 
@@ -180,7 +180,7 @@ RSpec.describe Factory, type: :model do
         params = {
           content: 'existing blob update',
           user_id: user.id,
-          attachements: [blob],
+          attachments: [blob],
           strip_metadata: false,
           allow_location_public: true
         }
@@ -241,12 +241,12 @@ RSpec.describe Factory, type: :model do
       params = {
         content: 'with blob',
         user_id: user.id,
-        attachements: [blob]
+        attachments: [blob]
       }
 
       msg = factory.create_message!(params)
-      expect(msg.attachements.size).to eq(1)
-      expect(msg.attachements.first.blob).to eq(blob)
+      expect(msg.attachments.size).to eq(1)
+      expect(msg.attachments.first.blob).to eq(blob)
     end
 
     it 'accepts and attaches a valid signed blob id' do
@@ -260,12 +260,12 @@ RSpec.describe Factory, type: :model do
       params = {
         content: 'with signed id',
         user_id: user.id,
-        attachements: [signed_id]
+        attachments: [signed_id]
       }
 
       msg = factory.create_message!(params)
-      expect(msg.attachements.size).to eq(1)
-      expect(msg.attachements.first.blob).to eq(blob)
+      expect(msg.attachments.size).to eq(1)
+      expect(msg.attachments.first.blob).to eq(blob)
     end
 
     it 'accepts and attaches a Hash with io and filename' do
@@ -280,35 +280,35 @@ RSpec.describe Factory, type: :model do
       params = {
         content: 'with hash',
         user_id: user.id,
-        attachements: [attachable_hash]
+        attachments: [attachable_hash]
       }
 
       msg = factory.create_message!(params)
-      expect(msg.attachements.size).to eq(1)
-      expect(msg.attachements.first.filename.to_s).to eq('hash_test.jpg')
+      expect(msg.attachments.size).to eq(1)
+      expect(msg.attachments.first.filename.to_s).to eq('hash_test.jpg')
     end
 
     it 'skips nil attachments without error' do
       params = {
         content: 'with nil',
         user_id: user.id,
-        attachements: [nil]
+        attachments: [nil]
       }
 
       msg = factory.create_message!(params)
-      expect(msg.attachements.size).to eq(0)
+      expect(msg.attachments.size).to eq(0)
     end
 
     it 'skips invalid signed ids without raising' do
       params = {
         content: 'with invalid id',
         user_id: user.id,
-        attachements: ['invalid-signature-blob-id']
+        attachments: ['invalid-signature-blob-id']
       }
 
       expect {
         msg = factory.create_message!(params)
-        expect(msg.attachements.size).to eq(0)
+        expect(msg.attachments.size).to eq(0)
       }.not_to raise_error
     end
   end

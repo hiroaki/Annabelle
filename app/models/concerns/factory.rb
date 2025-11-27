@@ -32,9 +32,9 @@ module Factory
   # broadcast job after the transaction commits.
   #
   # Intent / rationale:
-  # - Attachments are removed from `params` first (via `extract_attachements`) so
+  # - Attachments are removed from `params` first (via `extract_attachments`) so
   #   ActiveRecord won't attempt to auto-attach during `create!`. This avoids the
-  #   scenario where empty or malformed entries in `params[:attachements]` would
+  #   scenario where empty or malformed entries in `params[:attachments]` would
   #   cause spurious blobs or analyzer errors.
   # - The attach step is executed within the same database transaction so the
   #   association exists atomically with the message creation; subsequent jobs
@@ -52,7 +52,7 @@ module Factory
     ip_address = params.delete(:ip_address)
     user_agent = params.delete(:user_agent)
 
-    attachments = extract_attachements(params)
+    attachments = extract_attachments(params)
 
     message = nil
     Message.transaction do
@@ -115,19 +115,19 @@ module Factory
 
   private
 
-    # Extracts and removes the `attachements` entry from the provided params.
+    # Extracts and removes the `attachments` entry from the provided params.
     #
     # Background & rationale:
-    # - The controller is expected to sanitize `attachements` (remove empty
+    # - The controller is expected to sanitize `attachments` (remove empty
     #   strings) before calling the Factory. This method's responsibility is
     #   limited to removing the key so `Message.create!(params)` doesn't trigger
     #   any automatic attach behavior, and to normalize the value to an Array so
     #   the attach loop can uniformly iterate.
     # - We accept both symbol and string keys to be defensive toward different
     #   caller types (PermittedParameters vs plain Hash).
-    def extract_attachements(params)
-      raw = params.delete(:attachements)
-      raw = params.delete('attachements') if raw.nil? && params.respond_to?(:key?)
+    def extract_attachments(params)
+      raw = params.delete(:attachments)
+      raw = params.delete('attachments') if raw.nil? && params.respond_to?(:key?)
       Array.wrap(raw)
     end
 
@@ -181,7 +181,7 @@ module Factory
       # Attach the blob or attachable
       if blob
         # Case 1: New stripped blob created successfully
-        message.attachements.attach(blob)
+        message.attachments.attach(blob)
       elsif attachable.is_a?(Hash) && attachable[:io]
         # Case 2: Hash attachable (original upload or fallback stripped result)
         # Create new blob with metadata included
@@ -192,11 +192,11 @@ module Factory
           content_type: attachable[:content_type],
           metadata: (upload_settings || {})
         )
-        message.attachements.attach(blob)
+        message.attachments.attach(blob)
       else
         # Case 3: Existing Blob/Attachment or Signed ID
-        message.attachements.attach(attachable)
-        blob = message.attachements.last.blob
+        message.attachments.attach(attachable)
+        blob = message.attachments.last.blob
 
         # Only update metadata for existing blobs if settings are present
         if upload_settings
@@ -208,7 +208,7 @@ module Factory
     end
 
     # Convert an incoming upload representation into an Active Storage
-    # attachable suitable for `message.attachements.attach`.
+    # attachable suitable for `message.attachments.attach`.
     #
     # Supported shapes and reasoning:
     # - ActiveStorage::Blob or Attachment: returned as-is (already a persisted
