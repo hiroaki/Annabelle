@@ -17,9 +17,7 @@ RSpec.describe 'N+1 Detection', type: :system do
       end
 
       # 一時的にeager loadingを無効化してN+1を発生させる
-      allow_any_instance_of(MessagesController).to receive(:set_messages) do |controller|
-        controller.instance_variable_set(:@messages, Message.order(created_at: :desc).page(controller.params[:page]))
-      end
+      allow(Message).to receive(:includes).and_return(Message)
 
       login_as users.first
 
