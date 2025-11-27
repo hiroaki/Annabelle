@@ -74,4 +74,14 @@ Rails.application.configure do
     ENV['GITHUB_CLIENT_ID'] = 'test_github_client_id'
     ENV['GITHUB_CLIENT_SECRET'] = 'test_github_client_secret'
   end
+
+  # For Prosopite, the preferred notification channel should be configured
+  config.after_initialize do
+    Prosopite.rails_logger = true
+    Prosopite.raise = true
+  end
+
+  # Enable query_log_tags for SQLite3 + pg_query compatibility
+  # See: https://github.com/charkost/prosopite/issues/89
+  config.active_record.query_log_tags_enabled = true
 end

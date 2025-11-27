@@ -61,7 +61,7 @@ class MessagesController < ApplicationController
     end
 
     def set_messages
-      @messages = Message.order(created_at: :desc).page(params[:page])
+      @messages = Message.includes(:user, attachements_attachments: :blob).order(created_at: :desc).page(params[:page])
     end
 
     def strip_metadata_preference
