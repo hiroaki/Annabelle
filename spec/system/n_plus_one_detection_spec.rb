@@ -11,7 +11,27 @@ RSpec.describe 'N+1 Detection', type: :system do
   end
 
   context 'when displaying multiple messages' do
-    it 'detects N+1 queries for user associations' do
+    it 'detects N+1 queries when eager loading is disabled' do
+      # 複数のメッセージを作成（異なるユーザーで）
+      users = create_list(:user, 3, :confirmed)
+      users.each do |user|
+        create(:message, user: user, content: "Message from #{user.username}")
+      end
+
+      # 一時的にeager loadingを無効化してN+1を発生させる
+      allow_any_instance_of(MessagesController).to receive(:set_messages) do |controller|
+        controller.instance_variable_set(:@messages, Message.order(created_at: :desc).page(controller.params[:page]))
+      end
+
+      login_as confirmed_user
+
+      # Prosopiteが有効なら、N+1が検出されてエラーが発生する
+      expect {
+        visit messages_path
+      }.to raise_error(Prosopite::NPlusOneQueriesError)
+    end
+
+    it 'does not detect N+1 queries when eager loading is enabled' do
       # 複数のメッセージを作成（異なるユーザーで）
       users = create_list(:user, 3, :confirmed)
       users.each do |user|
@@ -21,7 +41,7 @@ RSpec.describe 'N+1 Detection', type: :system do
       login_as confirmed_user
       visit messages_path
 
-      # Prosopiteが有効なら、N+1が検出されてエラーが出るはず
+      # eager loadingが有効なのでN+1は発生しない
       expect(page).to have_content("Message from")
     end
   end
