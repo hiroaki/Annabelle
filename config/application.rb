@@ -1,6 +1,7 @@
 require_relative 'boot'
 
 require 'rails/all'
+require_relative '../lib/two_factor/configuration'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -25,9 +26,17 @@ module Annabelle
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Secrets configured for ActiveRecord encrypted attributes
-    config.active_record.encryption.primary_key = ENV['ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY']
-    config.active_record.encryption.deterministic_key = ENV['ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY']
-    config.active_record.encryption.key_derivation_salt = ENV['ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT']
+    # Only set these if all required ENV vars are present to avoid raising at boot
+    # Use the TwoFactor configuration service to determine configuration state.
+    if TwoFactor::Configuration.enabled?
+      # All keys present — enable ActiveRecord encryption.
+      config.active_record.encryption.primary_key = TwoFactor::Configuration.primary_key
+      config.active_record.encryption.deterministic_key = TwoFactor::Configuration.deterministic_key
+      config.active_record.encryption.key_derivation_salt = TwoFactor::Configuration.key_derivation_salt
+    elsif TwoFactor::Configuration.any_configured?
+      # Partial configuration is likely a misconfiguration — fail fast.
+      raise '[Annabelle] ActiveRecord encryption keys partially configured. You must set all three: ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY, ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY, and ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT.'
+    end
 
     # activerecord-session_store (gem) settings
     ActiveRecord::SessionStore::Session.serializer = :json

@@ -60,6 +60,16 @@ Rails.application.load_seed if Rails.env.test?
 
 
 RSpec.configure do |config|
+  # Stub TwoFactor availability for system/request specs by default
+  # Individual specs can override this by stubbing `TwoFactor::Configuration.enabled?`.
+  config.before(:each, type: :system) do
+    allow(TwoFactor::Configuration).to receive(:enabled?).and_return(true)
+  end
+
+  config.before(:each, type: :request) do
+    allow(TwoFactor::Configuration).to receive(:enabled?).and_return(true)
+  end
+
   # Skip GitHub OAuth-required specs when RSPEC_DISABLE_OAUTH_GITHUB is set
   config.before(:each, :oauth_github_required) do
     skip "Skipped: RSPEC_DISABLE_OAUTH_GITHUB (GitHub OAuth is disabled)" if ENV['RSPEC_DISABLE_OAUTH_GITHUB']

@@ -60,6 +60,9 @@ group :development, :test do
   # Prosopite is able to auto-detect Rails N+1 queries with zero false positives / false negatives.
   gem 'prosopite'
   gem 'pg_query'
+
+  # Easily manage your environment.
+  gem 'climate_control'
 end
 
 group :development do
