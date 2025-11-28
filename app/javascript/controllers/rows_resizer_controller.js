@@ -23,7 +23,9 @@ export default class extends Controller {
 
   connect() {
     this.initialRows = parseInt(this.element.getAttribute("rows"), 10)
-    if (Number.isNaN(this.initialRows)) this.initialRows = this.expandedRowsValue
+    if (Number.isNaN(this.initialRows)) {
+      this.initialRows = this.expandedRowsValue
+    }
 
     // Create a probe element that uses Tailwind's responsive classes to detect lg breakpoint
     this.probeEl = document.createElement("div")
@@ -50,7 +52,9 @@ export default class extends Controller {
 
   disconnect() {
     window.removeEventListener("resize", this.handleResize)
-    if (this.probeEl && this.probeEl.parentNode) this.probeEl.parentNode.removeChild(this.probeEl)
+    if (this.probeEl && this.probeEl.parentNode) {
+      this.probeEl.parentNode.removeChild(this.probeEl)
+    }
   }
 
   expand() {

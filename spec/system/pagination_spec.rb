@@ -74,9 +74,7 @@ RSpec.describe 'Pagination', type: :system, js: true do
 
     it 'hides the desktop pagination with page numbers' do
       # Desktop pagination should be hidden on mobile
-      # Note: The page numbers might still be in DOM but not visible
-      desktop_pagination = page.all('.page', visible: false)
-      expect(desktop_pagination.any? { |el| el.visible? }).to be false
+      expect(page).not_to have_selector('.page', visible: true)
     end
 
     it 'allows navigation via prev/next buttons' do
@@ -104,9 +102,10 @@ RSpec.describe 'Pagination', type: :system, js: true do
     end
 
     it 'validates page number input' do
-      current_page = page.execute_script(<<~JS)
-        return parseInt(document.querySelector('input[data-pagination-target="pageInput"]').value);
-      JS
+      # Get current page value
+      current_page = page.evaluate_script(
+        'document.querySelector(\'input[data-pagination-target="pageInput"]\').value'
+      ).to_i
 
       # Try invalid page number (too high) using JavaScript
       page.execute_script(<<~JS)
@@ -115,13 +114,17 @@ RSpec.describe 'Pagination', type: :system, js: true do
         input.dispatchEvent(new Event('change', { bubbles: true }));
       JS
 
-      # Should reset to current page
-      sleep 0.5 # Give time for validation
+      # Should reset to current page - wait by checking the value has been reset
+      # Use evaluate_script with Capybara's waiting mechanism
+      expect(page).to have_no_selector(
+        'input[data-pagination-target="pageInput"][value="999"]',
+        wait: 1
+      )
 
-      new_value = page.execute_script(<<~JS)
-        return parseInt(document.querySelector('input[data-pagination-target="pageInput"]').value);
-      JS
-
+      # Verify it reset to the original page
+      new_value = page.evaluate_script(
+        'document.querySelector(\'input[data-pagination-target="pageInput"]\').value'
+      ).to_i
       expect(new_value).to eq(current_page)
     end
 
@@ -173,12 +176,11 @@ RSpec.describe 'Pagination', type: :system, js: true do
 
       # Resize to mobile
       resize_to(:mobile)
-      sleep 0.5 # Give CSS time to apply
 
-      # Should now show mobile pagination
-      expect(page).to have_selector('input[data-pagination-target="pageInput"]', visible: true)
+      # Should now show mobile pagination - rely on Capybara's implicit waiting
+      expect(page).to have_selector('input[data-pagination-target="pageInput"]', visible: true, wait: 2)
       # Desktop page numbers should be hidden
-      expect(page).not_to have_selector('.page', visible: true)
+      expect(page).not_to have_selector('.page', visible: true, wait: 2)
     end
   end
 end
