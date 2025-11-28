@@ -7,23 +7,45 @@
     paginator:     the paginator that renders the pagination tags inside
 -%>
 <%= paginator.render do -%>
-  <nav class="flex items-center justify-between p-2 mb-2 bg-gray-100 text-xs" role="navigation" aria-label="pager">
-    <div>
-      <%= first_page_tag %>
-      <%= prev_page_tag %>
-    </div>
-    <div>
-      <% each_page do |page| -%>
-        <% if page.display_tag? -%>
-          <%= page_tag page %>
-        <% elsif !page.was_truncated? -%>
-          <%= gap_tag %>
+  <nav data-controller="pagination" data-pagination-total-pages-value="<%= total_pages %>" data-pagination-current-page-value="<%= current_page.number %>" role="navigation" aria-label="pager">
+    <!-- Desktop pagination -->
+    <div class="hidden lg:flex items-center justify-between p-2 mb-2 bg-gray-100 text-xs">
+      <div>
+        <%= first_page_tag %>
+        <%= prev_page_tag %>
+      </div>
+      <div>
+        <% each_page do |page| -%>
+          <% if page.display_tag? -%>
+            <%= page_tag page %>
+          <% elsif !page.was_truncated? -%>
+            <%= gap_tag %>
+          <% end -%>
         <% end -%>
-      <% end -%>
+      </div>
+      <div>
+        <%= next_page_tag %>
+        <%= last_page_tag %>
+      </div>
     </div>
-    <div>
+
+    <!-- Mobile pagination -->
+    <div class="flex lg:hidden items-center justify-center gap-2 p-2 mb-2 bg-gray-100 text-xs">
+      <%= prev_page_tag %>
+      <div class="flex items-center gap-1">
+        <input
+          type="number"
+          min="1"
+          max="<%= total_pages %>"
+          value="<%= current_page.number %>"
+          data-pagination-target="pageInput"
+          data-action="change->pagination#goToPage"
+          class="w-14 px-2 py-1 text-center border border-gray-400 rounded"
+          inputmode="numeric"
+        />
+        <span class="text-gray-600">/ <%= total_pages %></span>
+      </div>
       <%= next_page_tag %>
-      <%= last_page_tag %>
     </div>
   </nav>
 <% end -%>

@@ -44,6 +44,12 @@
                   rows: 3,
                   class: 'w-full px-0 text-gray-900 bg-white border-0 focus:ring-0',
                   required: true,
+                  data: {
+                    'controller' => 'rows-resizer',
+                    'action' => 'focus->rows-resizer#expand blur->rows-resizer#collapse',
+                    'rows-resizer-compact-rows-value' => 1,
+                    'rows-resizer-expanded-rows-value' => 3,
+                  }
                 ) %>
               </div>
               <!-- Compact upload options: placed between the submit button and attachments field -->
