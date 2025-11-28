@@ -10,11 +10,16 @@ import { Controller } from "@hotwired/stimulus"
 // to detect the lg breakpoint without hardcoding pixel values. This ensures the JS logic
 // stays synchronized with Tailwind's configuration, even if breakpoint values change.
 //
+// Configuration:
+// - Reads the initial rows value from the textarea's `rows` attribute
+// - If no `rows` attribute, falls back to `expandedRows` value (default: 3)
+// - `compactRows` can be customized via data attribute (default: 1)
+//
 // Behavior:
-// - Desktop (lg and above): Always shows `initialRows` (typically 3)
+// - Desktop (lg and above): Always shows initial rows from textarea
 // - Mobile (below lg):
-//   - Unfocused: Shows `compactRows` (default: 1)
-//   - Focused: Shows `expandedRows` (default: 3)
+//   - Unfocused: Shows `compactRows`
+//   - Focused: Shows initial rows from textarea
 export default class extends Controller {
   static values = {
     compactRows: { type: Number, default: 1 },
@@ -22,8 +27,10 @@ export default class extends Controller {
   }
 
   connect() {
+    // Read the initial rows value from the textarea element
     this.initialRows = parseInt(this.element.getAttribute("rows"), 10)
     if (Number.isNaN(this.initialRows)) {
+      // Fallback to expandedRows value if rows attribute is not set
       this.initialRows = this.expandedRowsValue
     }
 
