@@ -65,7 +65,7 @@ export default class extends Controller {
   }
 
   expand() {
-    if (this.isMobile()) this.setRows(this.expandedRowsValue)
+    if (this.isMobile()) this.setRows(this.initialRows)
   }
 
   collapse() {
@@ -76,7 +76,7 @@ export default class extends Controller {
     if (!this.isMobile()) {
       this.setRows(this.initialRows)
     } else if (document.activeElement === this.element) {
-      this.setRows(this.expandedRowsValue)
+      this.setRows(this.initialRows)
     } else {
       this.setRows(this.compactRowsValue)
     }
