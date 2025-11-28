@@ -35,7 +35,7 @@ module Annabelle
       config.active_record.encryption.key_derivation_salt = TwoFactor::Configuration.key_derivation_salt
     elsif TwoFactor::Configuration.any_configured?
       # Partial configuration is likely a misconfiguration — fail fast.
-      raise "[Annabelle] ActiveRecord encryption keys partially configured; if you set any of ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY, ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY, or ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT you must set all three."
+      raise '[Annabelle] ActiveRecord encryption keys partially configured; if you set any of ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY, ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY, or ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT you must set all three.'
     end
 
     # activerecord-session_store (gem) settings
