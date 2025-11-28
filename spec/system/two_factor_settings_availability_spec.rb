@@ -1,11 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe 'TwoFactorSettings Availability', type: :system do
-  # Assuming FactoryBot is configured and a :user factory exists
   let(:user) { FactoryBot.create(:user) }
 
   before do
-    # Assuming Devise or Warden test helpers are configured
     login_as user, scope: :user
   end
 
