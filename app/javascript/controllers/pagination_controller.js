@@ -21,7 +21,7 @@ export default class extends Controller {
   }
 
   goToPage(event) {
-    const pageNumber = parseInt(event.target.value)
+    const pageNumber = parseInt(event.target.value, 10)
 
     // Validate page number
     if (isNaN(pageNumber) || pageNumber < 1 || pageNumber > this.totalPagesValue) {
