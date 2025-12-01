@@ -1,6 +1,18 @@
 require 'rails_helper'
 
+require 'climate_control'
+
 RSpec.describe TwoFactorSettingsController, type: :request do
+  around do |example|
+    ClimateControl.modify(
+      'ENABLE_2FA' => '1',
+      'ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY' => 'primary',
+      'ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY' => 'det',
+      'ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT' => 'salt'
+    ) do
+      example.run
+    end
+  end
   let(:user) { FactoryBot.create(:user, password: 'password123') }
 
   describe 'GET /two_factor_settings/new' do

@@ -1,8 +1,18 @@
-# frozen_string_literal: true
-
 require 'rails_helper'
+require 'climate_control'
 
 RSpec.describe '2FA有効化フロー', type: :system do
+  around do |example|
+    ClimateControl.modify(
+      'ENABLE_2FA' => '1',
+      'ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY' => 'primary',
+      'ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY' => 'det',
+      'ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT' => 'salt'
+    ) do
+      example.run
+    end
+  end
+
   let(:username) { 'staff' }
   let(:password) { 'password123' }
   let!(:user) { create(:user, username: username, password: password, password_confirmation: password, confirmed_at: Time.current) }

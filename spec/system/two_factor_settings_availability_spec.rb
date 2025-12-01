@@ -10,7 +10,8 @@ RSpec.describe 'TwoFactorSettings Availability', type: :system do
   context 'when 2FA is unavailable (ENV vars missing)' do
     before do
       # Override the default stub defined in rails_helper.rb
-      allow(TwoFactor::Configuration).to receive(:enabled?).and_return(false)
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with('ENABLE_2FA').and_return(nil)
     end
 
     it 'redirects to dashboard with an alert message when accessing 2FA settings' do
