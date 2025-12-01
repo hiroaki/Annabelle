@@ -1,9 +1,8 @@
 require 'rails_helper'
-require 'climate_control'
 
 RSpec.describe '2FA有効化フロー', type: :system do
   around do |example|
-    ClimateControl.modify(
+    with_env(
       'ENABLE_2FA' => '1',
       'ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY' => 'primary',
       'ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY' => 'det',

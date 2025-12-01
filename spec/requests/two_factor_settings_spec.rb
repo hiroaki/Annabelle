@@ -1,7 +1,5 @@
 require 'rails_helper'
 
-require 'climate_control'
-
 RSpec.describe TwoFactorSettingsController, type: :request do
   around do |example|
     with_env(
