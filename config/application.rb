@@ -1,7 +1,6 @@
 require_relative 'boot'
 
 require 'rails/all'
-require_relative '../lib/two_factor/configuration'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -25,17 +24,23 @@ module Annabelle
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
-    # Secrets configured for ActiveRecord encrypted attributes
-    # Only set these if all required ENV vars are present to avoid raising at boot
-    # Use the TwoFactor configuration service to determine configuration state.
-    if TwoFactor::Configuration.enabled?
-      # All keys present — enable ActiveRecord encryption.
-      config.active_record.encryption.primary_key = TwoFactor::Configuration.primary_key
-      config.active_record.encryption.deterministic_key = TwoFactor::Configuration.deterministic_key
-      config.active_record.encryption.key_derivation_salt = TwoFactor::Configuration.key_derivation_salt
-    elsif TwoFactor::Configuration.any_configured?
-      # Partial configuration is likely a misconfiguration — fail fast.
-      raise '[Annabelle] ActiveRecord encryption keys partially configured. You must set all three: ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY, ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY, and ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT.'
+    # Two-factor authentication (2FA) and ActiveRecord encryption configuration
+    # When ENABLE_2FA is set, 2FA functionality becomes available in the application.
+    # 2FA requires ActiveRecord encryption to securely store OTP secrets, so all three
+    # encryption keys must be provided. If ENABLE_2FA is set but keys are missing,
+    # the application will fail fast with a clear error message.
+    if ENV['ENABLE_2FA'].present?
+      primary_key = ENV['ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY']
+      deterministic_key = ENV['ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY']
+      key_derivation_salt = ENV['ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT']
+
+      if primary_key.present? && deterministic_key.present? && key_derivation_salt.present?
+        config.active_record.encryption.primary_key = primary_key
+        config.active_record.encryption.deterministic_key = deterministic_key
+        config.active_record.encryption.key_derivation_salt = key_derivation_salt
+      else
+        raise '[Annabelle] ENABLE_2FA is set, but ActiveRecord encryption keys are missing or incomplete. You must set all three: ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY, ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY, and ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT.'
+      end
     end
 
     # activerecord-session_store (gem) settings
