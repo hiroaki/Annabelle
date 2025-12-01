@@ -25,6 +25,10 @@ module Annabelle
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Two-factor authentication (2FA) and ActiveRecord encryption configuration
+    # When ENABLE_2FA is set, 2FA functionality becomes available in the application.
+    # 2FA requires ActiveRecord encryption to securely store OTP secrets, so all three
+    # encryption keys must be provided. If ENABLE_2FA is set but keys are missing,
+    # the application will fail fast with a clear error message.
     if ENV['ENABLE_2FA'].present?
       primary_key = ENV['ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY']
       deterministic_key = ENV['ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY']
