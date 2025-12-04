@@ -90,9 +90,19 @@ RSpec.describe ImageMetadata::Stripper do
         expect(result[:io]).not_to eq(attachable[:io])
         expect(result[:filename]).to eq('image_with_gps.jpg')
 
+        # 特定の画像処理ライブラリ（MiniMagick や Vips）に依存せず、
+        # バイナリレベルで EXIF ヘッダの有無を確認する
         result[:io].rewind
-        image = MiniMagick::Image.read(result[:io].read)
-        expect(image.exif).to eq({})
+        stripped_data = result[:io].read
+
+        # 一般的な JPEG の Exif ヘッダシグネチャが含まれていないことを確認
+        # "Exif\0\0" は JPEG APP1 マーカー内の Exif 識別子です
+        expect(stripped_data).not_to include("Exif\0\0")
+
+        # 念のため、元のファイルには含まれていたことも確認（テストデータの妥当性保証）
+        attachable[:io].rewind
+        original_data = attachable[:io].read
+        expect(original_data).to include("Exif\0\0")
       ensure
         result[:io].close! if result&.dig(:io).is_a?(Tempfile)
       end
