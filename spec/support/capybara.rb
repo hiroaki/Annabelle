@@ -20,7 +20,7 @@ def cuprite_options
   }
 
   # Docker-specific browser options for containerized environments
-  if ENV['DOCKER'].present?
+  if StringBoolean.truthy?(ENV['DOCKER'])
     browser_options.merge!({
       'no-sandbox' => nil,           # Required for Docker containers
       'disable-dev-shm-usage' => nil, # Overcome limited resource problems
@@ -53,8 +53,8 @@ Capybara.configure do |config|
   config.default_max_wait_time = 2
   config.default_normalize_ws = true
 
-  if ENV['DOCKER'].present?
-    config.server_host = "0.0.0.0"
+  if StringBoolean.truthy?(ENV['DOCKER'])
+    config.server_host = '0.0.0.0'
   end
 end
 
