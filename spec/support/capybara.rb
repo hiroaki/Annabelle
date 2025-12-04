@@ -5,10 +5,12 @@ def cuprite_options
   lang = ENV['CAPYBARA_LANG'] || 'en'
   browser_options = { 'accept-lang' => lang }
 
+  headful = ENV['HEADLESS'].nil? ? false : StringBoolean.falsey?(ENV['HEADLESS'], default: false)
+
   options = {
     js_errors: true,
     window_size: [1200, 800],
-    headless: %w[0 false].exclude?(ENV['HEADLESS']),
+    headless: !headful,
     slowmo: ENV['SLOWMO']&.to_f,
     inspector: true,
     browser_options: browser_options,
@@ -26,7 +28,7 @@ def cuprite_options
     })
 
     # Respect HEADLESS env: do not force headless here. Set inspector based on HEADLESS.
-    options[:inspector] = %w[0 false].include?(ENV['HEADLESS']) ? true : false
+    options[:inspector] = headful
 
     # Ensure the cuprite driver uses the packaged Chromium binary inside the container.
     options[:browser_path] = '/usr/bin/chromium'
