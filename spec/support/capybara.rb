@@ -5,7 +5,7 @@ def cuprite_options
   lang = ENV['CAPYBARA_LANG'] || 'en'
   browser_options = { 'accept-lang' => lang }
 
-  headful = ENV['HEADLESS'].nil? ? false : StringBoolean.falsey?(ENV['HEADLESS'], default: false)
+  headful = StringBoolean.falsey?(ENV['HEADLESS'], default: false)
 
   options = {
     js_errors: true,
