@@ -64,7 +64,8 @@
         )
       %>
       <p class="mt-2 text-sm text-gray-500">
-        <%= t('devise.registrations.need_current_password') %>
+        <span><%= t('devise.registrations.need_current_password') %></span>
+        <%= link_to t('devise.shared.forgot_your_password'), new_user_password_path, data: { turbo: false }, class: 'underline' %>
       </p>
     </div>
 

@@ -94,6 +94,17 @@ $
 SECRET_KEY_BASE=7f1bbba9cbbd1999fd641b80861ac989807eb8fbdd...
 ```
 
+### Two-Factor Authentication / 二要素認証
+
+Set this variable to enable two-factor authentication.
+If you enable two-factor authentication, you must also set the Active Record encryption variables described in the next section.
+
+二要素認証を利用する場合にセットしてください。また、二要素認証を利用する場合は次の Active Record 暗号化の設定も必要になりますので、併せてセットしてください。
+
+```
+ENABLE_2FA=1
+```
+
 ### Active Record Encryption / Active Record 暗号化
 
 Active Record encryption configuration is required for the two-factor authentication implementation. These values can be generated using `bin/rails db:encryption:init`, and you should copy the strings output to the screen and set them to these environment variables:

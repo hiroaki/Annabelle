@@ -49,4 +49,17 @@ module ApplicationHelper
       )
     end
   end
+
+  # 二要素認証を利用する設定であるか否かを返します。
+  #
+  # 現状の判定ロジックについて:
+  # 2FA の有効/無効は、環境変数 ENABLE_2FA の有無のみで判定しています。
+  # 実際には config/application.rb で環境変数を元に 2FA の有効化処理が行われ、
+  # その結果アプリケーションが2FA有効状態で起動します。
+  # ただし、ここではアプリの実際の状態までは参照せず、環境変数のみを見ています。
+  # より厳密な判定が必要な場合は、config で判定した結果を Rails.configuration.x などに保存し、
+  # それを参照する設計が推奨されます。
+  def two_factor_auth_available?
+    ENV['ENABLE_2FA'].present?
+  end
 end

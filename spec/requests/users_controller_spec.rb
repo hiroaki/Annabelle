@@ -72,6 +72,23 @@ RSpec.describe UsersController, type: :request do
       end
     end
 
+    context "when updating metadata defaults" do
+      it "persists boolean fields" do
+        patch update_profile_path(locale: I18n.locale), params: {
+          user: {
+            default_strip_metadata: "0",
+            default_allow_location_public: "1",
+            show_image_location_on_preview: "0"
+          }
+        }
+
+        user.reload
+        expect(user.default_strip_metadata).to be false
+        expect(user.default_allow_location_public).to be true
+        expect(user.show_image_location_on_preview).to be false
+      end
+    end
+
     context "when changing preferred language to an unsupported locale" do
       it "does not change the preferred language and shows an error" do
         patch update_profile_path(locale: I18n.locale), params: { user: { preferred_language: "unsupported" } }

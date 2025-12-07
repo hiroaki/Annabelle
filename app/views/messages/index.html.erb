@@ -44,18 +44,38 @@
                   rows: 3,
                   class: 'w-full px-0 text-gray-900 bg-white border-0 focus:ring-0',
                   required: true,
+                  data: {
+                    'controller' => 'rows-resizer',
+                    'action' => 'focus->rows-resizer#expand blur->rows-resizer#collapse',
+                    'rows-resizer-compact-rows-value' => 1,
+                  }
                 ) %>
               </div>
+              <!-- Compact upload options: placed between the submit button and attachments field -->
               <div class="flex items-center justify-between px-3 py-2 border-t">
 
-                <div class="my-0 text-left">
-                  <button type="submit" class=" items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 hover:bg-blue-800">
-                    <%= t('messages.form.post') %>
-                  </button>
+                <div class="flex items-center space-x-4">
+                  <div class="my-0 text-left">
+                    <button type="submit" class=" items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 hover:bg-blue-800">
+                      <%= t('messages.form.post') %>
+                    </button>
 
-                  <% if disabled %>
-                    <span class="mx-2 text-sm text-red-500"><%= t('messages.email_confirmation_required') %></span>
-                  <% end %>
+                    <% if disabled %>
+                      <span class="mx-2 text-sm text-red-500"><%= t('messages.email_confirmation_required') %></span>
+                    <% end %>
+                  </div>
+
+                  <div class="flex items-center space-x-3 text-sm">
+                    <label class="inline-flex items-center gap-2" title="<%= t('messages.form.strip_metadata_help') %>">
+                      <%= form.check_box(:strip_metadata, { checked: strip_metadata_preference, id: 'message_strip_metadata', class: 'h-4 w-4 text-blue-600 border-gray-300 rounded' }) %>
+                      <span class="font-medium"><%= t('messages.form.strip_metadata_short') %></span>
+                    </label>
+
+                    <label class="inline-flex items-center gap-2" title="<%= t('messages.form.allow_location_public_help') %>">
+                      <%= form.check_box(:allow_location_public, { checked: allow_location_public_preference, id: 'message_allow_location_public', class: 'h-4 w-4 text-blue-600 border-gray-300 rounded' }) %>
+                      <span class="font-medium"><%= t('messages.form.allow_location_public_short') %></span>
+                    </label>
+                  </div>
                 </div>
 
                 <div class="flex ps-0 space-x-1 rtl:space-x-reverse sm:ps-2" data-file-upload-target="reactionZone" data-reaction-class="bg-red-200">
@@ -64,12 +84,13 @@
                       <path stroke="currentColor" stroke-linejoin="round" stroke-width="2" d="M1 6v8a5 5 0 1 0 10 0V4.5a3.5 3.5 0 1 0-7 0V13a2 2 0 0 0 4 0V6"/>
                     </svg>
                     <%=
-                      form.file_field(:attachements,
+                      form.file_field(:attachments,
                         multiple: true,
+                        id: 'message_attachments',
                         class: 'hidden',
                         data: {
                           'file-upload-target' => 'fileInput',
-                          'action' => 'change->file-upload#changeAttachements',
+                          'action' => 'change->file-upload#changeAttachments',
                         },
                       )
                     %>

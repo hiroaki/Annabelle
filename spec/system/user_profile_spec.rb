@@ -102,6 +102,26 @@ RSpec.describe 'User profile editing', type: :system do
     end
   end
 
+  describe 'Image metadata defaults' do
+    it 'updates metadata preference checkboxes' do
+      visit edit_profile_path
+
+      expect(page).to have_checked_field('user_default_strip_metadata')
+      expect(page).to have_unchecked_field('user_default_allow_location_public')
+      expect(page).to have_checked_field('user_show_image_location_on_preview')
+
+      uncheck 'user_default_strip_metadata'
+      check 'user_default_allow_location_public'
+      uncheck 'user_show_image_location_on_preview'
+      click_button 'Update'
+
+      user.reload
+      expect(user.default_strip_metadata).to be false
+      expect(user.default_allow_location_public).to be true
+      expect(user.show_image_location_on_preview).to be false
+    end
+  end
+
   describe 'Simultaneous username and language change' do
     it 'updates both username and language' do
       visit edit_profile_path

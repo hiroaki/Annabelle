@@ -5,10 +5,12 @@ def cuprite_options
   lang = ENV['CAPYBARA_LANG'] || 'en'
   browser_options = { 'accept-lang' => lang }
 
+  headful = StringBoolean.falsey?(ENV['HEADLESS'], default: false)
+
   options = {
     js_errors: true,
     window_size: [1200, 800],
-    headless: %w[0 false].exclude?(ENV['HEADLESS']),
+    headless: !headful,
     slowmo: ENV['SLOWMO']&.to_f,
     inspector: true,
     browser_options: browser_options,
@@ -18,7 +20,7 @@ def cuprite_options
   }
 
   # Docker-specific browser options for containerized environments
-  if ENV['DOCKER'].present?
+  if StringBoolean.truthy?(ENV['DOCKER'])
     browser_options.merge!({
       'no-sandbox' => nil,           # Required for Docker containers
       'disable-dev-shm-usage' => nil, # Overcome limited resource problems
@@ -26,7 +28,7 @@ def cuprite_options
     })
 
     # Respect HEADLESS env: do not force headless here. Set inspector based on HEADLESS.
-    options[:inspector] = %w[0 false].include?(ENV['HEADLESS']) ? true : false
+    options[:inspector] = headful
 
     # Ensure the cuprite driver uses the packaged Chromium binary inside the container.
     options[:browser_path] = '/usr/bin/chromium'
@@ -51,8 +53,8 @@ Capybara.configure do |config|
   config.default_max_wait_time = 2
   config.default_normalize_ws = true
 
-  if ENV['DOCKER'].present?
-    config.server_host = "0.0.0.0"
+  if StringBoolean.truthy?(ENV['DOCKER'])
+    config.server_host = '0.0.0.0'
   end
 end
 

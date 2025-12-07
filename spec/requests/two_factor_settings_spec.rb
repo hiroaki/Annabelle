@@ -1,6 +1,16 @@
 require 'rails_helper'
 
 RSpec.describe TwoFactorSettingsController, type: :request do
+  around do |example|
+    with_env(
+      'ENABLE_2FA' => '1',
+      'ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY' => 'primary',
+      'ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY' => 'det',
+      'ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT' => 'salt'
+    ) do
+      example.run
+    end
+  end
   let(:user) { FactoryBot.create(:user, password: 'password123') }
 
   describe 'GET /two_factor_settings/new' do

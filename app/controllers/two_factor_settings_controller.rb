@@ -1,5 +1,6 @@
 class TwoFactorSettingsController < ApplicationController
   before_action :authenticate_user!
+  before_action :ensure_two_factor_auth_available
 
   # new_two_factor_settings GET /two_factor_settings/new(.:format)
   def new
@@ -57,6 +58,13 @@ class TwoFactorSettingsController < ApplicationController
   end
 
   private
+
+  def ensure_two_factor_auth_available
+    unless helpers.two_factor_auth_available?
+      flash[:alert] = I18n.t('two_factor_settings.unavailable')
+      redirect_to dashboard_path
+    end
+  end
 
   def params_enabling_2fa
     params.require(:two_fa).permit(:code, :password)

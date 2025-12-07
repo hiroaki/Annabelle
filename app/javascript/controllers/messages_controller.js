@@ -37,10 +37,16 @@ export default class extends Controller {
     evt.preventDefault();
 
     const elem = evt.currentTarget;
+    // The metadata-fetcher controller ensures these values are populated if available
+    const latitude = elem.dataset['metadataFetcherLatitudeValue'];
+    const longitude = elem.dataset['metadataFetcherLongitudeValue'];
+
     const data = {
       sourceUrl: elem.dataset['sourceUrl'],
       filename: elem.dataset['filename'],
       contentType: elem.dataset['contentType'],
+      latitude: latitude,
+      longitude: longitude,
     };
 
     const isPreviewDisplayed = this.isDisplayed(this.previewTarget);

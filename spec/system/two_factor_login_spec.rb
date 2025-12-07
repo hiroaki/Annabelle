@@ -1,8 +1,17 @@
-# frozen_string_literal: true
-
 require 'rails_helper'
 
 RSpec.describe 'Two-factor authentication login', type: :system do
+  around do |example|
+    with_env(
+      'ENABLE_2FA' => '1',
+      'ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY' => 'primary',
+      'ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY' => 'det',
+      'ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT' => 'salt'
+    ) do
+      example.run
+    end
+  end
+
   let(:user) { FactoryBot.create(:user, :with_otp) }
 
   before do
