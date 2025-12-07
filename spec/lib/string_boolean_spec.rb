@@ -53,7 +53,7 @@ RSpec.describe StringBoolean do
       expect(described_class.falsey?('random')).to be false
     end
 
-    it 'non-nil values always follow ActiveModel::Type::Boolean result, regardless of default' do
+    it 'ignores default when value is non-nil, following ActiveModel::Type::Boolean result' do
       expect(described_class.falsey?('1', default: false)).to be false
       expect(described_class.falsey?('0', default: false)).to be true
       expect(described_class.falsey?('off', default: false)).to be true
