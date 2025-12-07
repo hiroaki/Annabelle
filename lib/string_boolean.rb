@@ -6,17 +6,20 @@ require 'active_model/type/boolean'
 # 文字列を真偽値として判定するヘルパーを提供するモジュールです。
 # 真偽値の定義は ActiveModel::Type::Boolean に委ねられます。
 module StringBoolean
-  # val を ActiveModel::Type::Boolean.new.cast に与え、その結果を返します。
+  # ActiveModel::Type::Boolean のインスタンスを使い回すことでパフォーマンスを向上させます。
+  BOOLEAN_TYPE = ActiveModel::Type::Boolean.new.freeze
+
+  # val を BOOLEAN_TYPE.cast に与え、その結果を返します。
   # ただし結果が nil であった場合は default に指定した値を返します。
   def self.truthy?(val, default: false)
-    result = ActiveModel::Type::Boolean.new.cast(val)
+    result = BOOLEAN_TYPE.cast(val)
     result.nil? ? default : result
   end
 
-  # val を ActiveModel::Type::Boolean.new.cast に与え、その結果を反転して返します。
+  # val を BOOLEAN_TYPE.cast に与え、その結果を反転して返します。
   # ただし結果が nil であった場合は default に指定した値を返します。
   def self.falsey?(val, default: true)
-    result = ActiveModel::Type::Boolean.new.cast(val)
+    result = BOOLEAN_TYPE.cast(val)
     result.nil? ? default : !result
   end
 end

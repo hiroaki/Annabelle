@@ -6,7 +6,7 @@ RSpec.describe StringBoolean do
     it 'returns true for values ActiveModel::Type::Boolean treats as true' do
       expect(described_class.truthy?('1')).to be true
       expect(described_class.truthy?('true')).to be true
-      expect(described_class.truthy?('yes')).to be true # yes is true
+      expect(described_class.truthy?('yes')).to be true
       expect(described_class.truthy?('on')).to be true
       expect(described_class.truthy?('no')).to be true  # no is true
       expect(described_class.truthy?('random')).to be true
