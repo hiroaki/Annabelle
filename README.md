@@ -14,17 +14,31 @@ Messages posted or deleted by other users are instantly reflected on the screen 
 
 他のユーザによるメッセージの投稿や削除が、Action Cable を通じて即座に画面に反映されます。チャットのように利用することも可能です。
 
-### Layout / 画面レイアウト
-
-The screen layout is optimized for quick preview of uploaded media such as images or videos. On PC screens, the right half is dedicated to previews, while on mobile devices, a modal window is used.
-
-アップロードされたメディア（画像や動画）をすばやく確認できるように、画面レイアウトが工夫されています。PC では画面の右半分がプレビュー領域となり、モバイルではモーダルウィンドウが使用されます。
-
 ### File Upload / ファイルアップロード
 
-Multiple files can be selected and uploaded at once. Currently, uploaded files are saved unencrypted on the local disk.
+Multiple files can be selected and uploaded at once as message attachments. (Note: Currently, uploaded files are saved unencrypted on the local disk.)
 
-複数のファイルを同時に選択してアップロードできます。現時点では、アップロードされたファイルは暗号化されずにローカルディスクに保存されます。
+メッセージに添付する形で、複数のファイルを同時に選択してアップロードできます。（注：現時点では、アップロードされたファイルは暗号化されずにローカルディスクに保存されます。）
+
+### Layout / 画面レイアウト
+
+The screen layout is designed for quick and easy preview of uploaded media such as images and videos. On desktop screens, the right half of the screen is used for previews, while on mobile devices, previews are shown in a modal window.
+
+アップロードされたメディア（画像や動画）をすばやく確認できるように、画面レイアウトが工夫されています。プレビュー領域は、デスクトップ向けには画面の右半分が、モバイルではモーダルウィンドウが使用されます。
+
+### Preview Features/ プレビュー機能
+
+Supported media for preview. More media types will be supported in future updates:
+- Text
+- Images (with location shown on OpenStreetMap if available)
+- Videos
+- GPX (location and tracks shown on OpenStreetMap)
+
+プレビュー可能なメディアは次のとおりです。これら以外のメディア対応についても今後追加していく予定です：
+- テキスト
+- 画像（画像と、位置情報が含まれていれば OpenStreetMap の地図で位置を表示します）
+- 動画
+- GPX（位置情報を OpenStreetMap の地図でウェイポイントやトラックを表示します）
 
 ### User Authentication / ユーザ認証
 

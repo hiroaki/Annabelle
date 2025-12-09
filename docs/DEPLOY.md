@@ -164,13 +164,17 @@ If you have not modified `config/deploy.staging.yml`, you do not need to change 
 
 ## Container Registry / コンテナ・レジストリ
 
-With Kamal, images built on the deployment source are pushed to a container registry.
+In Kamal deployments, the built image is pushed to a container registry.
 
-Kamal のコンセプトにより、デプロイ元でビルドされたイメージは、コンテナー・レジストリへ push されることになります。
+Kamal のデプロイでは、ビルドされたイメージは、コンテナー・レジストリへ push されることになります。
 
-This registry is an internet service (such as Docker Hub or GitHub). You will need an account with permission to push images.
+Starting with Kamal version 2.8, you can specify a local Docker container registry running on the host machine, so using an external container registry service is no longer strictly required.
 
-このレジストリはインターネット上のサービスになります（ Docker や GitHub など）。そのためにそれらのサービスにコンテナを push するためのアカウント（アクセス権）が必要です。
+Kamal のバージョン 2.8 からは、ホストマシン上の（ローカルの） Docker コンテナを指定することができるようになり、外部のコンテナ・レジストリ・サービスは必ずしも必要ではなくなりました。
+
+If you use an external service, you will need an account for that service. If you use a local container registry, Kamal will set it up automatically during deployment, so no additional configuration is needed.
+
+外部サービスを利用する場合は、そのアカウントが必要です。ローカルのコンテナ・レジストリを利用する場合は、 Kamal がデプロイ時に設置しますので、別途必要なものはありません。
 
 ## SSL (TLS) Certificates and hosts File / SSL (TSL) 証明書と hosts ファイル
 

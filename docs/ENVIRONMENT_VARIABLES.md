@@ -210,13 +210,25 @@ Many of the environment variables described below contain sensitive information 
 
 ### Container Registry Settings / コンテナ・レジストリの設定
 
-With Kamal, the built Docker image is pushed to a container registry. You will need write access to the container registry, so please set the account information accordingly.
+When deploying with Kamal, the built Docker image is first pushed to a container registry. Therefore, you need a container registry that allows write access.
 
-Kamal では、ビルドした Docker イメージはいちどコンテナ・レジストリへ push されます。そのためコンテナ・レジストリへの書き込み権限が必要で、そのアカウント情報を設定してください。
+Kamal でのデプロイは、ビルドした Docker イメージはいちどコンテナ・レジストリへ push されます。そのため書き込みができるコンテナ・レジストリが必要です。
 
-The password is typically a personal access token or an access token issued by the registry service.
+You can use a remote external service for the container registry, such as GitHub or Docker Hub, or you can use a local registry running on the Docker host machine.
 
-パスワードには、通常レジストリサービスで発行されたパーソナルアクセストークンやアクセストークンを入力します。
+コンテナ・レジストリには、 GitHub や Docker などのリモートの外部サービスを利用することもできますが、ホストマシンの Docker 上に設置された、ローカルのものを利用することもできます。
+
+To use a local registry on the host machine, specify `localhost`. Kamal will automatically create the local registry for you.
+
+この、ホストマシン上の Docker を利用する場合は、`localhost` を指定します。これにより、そのローカル・レジストリは Kamal によって自動的に作成されます。
+
+```
+DEPLOY_REGISTRY_SERVER=localhost:5555
+```
+
+Alternatively, if you use an external container registry, set the account information accordingly. For the password, enter a personal access token or authentication token issued by the registry service.
+
+もしくは、外部のコンテナ・レジストリを利用する場合は、そのアカウント情報を設定してください。そのパスワードには、レジストリサービスで発行されたパーソナルアクセストークンやアクセストークンを入力します。
 
 ```
 DEPLOY_REGISTRY_SERVER=ghcr.io
