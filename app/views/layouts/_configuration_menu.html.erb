@@ -38,9 +38,11 @@
       <li>
         <%= link_to t('layouts.configuration_menu.account_settings'), edit_user_registration_path, class: "block text-lg text-gray-700 hover:text-blue-500" %>
       </li>
-      <li>
-        <%= link_to t('layouts.configuration_menu.two_factor_authentication'), two_factor_authentication_path, class: "block text-lg text-gray-700 hover:text-blue-500", **data_with_testid('configuration-menu-two-factor-authentication') %>
-      </li>
+      <% if two_factor_auth_available? %>
+        <li>
+          <%= link_to t('layouts.configuration_menu.two_factor_authentication'), two_factor_authentication_path, class: "block text-lg text-gray-700 hover:text-blue-500", **data_with_testid('configuration-menu-two-factor-authentication') %>
+        </li>
+      <% end %>
     </ul>
 
     <hr class="my-8">

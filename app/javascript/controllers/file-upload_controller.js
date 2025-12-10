@@ -78,7 +78,7 @@ export default class extends Controller {
     return elem.dataset['reactionClass'] || 'bg-red-100';
   }
 
-  changeAttachements(event) {
+  changeAttachments(event) {
     this.renderPreviews();
   }
 

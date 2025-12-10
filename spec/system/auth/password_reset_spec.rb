@@ -99,6 +99,26 @@ RSpec.describe 'パスワードリセット', type: :system do
     end
   end
 
+  context 'ログインしている場合' do
+    before { login_as(user) }
+
+    it 'アカウント編集画面からパスワードリセット画面へ遷移でき、自動的にログアウトされること' do
+      visit edit_user_registration_path
+
+      # パスワードリセットリンクをクリック
+      click_link I18n.t('devise.shared.forgot_your_password')
+
+      # ログアウトメッセージが表示される
+      expect(page).to have_content('You have been signed out to reset your password.')
+
+      # パスワードリセット画面にいる
+      expect(page).to have_current_path(new_user_password_path)
+
+      # ログアウト状態であることを確認（ログインリンクが表示されているなど）
+      expect(page).to have_link(I18n.t('devise.sessions.log_in'))
+    end
+  end
+
   describe '言語スイッチャーの動作' do
     it 'パスワードリセット申請時のバリデーションエラーでも正しく動作すること' do
       visit new_user_password_path

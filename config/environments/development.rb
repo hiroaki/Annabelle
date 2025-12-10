@@ -97,4 +97,9 @@ Rails.application.configure do
   # Proxyサーバ側でリクエストサイズ制限がある場合は、必ず同じ値をここにも設定してください。
   # （アプリ側のチェックはユーザー体験向上のための目安であり、実際の制限はProxyで行われます）
   config.x.max_request_body = ENV['MAX_REQUEST_BODY'].presence
+
+  # For Prosopite, the preferred notification channel should be configured
+  config.after_initialize do
+    Prosopite.rails_logger = true
+  end
 end

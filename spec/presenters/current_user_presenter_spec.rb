@@ -88,8 +88,16 @@ RSpec.describe CurrentUserPresenter, type: :presenter do
           .with(name: 'current-user-id', content: user.id)
           .and_return('<meta name="current-user-id" content="1">')
 
+        expect(view_context.tag).to receive(:meta)
+          .with(name: 'current-user-show-location-preview', content: user.show_image_location_on_preview)
+          .and_return('<meta name="current-user-show-location-preview" content="true">')
+
+        expect(view_context).to receive(:safe_join)
+          .with(['<meta name="current-user-id" content="1">', '<meta name="current-user-show-location-preview" content="true">'])
+          .and_return('<meta name="current-user-id" content="1"><meta name="current-user-show-location-preview" content="true">')
+
         result = presenter.meta_tag
-        expect(result).to eq('<meta name="current-user-id" content="1">')
+        expect(result).to eq('<meta name="current-user-id" content="1"><meta name="current-user-show-location-preview" content="true">')
       end
     end
 

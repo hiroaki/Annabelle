@@ -124,6 +124,7 @@ RSpec.configure do |config|
 
   # Deviseのテストヘルパーを使用可能にする
   config.include Devise::Test::IntegrationHelpers, type: :request
+  config.include Devise::Test::ControllerHelpers, type: :controller
 
   # Capybara 用の自作ヘルパー
   config.include CapybaraHelpers, type: :system
@@ -146,5 +147,14 @@ RSpec.configure do |config|
   config.before(:each) do
     OmniAuth.config.test_mode = true
     OmniAuth.config.mock_auth[:github] = nil
+  end
+
+  # 各テストを Prosopite でスキャンし、 N+1 クエリを検出させます。
+  config.before(:each) do
+    Prosopite.scan
+  end
+
+  config.after(:each) do
+    Prosopite.finish
   end
 end

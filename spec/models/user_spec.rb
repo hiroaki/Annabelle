@@ -88,6 +88,14 @@ RSpec.describe User, type: :model do
         user = build(:user, email: 'invalid-email')
         expect(user).to be_invalid
       end
+
+      it "画像メタ情報の既定値が設定されていること" do
+        user = described_class.new
+
+        expect(user.default_strip_metadata).to be true
+        expect(user.default_allow_location_public).to be false
+        expect(user.show_image_location_on_preview).to be true
+      end
     end
   end
 
@@ -106,9 +114,12 @@ RSpec.describe User, type: :model do
       end
 
       it "エラーが発生すること" do
+        # このテストでは意図的に10回のexists?チェックが発生するため、Prosopiteを無効化
+        Prosopite.pause
         expect {
           described_class.generate_random_username!
         }.to raise_error("Unable to generate unique username")
+        Prosopite.resume
       end
     end
   end
@@ -215,7 +226,7 @@ RSpec.describe User, type: :model do
       it "メッセージが管理者に移管されること" do
         expect {
           user.destroy
-        }.to change { messages.map(&:reload).map(&:user_id).uniq }.to([admin.id])
+        }.to change { Message.where(id: messages.map(&:id)).pluck(:user_id).uniq }.to([admin.id])
       end
     end
 

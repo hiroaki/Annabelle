@@ -47,6 +47,7 @@ env:
     APP_HTTP_HOST: <%= ENV.fetch('APP_HTTP_HOST') %>
     APP_HTTP_PROTOCOL: <%= ENV.fetch('APP_HTTP_PROTOCOL') %>
     APP_HTTP_PORT: <%= ENV.fetch('APP_HTTP_PORT') %>
+    ENABLE_2FA: <%= ENV.fetch('ENABLE_2FA', '""') %>
     SMTP_ADDRESS: <%= ENV.fetch('SMTP_ADDRESS') %>
     SMTP_PORT: <%= ENV.fetch('SMTP_PORT') %>
     DEVISE_MAILER_SENDER: <%= ENV.fetch('DEVISE_MAILER_SENDER') %>

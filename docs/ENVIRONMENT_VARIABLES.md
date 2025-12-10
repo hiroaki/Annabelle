@@ -94,6 +94,17 @@ $
 SECRET_KEY_BASE=7f1bbba9cbbd1999fd641b80861ac989807eb8fbdd...
 ```
 
+### Two-Factor Authentication / 二要素認証
+
+Set this variable to enable two-factor authentication.
+If you enable two-factor authentication, you must also set the Active Record encryption variables described in the next section.
+
+二要素認証を利用する場合にセットしてください。また、二要素認証を利用する場合は次の Active Record 暗号化の設定も必要になりますので、併せてセットしてください。
+
+```
+ENABLE_2FA=1
+```
+
 ### Active Record Encryption / Active Record 暗号化
 
 Active Record encryption configuration is required for the two-factor authentication implementation. These values can be generated using `bin/rails db:encryption:init`, and you should copy the strings output to the screen and set them to these environment variables:
@@ -199,13 +210,25 @@ Many of the environment variables described below contain sensitive information 
 
 ### Container Registry Settings / コンテナ・レジストリの設定
 
-With Kamal, the built Docker image is pushed to a container registry. You will need write access to the container registry, so please set the account information accordingly.
+When deploying with Kamal, the built Docker image is first pushed to a container registry. Therefore, you need a container registry that allows write access.
 
-Kamal では、ビルドした Docker イメージはいちどコンテナ・レジストリへ push されます。そのためコンテナ・レジストリへの書き込み権限が必要で、そのアカウント情報を設定してください。
+Kamal でのデプロイは、ビルドした Docker イメージはいちどコンテナ・レジストリへ push されます。そのため書き込みができるコンテナ・レジストリが必要です。
 
-The password is typically a personal access token or an access token issued by the registry service.
+You can use a remote external service for the container registry, such as GitHub or Docker Hub, or you can use a local registry running on the Docker host machine.
 
-パスワードには、通常レジストリサービスで発行されたパーソナルアクセストークンやアクセストークンを入力します。
+コンテナ・レジストリには、 GitHub や Docker などのリモートの外部サービスを利用することもできますが、ホストマシンの Docker 上に設置された、ローカルのものを利用することもできます。
+
+To use a local registry on the host machine, specify `localhost`. Kamal will automatically create the local registry for you.
+
+この、ホストマシン上の Docker を利用する場合は、`localhost` を指定します。これにより、そのローカル・レジストリは Kamal によって自動的に作成されます。
+
+```
+DEPLOY_REGISTRY_SERVER=localhost:5555
+```
+
+Alternatively, if you use an external container registry, set the account information accordingly. For the password, enter a personal access token or authentication token issued by the registry service.
+
+もしくは、外部のコンテナ・レジストリを利用する場合は、そのアカウント情報を設定してください。そのパスワードには、レジストリサービスで発行されたパーソナルアクセストークンやアクセストークンを入力します。
 
 ```
 DEPLOY_REGISTRY_SERVER=ghcr.io

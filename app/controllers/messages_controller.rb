@@ -1,6 +1,8 @@
 class MessagesController < ApplicationController
   include Factory
 
+  helper_method :strip_metadata_preference, :allow_location_public_preference
+
   before_action :authenticate_user!
   before_action :require_confirmed_user_for_non_safe_requests
 
@@ -9,7 +11,7 @@ class MessagesController < ApplicationController
   end
 
   def create
-    create_message!(message_params.merge(user: current_user))
+    create_message!(message_params.merge(user: current_user, ip_address: request.remote_ip, user_agent: request.user_agent))
   rescue => ex
     flash.now.alert = I18n.t('messages.errors.generic', error_message: ex.message)
     respond_to do |format|
@@ -41,7 +43,14 @@ class MessagesController < ApplicationController
   private
 
     def message_params
-      params.permit(:content, attachements: [])
+      permitted = params.permit(:content, attachments: [])
+      if permitted.key?(:attachments)
+        # Remove empty file entries (browsers may submit "") to avoid treating them as uploads.
+        permitted[:attachments] = Array.wrap(permitted[:attachments]).compact_blank
+      end
+      permitted[:strip_metadata] = strip_metadata_preference
+      permitted[:allow_location_public] = allow_location_public_preference
+      permitted
     end
 
     def require_confirmed_user_for_non_safe_requests
@@ -52,7 +61,26 @@ class MessagesController < ApplicationController
     end
 
     def set_messages
-      @messages = Message.order(created_at: :desc).page(params[:page])
+      @messages = Message.includes(:user, attachments_attachments: :blob).order(created_at: :desc).page(params[:page])
+    end
+
+    def strip_metadata_preference
+      metadata_flag_from_params(:strip_metadata, current_user.default_strip_metadata)
+    end
+
+    def allow_location_public_preference
+      metadata_flag_from_params(:allow_location_public, current_user.default_allow_location_public)
+    end
+
+    def metadata_flag_from_params(key, default)
+      boolean_type = ActiveModel::Type::Boolean.new
+      if params.key?(key)
+        raw_value = params[key]
+        raw_value = raw_value.last if raw_value.is_a?(Array)
+        return boolean_type.cast(raw_value)
+      end
+
+      default
     end
 
   public

@@ -1,0 +1,132 @@
+# frozen_string_literal: true
+
+require 'exifr/jpeg'
+
+class ActiveStorage::Analyzer::ExifAnalyzer < ActiveStorage::Analyzer
+  SUPPORTED_CONTENT_TYPES = %w[image/jpeg image/jpg image/pjpeg].freeze
+
+  class << self
+    def accept?(blob)
+      blob.image? && SUPPORTED_CONTENT_TYPES.include?(blob.content_type)
+    end
+  end
+
+  def metadata
+    return {} unless self.class.accept?(blob)
+
+    base_metadata = default_analyzer_metadata
+    exif_metadata = extract_exif_metadata
+
+    base_metadata.merge(exif_metadata)
+  rescue ::EXIFR::MalformedJPEG, ::EOFError, ::ArgumentError => error
+    log_debug(error)
+    base_metadata
+  end
+
+  private
+
+  def extract_exif_metadata
+    download_blob_to_tempfile do |file|
+      build_metadata(file)
+    end
+  end
+
+  def build_metadata(file)
+    exif = ::EXIFR::JPEG.new(file.path)
+    extracted = {}
+
+    gps = extract_gps(exif)
+    extracted[:gps] = gps if gps
+
+    datetime = exif.date_time_original || exif.date_time || exif.date_time_digitized
+    # Preserve the EXIF date/time in the standard EXIF textual format
+    # `YYYY:MM:DD HH:MM:SS` when possible. If the analyzer returns a
+    # Time/DateTime-like object, format it to the EXIF representation
+    # so consumers can rely on the EXIF spec string. If the value is
+    # already a String, keep it as-is.
+    if datetime
+      if datetime.respond_to?(:strftime)
+        extracted[:datetime] = datetime.strftime('%Y:%m:%d %H:%M:%S')
+      else
+        extracted[:datetime] = datetime.to_s
+      end
+    end
+
+    camera = extract_camera(exif)
+    extracted[:camera] = camera if camera
+
+    extracted.empty? ? {} : { exif: extracted }
+  end
+
+  def default_analyzer_metadata
+    analyzer = default_analyzer_class
+    return {} unless analyzer
+
+    analyzer.new(blob).metadata
+  end
+
+  def default_analyzer_class
+    # Prioritize the analyzer that matches the configured variant processor
+    processor = Rails.application.config.active_storage.variant_processor
+    preferred_name = case processor
+    when :vips
+                       'ActiveStorage::Analyzer::ImageAnalyzer::Vips'
+    when :mini_magick
+                       'ActiveStorage::Analyzer::ImageAnalyzer::ImageMagick'
+    else
+                       log_warn("Unknown variant processor: #{processor}")
+                       nil
+    end
+
+    if preferred_name
+      preferred = ActiveStorage.analyzers.find { |klass| klass.name == preferred_name }
+      return preferred if preferred && preferred != self.class && preferred.accept?(blob)
+
+      log_warn("Preferred analyzer #{preferred_name} for processor #{processor} not found or not accepted. Falling back to detection.")
+    end
+
+    # Fallback to the first available analyzer
+    ActiveStorage.analyzers.detect do |klass|
+      next if klass == self.class
+
+      klass.accept?(blob)
+    end
+  end
+
+  def extract_gps(exif)
+    return unless exif&.gps
+
+    latitude = exif.gps.latitude
+    longitude = exif.gps.longitude
+    return unless latitude && longitude
+
+    { latitude: latitude.to_f, longitude: longitude.to_f }
+  end
+
+  def extract_camera(exif)
+    make = normalized_string(exif&.make)
+    model = normalized_string(exif&.model)
+
+    camera = {}
+    camera[:make] = make if make
+    camera[:model] = model if model
+    camera.empty? ? nil : camera
+  end
+
+  def normalized_string(value)
+    string = value.to_s.strip
+    string.empty? ? nil : string
+  end
+
+  def log_debug(error)
+    return unless defined?(Rails) && Rails.respond_to?(:logger) && Rails.logger
+
+    Rails.logger.debug { "[ExifAnalyzer] #{error.class}: #{error.message}" }
+  end
+
+  def log_warn(message)
+    return unless defined?(Rails) && Rails.respond_to?(:logger) && Rails.logger
+
+    Rails.logger.warn("[ExifAnalyzer] #{message}")
+  end
+end
