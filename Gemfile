@@ -51,7 +51,7 @@ group :development, :test do
   gem 'dotenv-rails'
 
   gem 'pry-rails'
-  gem 'rspec-rails', '~> 7.1', '>= 7.1.1'
+  gem 'rspec-rails', '~> 8.0'
   gem 'factory_bot_rails'
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
