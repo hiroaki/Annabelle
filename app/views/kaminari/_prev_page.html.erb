@@ -9,13 +9,13 @@
 <span class="prev">
   <% if current_page.first? %>
     <%= content_tag('span', t('views.pagination.previous').html_safe,
-      class: "bg-gray-100 text-gray-600 font-light py-1 px-4 rounded"
+      class: "bg-gray-100 text-gray-600 font-light py-1 px-4 rounded-sm"
     ) %>
   <% else %>
     <%= link_to(t('views.pagination.previous').html_safe, url,
       rel: 'prev',
       remote: remote,
-      class: "bg-white hover:bg-gray-100 text-gray-600 font-light py-1 px-4 border border-gray-400 rounded shadow"
+      class: "bg-white hover:bg-gray-100 text-gray-600 font-light py-1 px-4 border border-gray-400 rounded-sm shadow-sm"
     ) %>
   <% end %>
 </span>

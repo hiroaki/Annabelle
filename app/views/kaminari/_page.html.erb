@@ -9,7 +9,7 @@
 -%>
 <span class="page<%= ' current' if page.current? %>">
   <% if page.current? %>
-    <span class="bg-gray-400 text-white px-4 rounded" data-current-page-number="<%= page %>"><%= page %></span>
+    <span class="bg-gray-400 text-white px-4 rounded-sm" data-current-page-number="<%= page %>"><%= page %></span>
   <% else %>
     <%= link_to page, url, remote: remote, rel: page.rel, class: "px-4 text-gray-600 font-light" %>
   <% end %>
