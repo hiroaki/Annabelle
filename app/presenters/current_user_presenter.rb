@@ -53,9 +53,13 @@ class CurrentUserPresenter < ModelPresenterBase
     # data-messages-channel は Stimulus ではなく、チャンネルに関するものです。
     # app/javascript/channels/messages_channel.js
     view_context.content_tag(:span, 'Notifications', class: 'sr-only') +
-    view_context.content_tag(:div, '&nbsp;'.html_safe,
+    view_context.content_tag(:div,
       data: { messages_channel: 'notification' },
-      class: 'absolute inline-flex items-center justify-center w-4 h-4 text-xs text-white bg-red-500 border-white rounded-full -top-1 -end-1 hidden'
-    )
+      class: 'absolute -top-1 -end-1 hidden'
+    ) do
+      view_context.content_tag(:div, '&nbsp;'.html_safe,
+        class: 'inline-flex items-center justify-center w-4 h-4 text-xs text-white bg-red-500 border-white rounded-full'
+      )
+    end
   end
 end
