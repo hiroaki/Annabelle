@@ -2,7 +2,7 @@ export default function open({ context, attachment }) {
   const { container } = context || {};
   const { sourceUrl, filename, contentType } = attachment || {};
   const wrapper = document.createElement('div');
-  wrapper.className = 'relative w-full min-w-0 p-4 bg-white rounded-lg shadow-xs';
+  wrapper.className = 'relative w-full min-w-0 p-4 bg-white rounded-lg shadow-2xs';
 
   if (!sourceUrl) {
     container.appendChild(wrapper);
