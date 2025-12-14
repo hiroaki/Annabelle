@@ -105,6 +105,19 @@ services:
     working_dir: /rails/storage
     tty: true
 
+  sqlite-web:
+    # SQLite をブラウザで操作するための Web UI (coleifer/sqlite-web)
+    image: coleifer/sqlite-web
+    platform: linux/amd64
+    volumes:
+      - storage:/rails/storage
+    working_dir: /rails/storage
+    ports:
+      - "8080:8080"
+    entrypoint: ["sqlite_web"]
+    command: ["-H", "0.0.0.0", "/rails/storage/development.sqlite3"]
+    restart: "no"
+
 volumes:
   bundle:
   tmp:
