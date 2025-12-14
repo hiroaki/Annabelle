@@ -96,6 +96,15 @@ services:
       - "1080:1080"
       - "1025:1025"
 
+  sqlite:
+    # DBメンテナンス用サービス — 詳細は docker/sqlite/Dockerfile を参照
+    build:
+      context: ./docker/sqlite
+    volumes:
+      - storage:/rails/storage
+    working_dir: /rails/storage
+    tty: true
+
 volumes:
   bundle:
   tmp:
