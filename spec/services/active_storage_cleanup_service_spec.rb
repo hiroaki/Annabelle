@@ -99,5 +99,41 @@ RSpec.describe ActiveStorageCleanupService, type: :service do
         service.call
       end
     end
+
+    context 'edge cases' do
+      let(:dry_run) { true }
+
+      context 'when no unattached blobs exist older than specified days' do
+        # 5日以上前のファイルを対象にする（3日前のファイルは対象外になるはず）
+        let(:service) { described_class.new(days_old: 5, dry_run: dry_run, logger: logger) }
+
+        it 'finds 0 blobs' do
+          expect(logger).to receive(:info).with(/Total blobs found: 0/)
+          service.call
+        end
+      end
+
+      context 'when custom days_old is provided' do
+        # 0.5日前（12時間前）より古いものを対象にする -> 1日前の new_unattached_blob も対象になるはず
+        let(:service) { described_class.new(days_old: 0.5, dry_run: dry_run, logger: logger) }
+
+        it 'includes blobs older than the custom days' do
+          expect(logger).to receive(:info).with(/ID: #{new_unattached_blob.id}/)
+          expect(logger).to receive(:info).with(/ID: #{old_unattached_blob.id}/)
+          expect(logger).to receive(:info).with(/Total blobs found: 2/)
+          service.call
+        end
+      end
+
+      context 'when logger is not provided' do
+        # デフォルト引数の動作確認
+        let(:service) { described_class.new(days_old: 2, dry_run: dry_run) }
+
+        it 'uses default logger (stdout) without error' do
+          # 標準出力への出力を検証
+          expect { service.call }.to output(/=== DRY RUN MODE ===/).to_stdout
+        end
+      end
+    end
   end
 end
