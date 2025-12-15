@@ -113,7 +113,7 @@ services:
       - storage:/rails/storage
     working_dir: /rails/storage
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     entrypoint: ["sqlite_web"]
     command: ["-H", "0.0.0.0", "/rails/storage/development.sqlite3"]
     restart: "no"
