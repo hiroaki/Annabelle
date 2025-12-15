@@ -46,9 +46,23 @@ RSpec.describe ActiveStorageCleanupService, type: :service do
         }.not_to have_enqueued_job(ActiveStorage::PurgeJob)
       end
 
-      it 'logs the blobs that would be purged' do
+      it 'logs the blobs that would be purged correctly' do
+        # Dry Runモードの開始ログ
         expect(logger).to receive(:info).with(/DRY RUN MODE/)
+
+        # 削除対象のBlobが表示されること
         expect(logger).to receive(:info).with(/ID: #{old_unattached_blob.id}/)
+
+        # 削除対象外のBlobが表示されないこと（重要）
+        expect(logger).not_to receive(:info).with(/ID: #{new_unattached_blob.id}/)
+        expect(logger).not_to receive(:info).with(/ID: #{attached_blob.id}/)
+
+        # 集計結果が正しいこと（1件のみ）
+        expect(logger).to receive(:info).with(/Total blobs found: 1/)
+        
+        # 合計サイズの表示（"old content" は 11 bytes）
+        expect(logger).to receive(:info).with(/Total size: 11 Bytes/)
+
         service.call
       end
     end
