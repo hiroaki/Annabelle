@@ -30,6 +30,12 @@
 #   # MailCatcher Web UI
 #   http://127.0.0.1:1080/
 #
+#   # SQLite Web UI
+#   http://127.0.0.1:8080/
+#
+#   # SQLite CLI
+#   $ docker compose run --rm sqlite sqlite3 /rails/storage/development.sqlite3
+#
 # development 環境用 compose.yml
 #
 # 使い方:
@@ -60,6 +66,12 @@
 #
 #   # MailCatcher の Web UI
 #   http://127.0.0.1:1080/
+#
+#   # SQLite Web UI
+#   http://127.0.0.1:8080/
+#
+#   # SQLite CLI
+#   $ docker compose run --rm sqlite sqlite3 /rails/storage/development.sqlite3
 #
 services:
   web:
