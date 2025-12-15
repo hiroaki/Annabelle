@@ -7,8 +7,10 @@
 #   ActiveStorageCleanupService.new(days_old: 7, dry_run: false).call
 #
 class ActiveStorageCleanupService
+  class InvalidDaysOldError < StandardError; end
+
   def initialize(days_old: 2, dry_run: true, logger: Logger.new($stdout))
-    @days_old = days_old
+    @days_old = validate_days_old(days_old)
     @dry_run = dry_run
     @logger = logger
   end
@@ -27,6 +29,25 @@ class ActiveStorageCleanupService
   end
 
   private
+
+  def validate_days_old(value)
+    # nil の場合はデフォルト値 2 を採用する
+    return 2 if value.nil?
+
+    # 数値の場合
+    if value.is_a?(Numeric)
+      raise InvalidDaysOldError, 'days_old must be a positive number' unless value > 0
+      return value
+    end
+
+    # 文字列の場合（正の整数または小数を許容）
+    if value.is_a?(String) && value =~ /\A[1-9]\d*(\.\d+)?\z/
+      return value.to_f if value.include?('.')
+      return value.to_i
+    end
+
+    raise InvalidDaysOldError, "days_old must be a positive number, got: #{value.inspect}"
+  end
 
   def perform_dry_run(blobs, cutoff_period)
     @logger.info '=== DRY RUN MODE ==='

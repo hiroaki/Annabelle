@@ -139,6 +139,32 @@ RSpec.describe ActiveStorageCleanupService, type: :service do
           expect { service.call }.to output(/=== DRY RUN MODE ===/).to_stdout
         end
       end
+
+      context 'when invalid days_old is provided' do
+        it 'raises InvalidDaysOldError for negative number' do
+          expect {
+            described_class.new(days_old: -1, dry_run: dry_run, logger: logger)
+          }.to raise_error(ActiveStorageCleanupService::InvalidDaysOldError)
+        end
+
+        it 'raises InvalidDaysOldError for zero' do
+          expect {
+            described_class.new(days_old: 0, dry_run: dry_run, logger: logger)
+          }.to raise_error(ActiveStorageCleanupService::InvalidDaysOldError)
+        end
+
+        it 'raises InvalidDaysOldError for invalid string' do
+          expect {
+            described_class.new(days_old: "invalid", dry_run: dry_run, logger: logger)
+          }.to raise_error(ActiveStorageCleanupService::InvalidDaysOldError)
+        end
+
+        it 'accepts valid string number' do
+          expect {
+            described_class.new(days_old: "5", dry_run: dry_run, logger: logger)
+          }.not_to raise_error
+        end
+      end
     end
   end
 end

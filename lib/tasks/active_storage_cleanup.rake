@@ -16,11 +16,15 @@ namespace :active_storage do
   task cleanup: :environment do
     # 安全のため、作成から一定期間経過したものを対象とする（デフォルト2日）
     # アップロード直後のファイルなどを誤って削除しないための猶予期間
-    days_old = ENV.fetch('DAYS_OLD', 2).to_i
+    days_old = ENV['DAYS_OLD']
 
     # FORCE環境変数が "true" でない限り、Dry Run モードとする
     dry_run = ENV['FORCE'] != 'true'
 
-    ActiveStorageCleanupService.new(days_old: days_old, dry_run: dry_run).call
+    begin
+      ActiveStorageCleanupService.new(days_old: days_old, dry_run: dry_run).call
+    rescue ActiveStorageCleanupService::InvalidDaysOldError => e
+      abort "Error: #{e.message}"
+    end
   end
 end
