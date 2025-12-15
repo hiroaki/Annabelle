@@ -30,6 +30,12 @@
 #   # MailCatcher Web UI
 #   http://127.0.0.1:1080/
 #
+#   # SQLite Web UI
+#   http://127.0.0.1:8080/
+#
+#   # SQLite CLI
+#   $ docker compose run --rm sqlite sqlite3 /rails/storage/development.sqlite3
+#
 # development 環境用 compose.yml
 #
 # 使い方:
@@ -60,6 +66,12 @@
 #
 #   # MailCatcher の Web UI
 #   http://127.0.0.1:1080/
+#
+#   # SQLite Web UI
+#   http://127.0.0.1:8080/
+#
+#   # SQLite CLI
+#   $ docker compose run --rm sqlite sqlite3 /rails/storage/development.sqlite3
 #
 services:
   web:
@@ -95,6 +107,27 @@ services:
     ports:
       - "1080:1080"
       - "1025:1025"
+
+  sqlite:
+    # DBメンテナンス用サービス — 詳細は docker/sqlite/Dockerfile を参照
+    build:
+      context: ./docker/sqlite
+    volumes:
+      - storage:/rails/storage
+    working_dir: /rails/storage
+    tty: true
+
+  sqlite-web:
+    # SQLite をブラウザで操作するための Web UI (coleifer/sqlite-web)
+    image: coleifer/sqlite-web
+    platform: linux/amd64
+    volumes:
+      - storage:/rails/storage
+    ports:
+      - "127.0.0.1:8080:8080"
+    entrypoint: ["sqlite_web"]
+    command: ["-H", "0.0.0.0", "/rails/storage/development.sqlite3"]
+    restart: "no"
 
 volumes:
   bundle:
