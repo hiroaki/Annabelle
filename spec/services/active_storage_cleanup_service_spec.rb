@@ -1,0 +1,82 @@
+require 'rails_helper'
+
+RSpec.describe ActiveStorageCleanupService, type: :service do
+  let(:logger) { instance_double(Logger, info: nil, print: nil) }
+  let(:service) { described_class.new(days_old: 2, dry_run: dry_run, logger: logger) }
+
+  # テストデータのセットアップ
+  let!(:old_unattached_blob) do
+    ActiveStorage::Blob.create_and_upload!(
+      io: StringIO.new("old content"),
+      filename: "old.txt",
+      content_type: "text/plain"
+    ).tap { |blob| blob.update(created_at: 3.days.ago) }
+  end
+
+  let!(:new_unattached_blob) do
+    ActiveStorage::Blob.create_and_upload!(
+      io: StringIO.new("new content"),
+      filename: "new.txt",
+      content_type: "text/plain"
+    ).tap { |blob| blob.update(created_at: 1.day.ago) }
+  end
+
+  let!(:attached_blob) do
+    blob = ActiveStorage::Blob.create_and_upload!(
+      io: StringIO.new("attached content"),
+      filename: "attached.txt",
+      content_type: "text/plain"
+    )
+    blob.update(created_at: 3.days.ago)
+
+    # 正規の方法でアタッチ（Messageモデルを使用）
+    # FactoryBotを使用して親レコードを作成し、attachメソッドで紐付ける
+    message = FactoryBot.create(:message)
+    message.attachments.attach(blob)
+    blob
+  end
+
+  describe '#call' do
+    context 'when dry_run is true' do
+      let(:dry_run) { true }
+
+      it 'does not enqueue purge jobs' do
+        expect {
+          service.call
+        }.not_to have_enqueued_job(ActiveStorage::PurgeJob)
+      end
+
+      it 'logs the blobs that would be purged' do
+        expect(logger).to receive(:info).with(/DRY RUN MODE/)
+        expect(logger).to receive(:info).with(/ID: #{old_unattached_blob.id}/)
+        service.call
+      end
+    end
+
+    context 'when dry_run is false' do
+      let(:dry_run) { false }
+
+      # テスト実行前にサービスを呼び出す
+      before { service.call }
+
+      # エンキューされたジョブのGlobalIDリストを取得するヘルパー
+      let(:enqueued_gids) do
+        ActiveJob::Base.queue_adapter.enqueued_jobs.map do |job|
+          job[:args].first["_aj_globalid"]
+        end
+      end
+
+      it 'enqueues purge job for old unattached blobs' do
+        # RSpecのhave_enqueued_jobマッチャを使うとN+1エラーになるため、直接検証
+        expect(enqueued_gids).to include(old_unattached_blob.to_global_id.to_s)
+      end
+
+      it 'does not enqueue purge job for new or attached blobs' do
+        # 新しいBlobは削除対象外
+        expect(enqueued_gids).not_to include(new_unattached_blob.to_global_id.to_s)
+        # アタッチ済みBlobは削除対象外
+        expect(enqueued_gids).not_to include(attached_blob.to_global_id.to_s)
+      end
+    end
+  end
+end
