@@ -37,6 +37,11 @@ RSpec.describe ActiveStorageCleanupService, type: :service do
   end
 
   describe '#call' do
+    # テスト間の干渉を防ぐため、実行前にジョブキューをクリアする
+    before do
+      ActiveJob::Base.queue_adapter.enqueued_jobs.clear
+    end
+
     context 'when dry_run is true' do
       let(:dry_run) { true }
 
@@ -69,11 +74,6 @@ RSpec.describe ActiveStorageCleanupService, type: :service do
 
     context 'when dry_run is false' do
       let(:dry_run) { false }
-
-      # テスト間の干渉を防ぐため、ジョブキューをクリアする
-      before do
-        ActiveJob::Base.queue_adapter.enqueued_jobs.clear
-      end
 
       # エンキューされたジョブのGlobalIDリストを取得するヘルパー
       let(:enqueued_gids) do
