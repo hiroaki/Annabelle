@@ -44,12 +44,20 @@ class ActiveStorageCleanupService
     @logger.info "Purging unattached blobs created before #{cutoff_period}..."
 
     count = 0
+    progress_printed = false
+
     blobs.find_each do |blob|
       blob.purge_later
       count += 1
-      @logger.print '.' if count % 50 == 0
+      if count % 50 == 0
+        @logger.print '.'
+        progress_printed = true
+      end
     end
 
-    @logger.info "\nDone. #{count} blobs have been enqueued for deletion."
+    # ドットが出力されていて、かつ最後の出力で行が変わっていない場合は改行を入れる
+    @logger.print "\n" if progress_printed
+
+    @logger.info "Done. #{count} blobs have been enqueued for deletion."
   end
 end
