@@ -59,7 +59,7 @@ RSpec.describe ActiveStorageCleanupService, type: :service do
 
         # 集計結果が正しいこと（1件のみ）
         expect(logger).to receive(:info).with(/Total blobs found: 1/)
-        
+
         # 合計サイズの表示（"old content" は 11 bytes）
         expect(logger).to receive(:info).with(/Total size: 11 Bytes/)
 
@@ -70,9 +70,6 @@ RSpec.describe ActiveStorageCleanupService, type: :service do
     context 'when dry_run is false' do
       let(:dry_run) { false }
 
-      # テスト実行前にサービスを呼び出す
-      before { service.call }
-
       # エンキューされたジョブのGlobalIDリストを取得するヘルパー
       let(:enqueued_gids) do
         ActiveJob::Base.queue_adapter.enqueued_jobs.map do |job|
@@ -81,15 +78,25 @@ RSpec.describe ActiveStorageCleanupService, type: :service do
       end
 
       it 'enqueues purge job for old unattached blobs' do
+        service.call
         # RSpecのhave_enqueued_jobマッチャを使うとN+1エラーになるため、直接検証
         expect(enqueued_gids).to include(old_unattached_blob.to_global_id.to_s)
       end
 
       it 'does not enqueue purge job for new or attached blobs' do
+        service.call
         # 新しいBlobは削除対象外
         expect(enqueued_gids).not_to include(new_unattached_blob.to_global_id.to_s)
         # アタッチ済みBlobは削除対象外
         expect(enqueued_gids).not_to include(attached_blob.to_global_id.to_s)
+      end
+
+      it 'logs the execution details correctly' do
+        expect(logger).to receive(:info).with(/=== EXECUTE MODE ===/)
+        expect(logger).to receive(:info).with(/Purging unattached blobs created before/)
+        expect(logger).to receive(:info).with(/Done. 1 blobs have been enqueued for deletion./)
+
+        service.call
       end
     end
   end
