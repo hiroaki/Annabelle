@@ -83,13 +83,14 @@ class ActiveStorageCleanupService
       blob.purge_later
       count += 1
       if count % 50 == 0
-        @logger.print '.'
+        # Intentionally use << (no newline) to show progress dots on the same line every 50 blobs.
+        @logger << '.'
         progress_printed = true
       end
     end
 
     # ドットが出力されていて、かつ最後の出力で行が変わっていない場合は改行を入れる
-    @logger.print "\n" if progress_printed
+    @logger << "\n" if progress_printed
 
     @logger.info "Done. #{count} blobs have been enqueued for deletion."
 

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ActiveStorageCleanupService, type: :service do
-  let(:logger) { instance_double(Logger, info: nil, print: nil) }
+  let(:logger) { instance_double(Logger, info: nil, :<< => nil) }
   let(:service) { described_class.new(days_old: 2, dry_run: dry_run, logger: logger) }
 
   # テストデータのセットアップ
@@ -100,6 +100,27 @@ RSpec.describe ActiveStorageCleanupService, type: :service do
         expect(logger).to receive(:info).with(/=== EXECUTE MODE ===/)
         expect(logger).to receive(:info).with(/Purging unattached blobs created before/)
         expect(logger).to receive(:info).with(/Done. 1 blobs have been enqueued for deletion./)
+
+        service.call
+      end
+
+      it 'prints progress dots for large number of blobs' do
+        # N+1検知を一時的に無効化（テストデータ作成時のINSERT連打を許容）
+        Prosopite.pause do
+          # 50個以上のBlobを作成して、ドットが出力されることを確認
+          50.times do |i|
+            ActiveStorage::Blob.create_and_upload!(
+              io: StringIO.new("content #{i}"),
+              filename: "test_#{i}.txt",
+              content_type: "text/plain"
+            ).tap { |blob| blob.update(created_at: 3.days.ago) }
+          end
+        end
+
+        # ドットが出力されること
+        expect(logger).to receive(:<<).with('.')
+        # 最後に改行が出力されること
+        expect(logger).to receive(:<<).with("\n")
 
         service.call
       end
