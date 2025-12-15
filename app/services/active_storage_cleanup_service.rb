@@ -1,3 +1,11 @@
+# Service to safely purge unattached Active Storage blobs.
+#
+# It finds blobs that are not attached to any record and are older than a specified
+# number of days (default: 2), then purges them.
+#
+# Usage:
+#   ActiveStorageCleanupService.new(days_old: 7, dry_run: false).call
+#
 class ActiveStorageCleanupService
   def initialize(days_old: 2, dry_run: true, logger: Logger.new($stdout))
     @days_old = days_old
