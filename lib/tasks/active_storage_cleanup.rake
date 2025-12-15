@@ -19,8 +19,8 @@ namespace :active_storage do
     days_old = ENV.fetch('DAYS_OLD', 2).to_i
 
     # FORCE環境変数が "true" でない限り、Dry Run モードとする
-    is_dry_run = ENV['FORCE'] != 'true'
+    dry_run = ENV['FORCE'] != 'true'
 
-    ActiveStorageCleanupService.new(days_old: days_old, dry_run: is_dry_run).call
+    ActiveStorageCleanupService.new(days_old: days_old, dry_run: dry_run).call
   end
 end
