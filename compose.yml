@@ -111,7 +111,6 @@ services:
     platform: linux/amd64
     volumes:
       - storage:/rails/storage
-    working_dir: /rails/storage
     ports:
       - "127.0.0.1:8080:8080"
     entrypoint: ["sqlite_web"]
