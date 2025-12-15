@@ -13,6 +13,8 @@ class ActiveStorageCleanupService
     @logger = logger
   end
 
+  # Returns a Hash with execution results (count, total_size, dry_run).
+  # Note: The return structure may be revisited in the future as requirements evolve.
   def call
     cutoff_period = @days_old.days.ago
     unattached_blobs = ActiveStorage::Blob.unattached.where('active_storage_blobs.created_at <= ?', cutoff_period)
@@ -45,6 +47,8 @@ class ActiveStorageCleanupService
     @logger.info "Total size: #{ActiveSupport::NumberHelper.number_to_human_size(total_size)}"
     @logger.info ''
     @logger.info 'To actually purge these files, run with dry_run: false'
+
+    { count: count, total_size: total_size, dry_run: true }
   end
 
   def perform_cleanup(blobs, cutoff_period)
@@ -67,5 +71,7 @@ class ActiveStorageCleanupService
     @logger.print "\n" if progress_printed
 
     @logger.info "Done. #{count} blobs have been enqueued for deletion."
+
+    { count: count, dry_run: false }
   end
 end
