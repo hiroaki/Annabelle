@@ -3,10 +3,20 @@
 # It finds blobs that are not attached to any record and are older than a specified
 # number of days (default: 2), then purges them.
 #
+# Safety notes:
+# - The `days_old` grace period prevents deletion of recent uploads. In this app,
+#   attachments are created alongside their parent `Message`, and late attachments
+#   after the grace window are not expected by design.
+# - Active Storage refuses to purge attached blobs (`ActiveStorage::InUseError`),
+#   providing an extra safeguard. If business rules change to allow late attachments,
+#   consider adding an in-loop re-check before `purge_later`.
+#
 # Usage:
 #   ActiveStorageCleanupService.new(days_old: 7, dry_run: false).call
 #
 class ActiveStorageCleanupService
+  PROGRESS_INTERVAL = 50
+
   class InvalidDaysOldError < StandardError; end
 
   def initialize(days_old: 2, dry_run: true, logger: Logger.new($stdout))
@@ -16,10 +26,9 @@ class ActiveStorageCleanupService
   end
 
   # Returns a Hash with execution results (count, total_size, dry_run).
-  # Note: The return structure may be revisited in the future as requirements evolve.
   def call
     cutoff_period = @days_old.days.ago
-    unattached_blobs = ActiveStorage::Blob.unattached.where('active_storage_blobs.created_at <= ?', cutoff_period)
+    unattached_blobs = ActiveStorage::Blob.unattached.where('active_storage_blobs.created_at < ?', cutoff_period)
 
     if @dry_run
       perform_dry_run(unattached_blobs, cutoff_period)
@@ -83,7 +92,7 @@ class ActiveStorageCleanupService
       blob.purge_later
       count += 1
       total_size += blob.byte_size
-      if count % 50 == 0
+      if count % PROGRESS_INTERVAL == 0
         # Intentionally use << (no newline) to show progress dots on the same line every 50 blobs.
         @logger << '.'
         progress_printed = true

@@ -18,7 +18,7 @@ RSpec.describe ActiveStorageCleanupService, type: :service do
       io: StringIO.new("new content"),
       filename: "new.txt",
       content_type: "text/plain"
-    ).tap { |blob| blob.update(created_at: 1.day.ago) }
+    ).tap { |blob| blob.update(created_at: 1.day.ago - 1.second) }
   end
 
   let!(:attached_blob) do
@@ -145,7 +145,7 @@ RSpec.describe ActiveStorageCleanupService, type: :service do
       end
 
       context 'when custom days_old is provided' do
-        # 1日前より古いものを対象にする -> 1日前の new_unattached_blob も対象になるはず
+        # 1日前より「厳密に」古いものを対象にする -> 1日前-1秒の new_unattached_blob も対象になる
         let(:service) { described_class.new(days_old: 1, dry_run: dry_run, logger: logger) }
 
         it 'includes blobs older than the custom days' do
