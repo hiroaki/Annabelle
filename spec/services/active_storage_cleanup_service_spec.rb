@@ -140,8 +140,8 @@ RSpec.describe ActiveStorageCleanupService, type: :service do
       end
 
       context 'when custom days_old is provided' do
-        # 0.5日前（12時間前）より古いものを対象にする -> 1日前の new_unattached_blob も対象になるはず
-        let(:service) { described_class.new(days_old: 0.5, dry_run: dry_run, logger: logger) }
+        # 1日前より古いものを対象にする -> 1日前の new_unattached_blob も対象になるはず
+        let(:service) { described_class.new(days_old: 1, dry_run: dry_run, logger: logger) }
 
         it 'includes blobs older than the custom days' do
           expect(logger).to receive(:info).with(/ID: #{new_unattached_blob.id}/)
@@ -171,6 +171,12 @@ RSpec.describe ActiveStorageCleanupService, type: :service do
         it 'raises InvalidDaysOldError for zero' do
           expect {
             described_class.new(days_old: 0, dry_run: dry_run, logger: logger)
+          }.to raise_error(ActiveStorageCleanupService::InvalidDaysOldError)
+        end
+
+        it 'raises InvalidDaysOldError for float number' do
+          expect {
+            described_class.new(days_old: 1.5, dry_run: dry_run, logger: logger)
           }.to raise_error(ActiveStorageCleanupService::InvalidDaysOldError)
         end
 

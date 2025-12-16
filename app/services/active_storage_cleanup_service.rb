@@ -34,19 +34,18 @@ class ActiveStorageCleanupService
     # nil の場合はデフォルト値 2 を採用する
     return 2 if value.nil?
 
-    # 数値の場合
-    if value.is_a?(Numeric)
-      raise InvalidDaysOldError, 'days_old must be a positive number' unless value > 0
+    # 数値の場合（整数のみ許可）
+    if value.is_a?(Integer)
+      raise InvalidDaysOldError, 'days_old must be a positive integer' unless value > 0
       return value
     end
 
-    # 文字列の場合（正の整数または小数を許容）
-    if value.is_a?(String) && value =~ /\A[1-9]\d*(\.\d+)?\z/
-      return value.to_f if value.include?('.')
+    # 文字列の場合（正の整数のみ許可）
+    if value.is_a?(String) && value =~ /\A[1-9]\d*\z/
       return value.to_i
     end
 
-    raise InvalidDaysOldError, "days_old must be a positive number, got: #{value.inspect}"
+    raise InvalidDaysOldError, "days_old must be a positive integer, got: #{value.inspect}"
   end
 
   def perform_dry_run(blobs, cutoff_period)
