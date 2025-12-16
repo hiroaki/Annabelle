@@ -126,12 +126,34 @@ See [/docs/DEPLOY.md](/docs/DEPLOY.md)
 
 ## Operation / 運用について
 
+### Session information Cleanup / セッション情報のクリーンアップ
+
 Session information is stored in the database using [activerecord-session_store](https://github.com/rails/activerecord-session_store). Since old session records will remain unless cleaned up, please make sure to delete them periodically. A rake task is provided for this purpose, which deletes sessions older than 30 days by default. To specify a different threshold, set the number of days via the SESSION_DAYS_TRIM_THRESHOLD environment variable before running the task.
 
 セッション情報は [activerecord-session_store](https://github.com/rails/activerecord-session_store) を用いてデータベースに保存しています。古いセッションのレコードが残るため、定期的に削除してください。削除のための rake タスクがあり、実行すると、デフォルトでは 30日を経過したものが削除されます。この日数を指定したい場合は環境変数 `SESSION_DAYS_TRIM_THRESHOLD` に日数を指定して実行してください。
 
 ```
 $ SESSION_DAYS_TRIM_THRESHOLD=30 bin/rails db:sessions:trim
+```
+
+### Active Storage Cleanup / Active Storage のクリーンアップ
+
+ A rake task is available to safely clean up orphaned Active Storage blobs (for example, when a message is deleted but its attachments are not physically removed).
+
+Active Storage の孤立ファイル（例：メッセージを削除しても添付が物理削除されない場合）を安全にクリーンアップするための rake タスクを用意しています。
+
+```bash
+# Dry run (no deletion)
+# 確認のみ（削除はしません）
+$ bin/rake active_storage:cleanup
+
+# Execute deletion (enqueue purge_later)
+# 削除を実行（purge_later をエンキュー）
+$ bin/rake active_storage:cleanup FORCE=true
+
+# Target orphaned blobs older than 7 days (default: 2)
+# 7日より古い孤立ファイルを削除対象（デフォルト2日）
+$ bin/rake active_storage:cleanup FORCE=true DAYS_OLD=7
 ```
 
 ## License / ライセンス

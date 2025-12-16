@@ -183,15 +183,21 @@ RSpec.describe CurrentUserPresenter, type: :presenter do
           .and_return('<span class="sr-only">Notifications</span>')
 
         expect(view_context).to receive(:content_tag)
-          .with(:div, '&nbsp;'.html_safe, hash_including(
+          .with(:div, hash_including(
             data: { messages_channel: 'notification' },
-            class: 'absolute inline-flex items-center justify-center w-4 h-4 text-xs text-white bg-red-500 border-white rounded-full -top-1 -end-1 hidden'
+            class: 'absolute -top-1 -end-1 hidden'
           ))
-          .and_return('<div data-messages-channel="notification">Badge</div>')
+          .and_yield
+
+        expect(view_context).to receive(:content_tag)
+          .with(:div, '&nbsp;'.html_safe, hash_including(
+            class: 'inline-flex items-center justify-center w-4 h-4 text-xs text-white bg-red-500 border-white rounded-full'
+          ))
+          .and_return('BadgeContent')
 
         result = presenter.notification_badge
         expect(result).to include('Notifications')
-        expect(result).to include('Badge')
+        expect(result).to include('BadgeContent')
       end
     end
 

@@ -11,14 +11,20 @@ RSpec.describe '認証メールフロー', type: :system do
   it 'メール確認後に初回ログインができること' do
     # メール確認のリンクにアクセス
     visit user_confirmation_path(confirmation_token: confirmation_token)
-    expect(page).to have_content(I18n.t('devise.confirmations.confirmed'))
+    within('[data-flash-message-container]') do
+      expect(page).to have_selector('.flash-message-text')
+      expect(page).to have_content(I18n.t('devise.confirmations.confirmed'))
+    end
 
     # 確認完了後、ログインできることを確認
     fill_in 'Email', with: user.email
     fill_in 'Password', with: user.password
     click_button I18n.t('devise.sessions.log_in')
 
-    expect(page).to have_content(I18n.t('devise.sessions.signed_in'))
+    within('[data-flash-message-container]') do
+      expect(page).to have_selector('.flash-message-text')
+      expect(page).to have_content(I18n.t('devise.sessions.signed_in'))
+    end
   end
 
   it '確認メールを再送できること' do
