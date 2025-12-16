@@ -76,11 +76,13 @@ class ActiveStorageCleanupService
     @logger.info "Purging unattached blobs created before #{cutoff_period}..."
 
     count = 0
+    total_size = 0
     progress_printed = false
 
     blobs.find_each do |blob|
       blob.purge_later
       count += 1
+      total_size += blob.byte_size
       if count % 50 == 0
         # Intentionally use << (no newline) to show progress dots on the same line every 50 blobs.
         @logger << '.'
@@ -93,6 +95,6 @@ class ActiveStorageCleanupService
 
     @logger.info "Done. #{count} blobs have been enqueued for deletion."
 
-    { count: count, dry_run: false }
+    { count: count, total_size: total_size, dry_run: false }
   end
 end

@@ -104,6 +104,11 @@ RSpec.describe ActiveStorageCleanupService, type: :service do
         service.call
       end
 
+      it 'returns correct execution stats including total_size' do
+        result = service.call
+        expect(result).to eq({ count: 1, total_size: 11, dry_run: false })
+      end
+
       it 'prints progress dots for large number of blobs' do
         # N+1検知を一時的に無効化（テストデータ作成時のINSERT連打を許容）
         Prosopite.pause do
