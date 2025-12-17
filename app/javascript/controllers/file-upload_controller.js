@@ -92,11 +92,11 @@ export default class extends Controller {
       if (file.type.startsWith('image/')) {
         const img = document.createElement('img');
         img.src = URL.createObjectURL(file);
-        img.className = 'w-full h-full object-cover rounded';
+        img.className = 'w-full h-full object-cover rounded-sm';
         preview.appendChild(img);
       } else {
         const icon = document.createElement('div');
-        icon.className = 'w-full h-full flex items-center justify-center bg-gray-200 rounded';
+        icon.className = 'w-full h-full flex items-center justify-center bg-gray-200 rounded-sm';
         icon.innerHTML = '📄';
         preview.appendChild(icon);
       }

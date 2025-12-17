@@ -3,7 +3,7 @@
     <%= content_tag :li, **data_with_testid('configuration-menu-two-factor-authentication') do %>
       <div>
         <h3 class="text-xl font-semibold mb-2"><%= t('devise.sessions.two_factor_settings.scan_qr_title') %></h3>
-        <div class="bg-gray-50 border border-gray-300 rounded-lg p-4 shadow-sm">
+        <div class="bg-gray-50 border border-gray-300 rounded-lg p-4 shadow-xs">
           <p class="mb-4 text-gray-700">
             <%= t('devise.sessions.two_factor_settings.scan_qr_instruction') %>
           </p>
@@ -21,7 +21,7 @@
     <li>
       <div>
         <%= content_tag :h3, t('devise.sessions.two_factor_settings.confirm_otp_title'), class: 'text-xl font-semibold mb-2', **data_with_testid('backup-codes-title') %>
-        <div class="bg-gray-50 border border-gray-300 rounded-lg p-4 shadow-sm">
+        <div class="bg-gray-50 border border-gray-300 rounded-lg p-4 shadow-xs">
           <p class="mb-4 text-gray-700">
             <%= t('devise.sessions.two_factor_settings.confirm_otp_instruction') %>
           </p>
@@ -49,7 +49,7 @@
 
             <div>
               <%= form.submit(t('devise.sessions.two_factor_settings.confirm_and_enable'),
-                class: "w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500",
+                class: "w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-xs text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500",
                 **data_with_testid('confirm-and-enable-two-factor')
               ) %>
             </div>

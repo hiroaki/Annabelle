@@ -72,7 +72,7 @@
     <div class="flex items-center justify-between">
       <%=
         f.submit(t('devise.registrations.update'),
-          class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center",
+          class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-hidden focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center",
           **data_with_testid('account-update-submit')
         )
       %>
@@ -90,7 +90,7 @@
             button_to(t('devise.registrations.unlink_oauth.label', provider: provider_name),
               unlink_oauth_path,
               method: :delete,
-              class: "text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2",
+              class: "text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-hidden focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2",
               id: "unlink-button-#{provider}",
               **data_with_testid("account-unlink-#{provider}",
                 turbo: false,
@@ -115,7 +115,7 @@
             button_to(t('devise.registrations.link_oauth', provider: provider_name),
               omniauth_authorize_path(resource_name, provider),
               params: oauth_params,
-              class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2",
+              class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-hidden focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2",
               id: "oauth-button-#{provider}",
               **data_with_testid("account-link-#{provider}",
                 turbo: false
@@ -135,7 +135,7 @@
     <%=
       button_to(t('devise.registrations.cancel_my_account'), registration_path(resource_name),
         method: :delete,
-        class: "text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center",
+        class: "text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-hidden focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center",
         **data_with_testid('account-cancel',
           turbo_confirm: t('devise.registrations.cancel_confirm'),
           turbo_frame: '_top',

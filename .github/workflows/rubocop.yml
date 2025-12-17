@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Read Ruby version
         run: echo "RUBY_VERSION=$(cat .ruby-version)" >> $GITHUB_ENV

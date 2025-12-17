@@ -51,7 +51,7 @@ group :development, :test do
   gem 'dotenv-rails'
 
   gem 'pry-rails'
-  gem 'rspec-rails', '~> 7.1', '>= 7.1.1'
+  gem 'rspec-rails', '~> 8.0'
   gem 'factory_bot_rails'
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
@@ -81,14 +81,14 @@ group :test do
   gem 'capybara'
   gem 'cuprite'
   gem 'selenium-webdriver'
-  gem 'shoulda-matchers', '~> 6.0'
+  gem 'shoulda-matchers', '~> 7.0'
   gem 'simplecov', require: false
   gem 'simplecov-lcov', require: false
 end
 
 gem 'solid_cable', '~> 3.0'
 
-gem 'tailwindcss-rails', '~> 3.0'
+gem 'tailwindcss-rails', '~> 4.0'
 
 gem 'kaminari', '~> 1.2'
 
@@ -102,7 +102,7 @@ gem 'omniauth-rails_csrf_protection'
 gem 'omniauth-github'
 gem 'rqrcode'
 gem 'activerecord-session_store'
-gem 'rails-i18n', '~> 8.0.0' # For Rails >= 8.0.0
+gem 'rails-i18n', '~> 8.1.0' # For Rails >= 8.0.0
 gem 'http_accept_language'
 gem 'flash_unified'
 

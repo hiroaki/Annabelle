@@ -1,5 +1,5 @@
 <div
-  class="mb-2 w-full min-w-0 p-4 bg-white rounded-lg shadow-xs overflow-auto scrollbar-gutter-stable"
+  class="mb-2 w-full min-w-0 p-4 bg-white rounded-lg shadow-2xs overflow-auto"
   data-message-id="<%= message.id %>"
   data-owner-id="<%= message.user.id %>"
   data-controller="message-ownership new-message-highlighter"
@@ -28,7 +28,7 @@
   <div class="container flex">
     <% if message.attachments.attached? %>
       <% message.attachments.each do |att| %>
-        <div class="container flex-shrink-0 w-auto mx-2">
+        <div class="container shrink-0 w-auto mx-2">
           <% if att.representable? %>
             <div class="my-2 h-40 w-40 bg-gray-200 flex cursor-pointer"
               data-source-url="<%= url_for(att) %>"
