@@ -93,7 +93,7 @@ gem 'tailwindcss-rails', '~> 4.0'
 gem 'kaminari', '~> 1.2'
 
 # The version is specified to avoid "Unresolved or ambiguous specs" warnings.
-gem 'stringio', '~> 3.1.5'
+gem 'stringio', '~> 3.2.0'
 
 gem 'devise', '~> 4.9'
 gem 'devise-two-factor'
