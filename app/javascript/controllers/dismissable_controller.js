@@ -34,7 +34,7 @@ export default class extends Controller {
     element.style.paddingBottom = styles.paddingBottom;
 
     // リフローを強制して、スタイルの変更を確実に反映
-    element.offsetHeight;
+    void element.offsetHeight;
 
     // アニメーション用のクラスを追加
     element.classList.add('overflow-hidden', 'transition-all', 'duration-500');
