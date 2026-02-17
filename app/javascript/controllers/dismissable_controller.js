@@ -20,12 +20,40 @@ export default class extends Controller {
   }
 
   dismiss() {
-    this.element.classList.add(
-      'transition-all', 'duration-500', 'opacity-0', 'max-h-0', 'overflow-hidden', 'py-0', 'mb-0'
-    )
+    const element = this.element;
+    // 現在の高さ・余白・パディングを取得
+    const currentHeight = element.offsetHeight;
+    const styles = window.getComputedStyle(element);
 
-    setTimeout(() => {
-      this.element.remove();
-    }, 1000)
+    // アニメーション開始前に、インラインスタイルで現在値をセット
+    element.style.height = `${currentHeight}px`;
+    element.style.opacity = '1';
+    element.style.marginTop = styles.marginTop;
+    element.style.marginBottom = styles.marginBottom;
+    element.style.paddingTop = styles.paddingTop;
+    element.style.paddingBottom = styles.paddingBottom;
+
+    // リフローを強制して、スタイルの変更を確実に反映
+    element.offsetHeight;
+
+    // アニメーション用のクラスを追加
+    element.classList.add('overflow-hidden', 'transition-all', 'duration-500');
+    // 高さ・透明度・余白・パディングを0にしてアニメーション開始
+    element.style.height = '0px';
+    element.style.opacity = '0';
+    element.style.marginTop = '0px';
+    element.style.marginBottom = '0px';
+    element.style.paddingTop = '0px';
+    element.style.paddingBottom = '0px';
+
+    // アニメーション終了時に要素を削除
+    const handleTransitionEnd = (event) => {
+      if (event.target !== element) return;
+      if (event.propertyName !== 'height') return;
+
+      element.removeEventListener('transitionend', handleTransitionEnd);
+      element.remove();
+    };
+    element.addEventListener('transitionend', handleTransitionEnd);
   }
 }
