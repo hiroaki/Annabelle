@@ -2,6 +2,15 @@ source 'https://rubygems.org'
 
 ruby '3.4.8'
 
+# psychのバージョンを5.2.2に固定
+# Ruby 3.4.xにはpsych 5.2.2がdefault gemとして含まれているが、
+# rdocなど一部のgemがpsych (>= 4.0.0)を要求するため、bundle update時に
+# より新しいpsych（例: 5.3.1）が追加され、複数バージョンが共存し
+# Bundlerの警告（WARN: Unresolved or ambiguous specs during Gem::Specification.reset）が発生する。
+# セキュリティアップデートが必要な場合はRuby自体のアップデートで対応するのが基本であり、
+# psychのバージョン固定は警告回避のための対応。
+gem 'psych', '5.2.2'
+
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem 'rails', '~> 8.1', '>= 8.1.1'
 

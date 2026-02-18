@@ -329,7 +329,7 @@ GEM
       reline (>= 0.6.0)
     pry-rails (0.3.11)
       pry (>= 0.13.0)
-    psych (5.3.1)
+    psych (5.2.2)
       date
       stringio
     public_suffix (7.0.2)
@@ -568,6 +568,7 @@ DEPENDENCIES
   propshaft
   prosopite
   pry-rails
+  psych (= 5.2.2)
   puma (>= 5.0)
   rails (~> 8.1, >= 8.1.1)
   rails-i18n (~> 8.1.0)
@@ -712,7 +713,7 @@ CHECKSUMS
   prosopite (2.1.2) sha256=ca474e5b83bf65cdb1b3d44f848ceb3270c1e3474a9c20fd9228114bf766fd0b
   pry (0.16.0) sha256=d76c69065698ed1f85e717bd33d7942c38a50868f6b0673c636192b3d1b6054e
   pry-rails (0.3.11) sha256=a69e28e24a34d75d1f60bcf241192a54253f8f7ef8a62cba1e75750a9653593d
-  psych (5.3.1) sha256=eb7a57cef10c9d70173ff74e739d843ac3b2c019a003de48447b2963d81b1974
+  psych (5.2.2) sha256=a4a9477c85d3e858086c38cf64e7096abe40d1b1eed248b01020dec0ff9906ab
   public_suffix (7.0.2) sha256=9114090c8e4e7135c1fd0e7acfea33afaab38101884320c65aaa0ffb8e26a857
   puma (7.2.0) sha256=bf8ef4ab514a4e6d4554cb4326b2004eba5036ae05cf765cfe51aba9706a72a8
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
