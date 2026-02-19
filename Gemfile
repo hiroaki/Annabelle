@@ -101,7 +101,7 @@ gem 'tailwindcss-rails', '~> 4.0'
 
 gem 'kaminari', '~> 1.2'
 
-gem 'devise', '~> 5.0', '>= 5.0.1'
+gem 'devise', '~> 5.0'
 gem 'devise-two-factor'
 gem 'omniauth'
 gem 'omniauth-rails_csrf_protection'
