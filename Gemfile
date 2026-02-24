@@ -9,7 +9,7 @@ ruby '3.4.8'
 # Bundlerの警告（WARN: Unresolved or ambiguous specs during Gem::Specification.reset）が発生する。
 # セキュリティアップデートが必要な場合はRuby自体のアップデートで対応するのが基本であり、
 # psychのバージョン固定は警告回避のための対応。
-gem 'psych', '5.2.2'
+gem 'psych', '5.2.6'
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem 'rails', '~> 8.1', '>= 8.1.1'
