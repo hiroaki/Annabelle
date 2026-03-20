@@ -229,6 +229,20 @@ RSpec.describe ImageMetadata::Stripper do
         tempfile.close! if tempfile
       end
     end
+
+    describe '.ensure_extension' do
+      it 'returns extension unchanged when already dotted' do
+        result = described_class.send(:ensure_extension, '.jpg')
+
+        expect(result).to eq('.jpg')
+      end
+
+      it 'adds a dot when extension is not dotted' do
+        result = described_class.send(:ensure_extension, 'png')
+
+        expect(result).to eq('.png')
+      end
+    end
     end
   end
 end
