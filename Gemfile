@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '3.4.8'
+ruby '3.4.9'
 
 # psychのバージョンを5.2.2に固定
 # Ruby 3.4.xにはpsych 5.2.2がdefault gemとして含まれているが、
