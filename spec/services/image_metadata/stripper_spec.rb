@@ -201,6 +201,34 @@ RSpec.describe ImageMetadata::Stripper do
         expect(result).to eq(attachable)
       end
     end
+
+    describe '.process_with_minimagick' do
+      it 'returns a tempfile containing stripped blob data' do
+        mini_magick_module = Module.new
+        image_class = Class.new do
+          def self.read(_data); end
+        end
+        mini_magick_module.const_set(:Image, image_class)
+        stub_const('MiniMagick', mini_magick_module)
+
+        image = double('mini_magick_image')
+        allow(image).to receive(:strip)
+        allow(image).to receive(:to_blob).and_return('stripped-binary')
+        allow(MiniMagick::Image).to receive(:read).with('raw-image-data').and_return(image)
+
+        tempfile = described_class.send(:process_with_minimagick, 'raw-image-data', 'jpg')
+
+        expect(tempfile).to be_a(Tempfile)
+        expect(image).to have_received(:strip)
+        expect(image).to have_received(:to_blob)
+
+        tempfile.rewind
+        expect(tempfile.read).to eq('stripped-binary')
+        expect(File.extname(tempfile.path)).to eq('.jpg')
+      ensure
+        tempfile.close! if tempfile
+      end
+    end
     end
   end
 end
