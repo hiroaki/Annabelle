@@ -12,7 +12,7 @@ ruby '3.4.9'
 gem 'psych', '5.2.2'
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem 'rails', '~> 8.1', '>= 8.1.1'
+gem 'rails', '~> 8.1'
 
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem 'propshaft'
