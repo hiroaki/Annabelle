@@ -59,6 +59,41 @@ RSpec.describe 'Messages Form', type: :system do
       expect(page).to have_content('This is a test message')
     end
 
+    it 'highlights a newly posted message until the user interacts with it' do
+      create(:message, user: confirmed_user, content: 'Existing message')
+      visit current_path
+
+      existing_message = find('[data-message-id]', text: 'Existing message')
+      existing_message_id = existing_message['data-message-id']
+      existing_background = page.evaluate_script(
+        "getComputedStyle(document.querySelector('[data-message-id=\"#{existing_message_id}\"]')).backgroundColor"
+      )
+
+      fill_in 'comment', with: 'Highlighted new message'
+      click_button I18n.t('messages.form.post')
+
+      new_message = find('[data-message-id]', text: 'Highlighted new message', wait: 5)
+      new_message_id = new_message['data-message-id']
+      new_background = page.evaluate_script(
+        "getComputedStyle(document.querySelector('[data-message-id=\"#{new_message_id}\"]')).backgroundColor"
+      )
+
+      expect(new_message['data-new-message']).to eq('true')
+      expect(new_background).not_to eq(existing_background)
+
+      page.execute_script(<<~JS)
+        const message = document.querySelector('[data-message-id="#{new_message_id}"]')
+        message.dispatchEvent(new MouseEvent('mouseenter', { bubbles: false }))
+      JS
+
+      cleared_background = page.evaluate_script(
+        "getComputedStyle(document.querySelector('[data-message-id=\"#{new_message_id}\"]')).backgroundColor"
+      )
+
+      expect(page).to have_no_selector("[data-message-id='#{new_message_id}'][data-new-message='true']")
+      expect(cleared_background).to eq(existing_background)
+    end
+
     it 'shows a generic error message when message creation fails' do
       allow_any_instance_of(MessagesController).to receive(:create_message!).and_raise(StandardError, 'Simulated failure!')
       visit messages_path
