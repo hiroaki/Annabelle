@@ -41,6 +41,7 @@ module ApplicationHelper
     keys = %w[
       cable_disconnected
       new_messages_available_count
+      message_deleted
     ]
     content_tag(:ul, id: 'exported-locale-messages', style: 'display: none;') do
       safe_join(

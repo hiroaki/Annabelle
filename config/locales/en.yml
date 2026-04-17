@@ -97,6 +97,7 @@ en:
       too_short: "is too short (minimum is %{count} characters)"
   exports:
     cable_disconnected: "Connection to the server has been lost. Please reload the page to reconnect."
+    message_deleted: "This message was deleted."
     new_messages_available_count: "%{count} new messages — click to show"
   helpers:
     page_entries_info:

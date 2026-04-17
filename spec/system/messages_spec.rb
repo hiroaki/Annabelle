@@ -213,6 +213,26 @@ RSpec.describe 'Messages Form', type: :system do
       expect(page).not_to have_selector("[data-testid='delete-message-#{message.id}']")
     end
 
+    it 'keeps deleted messages as tombstones with metadata' do
+      other_user = create(:user, :confirmed, username: 'otheruser')
+      message = create(:message, user: other_user, content: 'to be deleted')
+      visit messages_path
+
+      target = find("[data-message-id='#{message.id}']")
+      expect(target).to have_content('to be deleted')
+      expect(target).to have_content('otheruser')
+
+      message.destroy!
+      MessageBroadcastJob.perform_now(message.id)
+
+      tombstone = find("[data-message-id='#{message.id}']", wait: 5)
+      expect(tombstone['data-deleted-message']).to eq('true')
+      expect(tombstone).to have_content(I18n.t('exports.message_deleted'))
+      expect(tombstone).to have_content('otheruser')
+      expect(tombstone).not_to have_content('to be deleted')
+      expect(tombstone).to have_no_selector('[data-testid^="delete-message-"]')
+    end
+
     it 'renders metadata checkboxes using user defaults' do
       confirmed_user.update(default_strip_metadata: false, default_allow_location_public: true)
       visit current_path

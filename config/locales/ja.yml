@@ -97,6 +97,7 @@ ja:
       too_short: "は%{count}文字以上で入力してください"
   exports:
     cable_disconnected: "サーバーとの接続が切れました。再接続するには画面をリロードしてください。"
+    message_deleted: "このメッセージは削除されました。"
     new_messages_available_count: "新着メッセージが%{count}件あります。クリックで表示します。"
   helpers:
     page_entries_info:

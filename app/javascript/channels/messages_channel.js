@@ -49,7 +49,14 @@ consumer.subscriptions.create("MessagesChannel", {
     }
     else if (data['destroyed']) {
       const destroyedMessageId = String(data['destroyed'])
-      messages.querySelectorAll(`[data-message-id="${destroyedMessageId}"]`).forEach((elem) => elem.remove())
+      messages.querySelectorAll(`[data-message-id="${destroyedMessageId}"]`).forEach((elem) => {
+        if (elem.dataset['pendingMessage'] === 'true') {
+          elem.remove()
+          return
+        }
+
+        this.convertToDeletedMessage(elem)
+      })
       this.updatePendingMessagesNotice()
     }
   },
@@ -164,6 +171,33 @@ consumer.subscriptions.create("MessagesChannel", {
 
   pendingMessageElements() {
     return Array.from(this.messagesContainer()?.querySelectorAll('[data-pending-message="true"]') || [])
+  },
+
+  convertToDeletedMessage(messageElement) {
+    if (!messageElement || messageElement.dataset['deletedMessage'] === 'true') return
+
+    messageElement.dataset.deletedMessage = 'true'
+    messageElement.removeAttribute('data-new-message')
+    messageElement.classList.remove('bg-white')
+    messageElement.classList.add('bg-gray-100')
+
+    const deleteLink = messageElement.querySelector('[data-testid^="delete-message-"]')
+    if (deleteLink) deleteLink.remove()
+
+    const body = messageElement.querySelector('[data-message-body="true"]')
+    if (body) {
+      body.textContent = this.deletedMessageText()
+      body.classList.remove('text-nowrap')
+      body.classList.add('text-gray-500', 'italic')
+    }
+
+    const attachments = messageElement.querySelector('[data-message-attachments="true"]')
+    if (attachments) attachments.innerHTML = ''
+  },
+
+  deletedMessageText() {
+    const fallback = 'This message was deleted.'
+    return this.localeMessage('message_deleted') || fallback
   },
 
   buildSeparatorElement() {
