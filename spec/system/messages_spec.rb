@@ -83,7 +83,7 @@ RSpec.describe 'Messages Form', type: :system do
 
       page.execute_script(<<~JS)
         const message = document.querySelector('[data-message-id="#{new_message_id}"]')
-        message.dispatchEvent(new MouseEvent('mouseenter', { bubbles: false }))
+        message.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
       JS
 
       cleared_background = page.evaluate_script(
@@ -92,6 +92,72 @@ RSpec.describe 'Messages Form', type: :system do
 
       expect(page).to have_no_selector("[data-message-id='#{new_message_id}'][data-new-message='true']")
       expect(cleared_background).to eq(existing_background)
+    end
+
+    it 'queues messages from other users until the reveal line is clicked' do
+      create(:message, user: confirmed_user, content: 'Older visible message')
+      visit current_path
+
+      expect(page).to have_css('#messages[data-channel-connected="true"]', wait: 5)
+      reference_message = find('[data-message-id]', text: 'Older visible message')
+      reference_message_id = reference_message['data-message-id']
+      existing_background = page.evaluate_script(
+        "getComputedStyle(document.querySelector('[data-message-id=\"#{reference_message_id}\"]')).backgroundColor"
+      )
+
+      other_user = create(:user, :confirmed)
+      incoming_message_1 = create(:message, user: other_user, content: 'Incoming message one')
+      incoming_message_2 = create(:message, user: other_user, content: 'Incoming message two')
+
+      MessageBroadcastJob.perform_now(incoming_message_1.id)
+      MessageBroadcastJob.perform_now(incoming_message_2.id)
+
+      expect(page).to have_css('#new-messages-notice[data-pending-visible="true"] [data-role="new-messages-reveal"]', wait: 5)
+      expect(page).not_to have_content('Incoming message one')
+      expect(page).not_to have_content('Incoming message two')
+
+      fill_in 'comment', with: 'My visible message'
+      click_button I18n.t('messages.form.post')
+      expect(page).to have_content('My visible message')
+
+      first_child_id = page.evaluate_script("document.querySelector('#messages').firstElementChild.id")
+      expect(first_child_id).to eq('new-messages-notice')
+
+      find('[data-role="new-messages-reveal"]', visible: true).click
+
+      message_one = find('[data-message-id]', text: 'Incoming message one')
+      message_two = find('[data-message-id]', text: 'Incoming message two')
+      background_one = page.evaluate_script(
+        "getComputedStyle(document.querySelector('[data-message-id=\"#{message_one['data-message-id']}\"]')).backgroundColor"
+      )
+      background_two = page.evaluate_script(
+        "getComputedStyle(document.querySelector('[data-message-id=\"#{message_two['data-message-id']}\"]')).backgroundColor"
+      )
+
+      expect(page).to have_css('[data-role="new-messages-separator"]', wait: 5)
+      expect(page).to have_css('#new-messages-notice[data-pending-visible="false"]', wait: 5, visible: :all)
+      expect(page.all('[data-role="new-messages-separator"]', visible: true).size).to eq(1)
+      separator_has_message_above = page.evaluate_script(<<~JS)
+        (() => {
+          const sep = [...document.querySelectorAll('[data-role="new-messages-separator"]')].at(-1)
+          return !!(sep && sep.previousElementSibling && sep.previousElementSibling.dataset && sep.previousElementSibling.dataset.messageId)
+        })()
+      JS
+      expect(separator_has_message_above).to be(true)
+      expect(background_one).not_to eq(existing_background)
+      expect(background_two).not_to eq(existing_background)
+
+      incoming_message_3 = create(:message, user: other_user, content: 'Incoming message three')
+      MessageBroadcastJob.perform_now(incoming_message_3.id)
+
+      first_child_role = page.evaluate_script("document.querySelector('#messages').firstElementChild.querySelector('[data-role]')?.dataset.role")
+      expect(first_child_role).to eq('new-messages-reveal')
+      expect(page).to have_css('[data-role="new-messages-separator"]', wait: 5)
+      expect(page).not_to have_content('Incoming message three')
+
+      find('[data-role="new-messages-reveal"]', visible: true).click
+      expect(page).to have_content('Incoming message three')
+      expect(page.all('[data-role="new-messages-separator"]', visible: true).size).to eq(2)
     end
 
     it 'shows a generic error message when message creation fails' do
