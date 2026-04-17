@@ -5,17 +5,23 @@ consumer.subscriptions.create("MessagesChannel", {
   connected() {
     // Called when the subscription is ready for use on the server
     console.log("MessagesChannel: connected")
-    this.messagesContainer()?.setAttribute('data-channel-connected', 'true')
-    this.boundRevealPendingMessages = this.revealPendingMessages.bind(this)
-    this.pendingNoticeButton()?.addEventListener('click', this.boundRevealPendingMessages)
-    this.updatePendingMessagesNotice()
+    this.boundDocumentClick = this.handleDocumentClick.bind(this)
+    this.boundSyncMessagesUi = this.syncMessagesUi.bind(this)
+
+    document.addEventListener('click', this.boundDocumentClick)
+    document.addEventListener('turbo:load', this.boundSyncMessagesUi)
+    document.addEventListener('turbo:render', this.boundSyncMessagesUi)
+
+    this.syncMessagesUi()
   },
 
   disconnected() {
     // Called when the subscription has been terminated by the server
     console.log("MessagesChannel: disconnected");
     this.messagesContainer()?.setAttribute('data-channel-connected', 'false')
-    this.pendingNoticeButton()?.removeEventListener('click', this.boundRevealPendingMessages)
+    document.removeEventListener('click', this.boundDocumentClick)
+    document.removeEventListener('turbo:load', this.boundSyncMessagesUi)
+    document.removeEventListener('turbo:render', this.boundSyncMessagesUi)
 
     const flashMessage = this.disconnectedMessage();
     clearFlashMessages(flashMessage);
@@ -62,8 +68,7 @@ consumer.subscriptions.create("MessagesChannel", {
   },
 
   revealPendingMessages() {
-    const messages = document.getElementById('messages');
-    if (!messages) return;
+    if (!this.messagesContainer()) return;
 
     const pending = this.pendingMessageElements()
     if (pending.length === 0) return;
@@ -79,6 +84,18 @@ consumer.subscriptions.create("MessagesChannel", {
       lastRevealed.insertAdjacentElement('afterend', this.buildSeparatorElement())
     }
 
+    this.updatePendingMessagesNotice()
+  },
+
+  handleDocumentClick(event) {
+    const revealButton = event.target.closest('[data-role="new-messages-reveal"]')
+    if (!revealButton || revealButton !== this.pendingNoticeButton()) return
+
+    this.revealPendingMessages()
+  },
+
+  syncMessagesUi() {
+    this.messagesContainer()?.setAttribute('data-channel-connected', 'true')
     this.updatePendingMessagesNotice()
   },
 

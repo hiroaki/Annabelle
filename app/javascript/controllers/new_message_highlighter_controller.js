@@ -4,12 +4,16 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   connect() {
+    if (this.element.getAttribute('data-new-message') !== 'true') return
+
     this.boundHandleUserActivity = this.handleUserActivity.bind(this)
     this.element.addEventListener('mousemove', this.boundHandleUserActivity)
     this.element.addEventListener('focusin', this.boundHandleUserActivity)
   }
 
   disconnect() {
+    if (!this.boundHandleUserActivity) return
+
     this.element.removeEventListener('mousemove', this.boundHandleUserActivity)
     this.element.removeEventListener('focusin', this.boundHandleUserActivity)
   }
@@ -17,8 +21,9 @@ export default class extends Controller {
   handleUserActivity() {
     if (this.element.getAttribute('data-new-message') === 'true') {
       this.element.removeAttribute('data-new-message')
-      this.element.removeEventListener('mousemove', this.boundHandleUserActivity)
-      this.element.removeEventListener('focusin', this.boundHandleUserActivity)
     }
+
+    this.element.removeEventListener('mousemove', this.boundHandleUserActivity)
+    this.element.removeEventListener('focusin', this.boundHandleUserActivity)
   }
 }

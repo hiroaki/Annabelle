@@ -217,6 +217,7 @@ RSpec.describe 'Messages Form', type: :system do
       other_user = create(:user, :confirmed, username: 'otheruser')
       message = create(:message, user: other_user, content: 'to be deleted')
       visit messages_path
+      expect(page).to have_css('#messages[data-channel-connected="true"]', wait: 5)
 
       target = find("[data-message-id='#{message.id}']")
       expect(target).to have_content('to be deleted')
