@@ -34,12 +34,16 @@ consumer.subscriptions.create("MessagesChannel", {
     console.log("MessagesChannel: received", data)
 
     const messages = document.getElementById('messages');
-    if (!messages) return;
 
     const notificationTargets = document.querySelectorAll('[data-messages-channel="notification"]');
     const page = document.querySelector('[data-current-page-number]')?.dataset?.currentPageNumber; // or undefined
 
     if (data['created']) {
+      if (!messages) {
+        notificationTargets.forEach((nt) => nt.classList.remove('hidden'));
+        return;
+      }
+
       if (!page || page == '1') {
         if (this.createdByCurrentUser(messages, data)) {
           // Own posts are shown immediately and intentionally keep the same
@@ -54,6 +58,8 @@ consumer.subscriptions.create("MessagesChannel", {
       }
     }
     else if (data['destroyed']) {
+      if (!messages) return;
+
       const destroyedMessageId = String(data['destroyed'])
       messages.querySelectorAll(`[data-message-id="${destroyedMessageId}"]`).forEach((elem) => {
         if (elem.dataset['pendingMessage'] === 'true') {
@@ -198,7 +204,7 @@ consumer.subscriptions.create("MessagesChannel", {
     messageElement.classList.remove('bg-white')
     messageElement.classList.add('bg-gray-100')
 
-    const deleteLink = messageElement.querySelector('[data-testid^="delete-message-"]')
+    const deleteLink = messageElement.querySelector('[data-message-ownership-target="owner"]')
     if (deleteLink) deleteLink.remove()
 
     const body = messageElement.querySelector('[data-message-body="true"]')

@@ -232,6 +232,23 @@ RSpec.describe 'Messages Form', type: :system do
       expect(tombstone).to have_content('otheruser')
       expect(tombstone).not_to have_content('to be deleted')
       expect(tombstone).to have_no_selector('[data-testid^="delete-message-"]')
+      expect(tombstone).to have_no_selector('[data-message-ownership-target="owner"]')
+    end
+
+    it 'shows notification badge when messages container is not present' do
+      visit messages_path
+      expect(page).to have_css('#messages[data-channel-connected="true"]', wait: 5)
+
+      page.execute_script(<<~JS)
+        document.getElementById('messages')?.remove()
+        document.querySelectorAll('[data-messages-channel="notification"]').forEach((badge) => badge.classList.add('hidden'))
+      JS
+
+      other_user = create(:user, :confirmed)
+      incoming_message = create(:message, user: other_user, content: 'Notification when messages is missing')
+      MessageBroadcastJob.perform_now(incoming_message.id)
+
+      expect(page).to have_css('[data-messages-channel="notification"]:not(.hidden)', wait: 5)
     end
 
     it 'renders metadata checkboxes using user defaults' do
