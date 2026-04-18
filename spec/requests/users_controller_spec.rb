@@ -35,7 +35,7 @@ RSpec.describe UsersController, type: :request do
     context "with invalid params" do
       it "renders edit template" do
         patch update_profile_path(locale: I18n.locale), params: { user: { username: "" } }
-        expect(response).to have_http_status(:unprocessable_content)
+        expect(response).to have_http_status(:unprocessable_entity)
         expect(response.body).to include("Username can&#39;t be blank")
       end
     end
@@ -92,7 +92,7 @@ RSpec.describe UsersController, type: :request do
     context "when changing preferred language to an unsupported locale" do
       it "does not change the preferred language and shows an error" do
         patch update_profile_path(locale: I18n.locale), params: { user: { preferred_language: "unsupported" } }
-        expect(response).to have_http_status(:unprocessable_content)
+        expect(response).to have_http_status(:unprocessable_entity)
         expect(user.reload.preferred_language).not_to eq("unsupported")
         expect(response.body).to include("Display Language is not a valid locale")
       end
