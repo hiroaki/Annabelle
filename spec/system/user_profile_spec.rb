@@ -209,5 +209,17 @@ RSpec.describe 'User profile editing', type: :system do
       expect(page).to have_selector("[data-testid='account-preferred-language']")
       expect(page).to have_field('Username')
     end
+
+    it 'does not replace header username with invalid input value' do
+      visit edit_profile_path
+
+      create(:user, :confirmed, username: 'already_taken_username')
+      fill_in 'Username', with: 'already_taken_username'
+      click_button 'Update'
+
+      expect(page).to have_content('Username has already been taken')
+      expect(page).to have_selector("[data-testid='current-user-display']", text: 'testuser')
+      expect(page).to have_field('Username', with: 'already_taken_username')
+    end
   end
 end
