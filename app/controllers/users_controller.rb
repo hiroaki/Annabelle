@@ -31,7 +31,7 @@ class UsersController < ApplicationController
         redirect_to edit_profile_path
       end
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

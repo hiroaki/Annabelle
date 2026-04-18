@@ -226,8 +226,8 @@ RSpec.describe 'Messages Form', type: :system do
       message.destroy!
       MessageBroadcastJob.perform_now(message.id)
 
-      tombstone = find("[data-message-id='#{message.id}']", wait: 5)
-      expect(tombstone['data-deleted-message']).to eq('true')
+      expect(page).to have_css("[data-message-id='#{message.id}'][data-deleted-message='true']", wait: 5)
+      tombstone = find("[data-message-id='#{message.id}'][data-deleted-message='true']")
       expect(tombstone).to have_content(I18n.t('exports.message_deleted'))
       expect(tombstone).to have_content('otheruser')
       expect(tombstone).not_to have_content('to be deleted')
