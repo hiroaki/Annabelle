@@ -19,6 +19,7 @@ class MessageBroadcastJob < ApplicationJob
     else
       ActionCable.server.broadcast('general_message_board', {
         created: message_id,
+        sender_user_id: message.user_id,
         rendered_message: render_message(message)
       })
     end

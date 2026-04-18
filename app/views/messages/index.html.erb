@@ -108,7 +108,10 @@
         <%= paginate @messages %>
       </div>
 
-      <div id="messages" class="container">
+      <div id="messages" class="container" data-current-user-id="<%= current_user.id %>">
+        <div id="new-messages-notice" class="hidden mb-2" data-pending-visible="false">
+          <button type="button" class="w-full rounded-lg border border-blue-200 bg-blue-100 px-4 py-2 text-sm text-blue-700 hover:bg-blue-200" data-role="new-messages-reveal"></button>
+        </div>
         <%= render @messages %>
       </div>
 

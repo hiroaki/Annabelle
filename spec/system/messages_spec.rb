@@ -59,6 +59,107 @@ RSpec.describe 'Messages Form', type: :system do
       expect(page).to have_content('This is a test message')
     end
 
+    it 'highlights a newly posted message until the user interacts with it' do
+      create(:message, user: confirmed_user, content: 'Existing message')
+      visit current_path
+
+      existing_message = find('[data-message-id]', text: 'Existing message')
+      existing_message_id = existing_message['data-message-id']
+      existing_background = page.evaluate_script(
+        "getComputedStyle(document.querySelector('[data-message-id=\"#{existing_message_id}\"]')).backgroundColor"
+      )
+
+      fill_in 'comment', with: 'Highlighted new message'
+      click_button I18n.t('messages.form.post')
+
+      new_message = find('[data-message-id]', text: 'Highlighted new message', wait: 5)
+      new_message_id = new_message['data-message-id']
+      new_background = page.evaluate_script(
+        "getComputedStyle(document.querySelector('[data-message-id=\"#{new_message_id}\"]')).backgroundColor"
+      )
+
+      expect(new_message['data-new-message']).to eq('true')
+      expect(new_background).not_to eq(existing_background)
+
+      page.execute_script(<<~JS)
+        const message = document.querySelector('[data-message-id="#{new_message_id}"]')
+        message.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
+      JS
+
+      cleared_background = page.evaluate_script(
+        "getComputedStyle(document.querySelector('[data-message-id=\"#{new_message_id}\"]')).backgroundColor"
+      )
+
+      expect(page).to have_no_selector("[data-message-id='#{new_message_id}'][data-new-message='true']")
+      expect(cleared_background).to eq(existing_background)
+    end
+
+    it 'queues messages from other users until the reveal line is clicked' do
+      create(:message, user: confirmed_user, content: 'Older visible message')
+      visit current_path
+
+      expect(page).to have_css('#messages[data-channel-connected="true"]', wait: 5)
+      reference_message = find('[data-message-id]', text: 'Older visible message')
+      reference_message_id = reference_message['data-message-id']
+      existing_background = page.evaluate_script(
+        "getComputedStyle(document.querySelector('[data-message-id=\"#{reference_message_id}\"]')).backgroundColor"
+      )
+
+      other_user = create(:user, :confirmed)
+      incoming_message_1 = create(:message, user: other_user, content: 'Incoming message one')
+      incoming_message_2 = create(:message, user: other_user, content: 'Incoming message two')
+
+      MessageBroadcastJob.perform_now(incoming_message_1.id)
+      MessageBroadcastJob.perform_now(incoming_message_2.id)
+
+      expect(page).to have_css('#new-messages-notice[data-pending-visible="true"] [data-role="new-messages-reveal"]', wait: 5)
+      expect(page).not_to have_content('Incoming message one')
+      expect(page).not_to have_content('Incoming message two')
+
+      fill_in 'comment', with: 'My visible message'
+      click_button I18n.t('messages.form.post')
+      expect(page).to have_content('My visible message')
+
+      first_child_id = page.evaluate_script("document.querySelector('#messages').firstElementChild.id")
+      expect(first_child_id).to eq('new-messages-notice')
+
+      find('[data-role="new-messages-reveal"]', visible: true).click
+
+      message_one = find('[data-message-id]', text: 'Incoming message one')
+      message_two = find('[data-message-id]', text: 'Incoming message two')
+      background_one = page.evaluate_script(
+        "getComputedStyle(document.querySelector('[data-message-id=\"#{message_one['data-message-id']}\"]')).backgroundColor"
+      )
+      background_two = page.evaluate_script(
+        "getComputedStyle(document.querySelector('[data-message-id=\"#{message_two['data-message-id']}\"]')).backgroundColor"
+      )
+
+      expect(page).to have_css('[data-role="new-messages-separator"]', wait: 5)
+      expect(page).to have_css('#new-messages-notice[data-pending-visible="false"]', wait: 5, visible: :all)
+      expect(page.all('[data-role="new-messages-separator"]', visible: true).size).to eq(1)
+      separator_has_message_above = page.evaluate_script(<<~JS)
+        (() => {
+          const sep = [...document.querySelectorAll('[data-role="new-messages-separator"]')].at(-1)
+          return !!(sep && sep.previousElementSibling && sep.previousElementSibling.dataset && sep.previousElementSibling.dataset.messageId)
+        })()
+      JS
+      expect(separator_has_message_above).to be(true)
+      expect(background_one).not_to eq(existing_background)
+      expect(background_two).not_to eq(existing_background)
+
+      incoming_message_3 = create(:message, user: other_user, content: 'Incoming message three')
+      MessageBroadcastJob.perform_now(incoming_message_3.id)
+
+      first_child_role = page.evaluate_script("document.querySelector('#messages').firstElementChild.querySelector('[data-role]')?.dataset.role")
+      expect(first_child_role).to eq('new-messages-reveal')
+      expect(page).to have_css('[data-role="new-messages-separator"]', wait: 5)
+      expect(page).not_to have_content('Incoming message three')
+
+      find('[data-role="new-messages-reveal"]', visible: true).click
+      expect(page).to have_content('Incoming message three')
+      expect(page.all('[data-role="new-messages-separator"]', visible: true).size).to eq(2)
+    end
+
     it 'shows a generic error message when message creation fails' do
       allow_any_instance_of(MessagesController).to receive(:create_message!).and_raise(StandardError, 'Simulated failure!')
       visit messages_path
@@ -110,6 +211,44 @@ RSpec.describe 'Messages Form', type: :system do
 
       expect(page).not_to have_content('my message')
       expect(page).not_to have_selector("[data-testid='delete-message-#{message.id}']")
+    end
+
+    it 'keeps deleted messages as tombstones with metadata' do
+      other_user = create(:user, :confirmed, username: 'otheruser')
+      message = create(:message, user: other_user, content: 'to be deleted')
+      visit messages_path
+      expect(page).to have_css('#messages[data-channel-connected="true"]', wait: 5)
+
+      target = find("[data-message-id='#{message.id}']")
+      expect(target).to have_content('to be deleted')
+      expect(target).to have_content('otheruser')
+
+      message.destroy!
+      MessageBroadcastJob.perform_now(message.id)
+
+      tombstone = find("[data-message-id='#{message.id}']", wait: 5)
+      expect(tombstone['data-deleted-message']).to eq('true')
+      expect(tombstone).to have_content(I18n.t('exports.message_deleted'))
+      expect(tombstone).to have_content('otheruser')
+      expect(tombstone).not_to have_content('to be deleted')
+      expect(tombstone).to have_no_selector('[data-testid^="delete-message-"]')
+      expect(tombstone).to have_no_selector('[data-message-ownership-target="owner"]')
+    end
+
+    it 'shows notification badge when messages container is not present' do
+      visit messages_path
+      expect(page).to have_css('#messages[data-channel-connected="true"]', wait: 5)
+
+      page.execute_script(<<~JS)
+        document.getElementById('messages')?.remove()
+        document.querySelectorAll('[data-messages-channel="notification"]').forEach((badge) => badge.classList.add('hidden'))
+      JS
+
+      other_user = create(:user, :confirmed)
+      incoming_message = create(:message, user: other_user, content: 'Notification when messages is missing')
+      MessageBroadcastJob.perform_now(incoming_message.id)
+
+      expect(page).to have_css('[data-messages-channel="notification"]:not(.hidden)', wait: 5)
     end
 
     it 'renders metadata checkboxes using user defaults' do
