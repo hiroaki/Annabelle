@@ -192,4 +192,22 @@ RSpec.describe 'User profile editing', type: :system do
       expect(page).to have_field('ユーザー名')
     end
   end
+
+  describe 'Reload after validation errors' do
+    it 'keeps showing profile edit form after reload' do
+      visit edit_profile_path
+
+      create(:user, :confirmed, username: 'already_taken_username')
+      fill_in 'Username', with: 'already_taken_username'
+      click_button 'Update'
+
+      expect(page).to have_content('Username has already been taken')
+
+      page.refresh
+
+      expect(page).to have_current_path('/en/profile/edit')
+      expect(page).to have_selector("[data-testid='account-preferred-language']")
+      expect(page).to have_field('Username')
+    end
+  end
 end
