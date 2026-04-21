@@ -117,3 +117,6 @@ gem 'thruster', require: false
 
 # Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
 gem 'kamal', require: false
+
+# Rack middleware for blocking & throttling
+gem 'rack-attack', '~> 6.8'
