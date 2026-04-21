@@ -46,39 +46,43 @@ This example assumes the following architecture:
 これから紹介する例では、次のような構成を前提とします。
 
 ```
-                   User (developer)
-......................................................
-   |        |                                     |
-   |        | access                              |
-   |        v                                     |
-   |        443                                   |
-   |    +-----------+                             |
-   |    |kamal-proxy|                             |
-   |    +-----------+                             |
-   |        |                                     | access
-   |        |forward                              |
-   |        v                                     v
-   |       3001                                  1080
-   |   +----------------+                    +-----------+
-   |   |thruster + Rails|---["kamal"]--> 1025|MailCatcher|
-   |   +----------------+    Network         +-----------+
-   |        ^                                     ^
-   |        | pull                                | pull    LAN
-~~~|~~~~~~~~|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|~~~~~~~~~~~~~~~~~
-   v push   |                                     |         Internet
- +------------------------+               +--------------+
- |    Container Registry  |               | Docker Hub   |
- +------------------------+               +--------------+
+                   User (Developer)
+==================================================================
+      |                    |                       |      Local PC
+      v deploy             |                       |
+ +------------------+      |                       |
+ | kamal            |      |                       |
+ | -docker-registry |      |                       |
+ +------------------+      |                       |
+   |                       |                       |
+==[22]===================[443]==================[1080]============
+   |                       |                       |       Staging
+   |                       v access                |
+   | pull       +-------------+                    |
+   +----------->| kamal-proxy |                    |
+   |            +-------------+                    |
+   |               |                               |
+   |               v forward                       |
+   | pull         3001                             v access
+   |    +----------------+     send mail      +-------------+
+   +--> | thruster       |-------------> 1025 | MailCatcher |
+        |  -> 3000 Rails |    "kamal"         +-------------+
+        +----------------+    Network              ^ pull
+===================================================|==============
+                                                   |      Internet
+                                            +~~~~~~~~~~~~+
+                                            | Docker Hub |
+                                            +~~~~~~~~~~~~+
 ```
 
-- The "User" represents a developer who tests the staging environment and performs deployments and service access.
+- The "Developer" and "User" represents a developer who tests the staging environment and performs deployments and service access.
 - The entry point is `kamal-proxy`, which also acts as the SSL terminator (port 443).
 - The application server uses `thruster` as a wrapper for Puma, listening on port 3001.
 - Mail sent from Rails is handled by MailCatcher (SMTP), with communication over the internal Docker network "kamal".
 - The MailCatcher web interface is exposed directly on port 1080, without passing through the proxy.
 - In this staging setup, all roles are deployed on a single host, even though the diagram shows them separately.
 
-- User はステージング環境をテストする開発者を表します。ここからデプロイ、およびサービスの利用を行います。
+- Developer および User はステージング環境をテストする開発者を表します。ここからデプロイ、およびサービスの利用を行います。
 - kamal-proxy をエントリーポイントとし、また SSL終端 として位置付けます。ポート番号は 443 とします。
 - アプリケーションサーバは puma のラッパーとなる thruster を利用します。ポート番号は 3001 とします。
 - Rails からのメールを処理する SMTP サーバーには MailCatcher を利用し、その間の通信は Docker の内部ネットワーク "kamal" を利用します。
