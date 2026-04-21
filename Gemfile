@@ -96,6 +96,7 @@ group :test do
 end
 
 gem 'solid_cable', '~> 3.0'
+gem 'solid_cache', '~> 1.0'
 
 gem 'tailwindcss-rails', '~> 4.0'
 
@@ -117,3 +118,6 @@ gem 'thruster', require: false
 
 # Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
 gem 'kamal', require: false
+
+# Rack middleware for blocking & throttling
+gem 'rack-attack', '~> 6.8'
