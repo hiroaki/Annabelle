@@ -38,6 +38,10 @@ production:
     <<: *default
     database: storage/production_cable.sqlite3
     migrations_paths: db/cable_migrate
+  cache:
+    <<: *default
+    database: storage/production_cache.sqlite3
+    migrations_paths: db/cache_migrate
 
 staging:
   primary:
@@ -47,3 +51,7 @@ staging:
     <<: *default
     database: storage/staging_cable.sqlite3
     migrations_paths: db/cable_migrate
+  cache:
+    <<: *default
+    database: storage/staging_cache.sqlite3
+    migrations_paths: db/cache_migrate
