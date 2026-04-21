@@ -89,7 +89,7 @@ if rack_attack_settings[:enabled]
     Rack::Attack.cache.store.read(rack_attack_config.ban_cache_key(req.ip)) == '1'
   end
 
-  Rack::Attack.throttled_responder = lambda do |request|
+  Rack::Attack.throttled_responder = lambda do |_request|
     headers = {
       'Content-Type' => 'application/json; charset=utf-8',
       'Retry-After' => rack_attack_settings[:throttle_period].to_i.to_s
