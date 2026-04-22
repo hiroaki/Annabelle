@@ -31,7 +31,7 @@ class UsersController < ApplicationController
         redirect_to edit_profile_path
       end
     else
-      render :edit
+      render :edit, status: :unprocessable_content
     end
   end
 
@@ -42,7 +42,9 @@ class UsersController < ApplicationController
   private
 
   def set_user
-    @user = current_user
+    # current_user は認証・レイアウト表示でも参照されるため、フォーム用の @user とは分離して扱います。
+    # 同一インスタンスを共有すると、未保存の変更が他の表示へ意図せず漏れることがあります。
+    @user = User.find(current_user.id)
   end
 
   def user_params_for_profile

@@ -1,4 +1,8 @@
 class ApplicationController < ActionController::Base
+  class << self
+    attr_accessor :legacy_basic_auth_warning_emitted
+  end
+
   before_action :http_basic_authenticate
   before_action :set_locale
   before_action :configure_permitted_parameters, if: :devise_controller?
@@ -32,23 +36,101 @@ class ApplicationController < ActionController::Base
 
   private
 
-  # 環境変数 BASIC_AUTH_USER と BASIC_AUTH_PASSWORD が設定されている場合にかぎり、
-  # Basic 認証を有効にします。
+  # ENABLED_BASIC_AUTH が設定されている場合は新方式のみを利用し、
+  # 未設定時のみ互換性のため BASIC_AUTH_USER/BASIC_AUTH_PASSWORD を利用します。
   def http_basic_authenticate
-    if valid_user && valid_pswd
-      authenticate_or_request_with_http_basic do |username, password|
-        username == valid_user && password == valid_pswd
+    if basic_auth_switch_configured?
+      authenticate_with_basic_auth
+    else
+      authenticate_with_basic_auth_legacy
+    end
+  end
+
+  def basic_auth_switch_configured?
+    ENV['ENABLED_BASIC_AUTH'].present?
+  end
+
+  def basic_auth_enabled?
+    # Note: This guard is important for future cleanup.
+    # When legacy support is removed, http_basic_authenticate will always call this method,
+    # so this check will become the main gate for enabling Basic Auth.
+    return false unless basic_auth_switch_configured?
+
+    ActiveModel::Type::Boolean.new.cast(ENV['ENABLED_BASIC_AUTH'])
+  end
+
+  def configured_basic_auth_pairs
+    parse_basic_auth_pairs(ENV['BASIC_AUTH_PAIRS'])
+  end
+
+  def parse_basic_auth_pairs(raw_pairs)
+    raw_pairs.to_s.split(',').filter_map do |pair|
+      pair = pair.strip
+      user, pswd = pair.split(':', 2)
+      next if user.blank? || pswd.blank?
+
+      [user, pswd]
+    end
+  end
+
+  def authenticate_with_basic_auth
+    return unless basic_auth_enabled?
+
+    pairs = configured_basic_auth_pairs
+    authenticate_or_request_with_http_basic do |username, password|
+      pairs.any? do |user, pswd|
+        secure_eq(username, user) & secure_eq(password, pswd)
       end
     end
   end
 
-  def valid_user
+  def secure_eq(string_a, string_b)
+    Rack::Utils.secure_compare(
+      Digest::SHA256.hexdigest(string_a.to_s),
+      Digest::SHA256.hexdigest(string_b.to_s)
+    )
+  end
+
+  #---
+
+  def authenticate_with_basic_auth_legacy
+    pairs = configured_basic_auth_pairs_legacy
+    return if pairs.empty?
+
+    authenticate_or_request_with_http_basic do |username, password|
+      pairs.any? do |user, pswd|
+        secure_eq(username, user) & secure_eq(password, pswd)
+      end
+    end
+  end
+
+  def basic_auth_enabled_legacy?
+    basic_auth_user_legacy && basic_auth_password_legacy
+  end
+
+  def configured_basic_auth_pairs_legacy
+    return [] unless basic_auth_enabled_legacy?
+
+    warn_legacy_basic_auth_env_once
+    [[basic_auth_user_legacy, basic_auth_password_legacy]]
+  end
+
+  def warn_legacy_basic_auth_env_once
+    return if ApplicationController.legacy_basic_auth_warning_emitted
+
+    Rails.logger.warn('[BasicAuth] BASIC_AUTH_USER/BASIC_AUTH_PASSWORD are deprecated. Use BASIC_AUTH_PAIRS instead.')
+    ApplicationController.legacy_basic_auth_warning_emitted = true
+  end
+
+  def basic_auth_user_legacy
     ENV['BASIC_AUTH_USER'].presence
   end
 
-  def valid_pswd
+  def basic_auth_password_legacy
     ENV['BASIC_AUTH_PASSWORD'].presence
   end
+
+  #---
 
   def handle_invalid_locale(exception)
     Rails.logger.error("[Locale] Invalid locale error: #{exception.message} (params: #{params.inspect})")

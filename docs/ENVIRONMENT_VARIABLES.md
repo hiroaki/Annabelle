@@ -161,9 +161,72 @@ Setting these values enables Basic Authentication.
 これらの値を設定すると、 Basic 認証 を有効にします。
 
 ```
-BASIC_AUTH_USER=guest
-BASIC_AUTH_PASSWORD=annabelle
+ENABLED_BASIC_AUTH=1
+BASIC_AUTH_PAIRS=guest:annabelle,readonly:readonlypass
 ```
+
+`ENABLED_BASIC_AUTH` controls whether Basic Authentication is enabled. When enabled, it is required to set `BASIC_AUTH_PAIRS` for credentials.
+
+`ENABLED_BASIC_AUTH` は Basic 認証を有効化するかどうかを制御します。認証情報として `BASIC_AUTH_PAIRS` が必要です。
+
+`BASIC_AUTH_PAIRS` supports multiple `username:password` pairs separated by commas.
+
+`BASIC_AUTH_PAIRS` はカンマ区切りで複数の `username:password` ペアを指定できます。
+
+### Rack::Attack Configuration / Rack::Attack 設定
+
+These variables control the optional Rack::Attack based throttling and blocking.
+At the moment this is intended as a demo-oriented defensive feature, not as a full production-grade rate limiting design.
+
+これらの変数は、 Rack::Attack による任意のアクセス制限・遮断のための設定です。
+現時点では、これは本格的な大規模運用向けの設計というより、デモ用途を意識した簡易的な防衛機能として位置づけています。
+
+```
+ENABLED_RACK_ATTACK=1
+RACK_ATTACK_GET_THROTTLE_LIMIT=300
+RACK_ATTACK_WRITE_THROTTLE_LIMIT=60
+RACK_ATTACK_THROTTLE_PERIOD_SECONDS=60
+RACK_ATTACK_BAN_DURATION_SECONDS=600
+```
+
+`ENABLED_RACK_ATTACK` enables or disables Rack::Attack entirely.
+
+`ENABLED_RACK_ATTACK` は Rack::Attack 全体の有効・無効を切り替えます。
+
+`RACK_ATTACK_GET_THROTTLE_LIMIT` is the maximum number of GET/HEAD requests allowed from a single IP during one throttle period.
+
+`RACK_ATTACK_GET_THROTTLE_LIMIT` は、 1 つの throttle period の間に、単一 IP から許可する GET / HEAD リクエスト数の上限です。
+
+`RACK_ATTACK_WRITE_THROTTLE_LIMIT` is the maximum number of non-GET/HEAD requests allowed from a single IP during one throttle period.
+
+`RACK_ATTACK_WRITE_THROTTLE_LIMIT` は、 1 つの throttle period の間に、単一 IP から許可する GET / HEAD 以外のリクエスト数の上限です。
+
+`RACK_ATTACK_THROTTLE_PERIOD_SECONDS` is the period length, in seconds, used by both throttles.
+
+`RACK_ATTACK_THROTTLE_PERIOD_SECONDS` は、 GET 系と write 系の双方で使う制限期間の長さ（秒）です。
+
+`RACK_ATTACK_BAN_DURATION_SECONDS` is the ban duration, in seconds, applied when a request probes `/.env` or `/.env.*`.
+
+`RACK_ATTACK_BAN_DURATION_SECONDS` は、 `/.env` または `/.env.*` へのアクセスを検知したときに適用する ban の長さ（秒）です。
+
+Current default behavior:
+
+- GET / HEAD requests are throttled per IP.
+- Non-GET / HEAD requests are throttled per IP.
+- Requests to `/.env` or `/.env.*` are immediately banned.
+- The health check path `/up` is excluded from GET / HEAD throttling.
+
+現在のデフォルト動作は次の通りです：
+
+- GET / HEAD リクエストは IP 単位で制限されます。
+- GET / HEAD 以外のリクエストも IP 単位で制限されます。
+- `/.env` または `/.env.*` へのアクセスは即座に ban の対象になります。
+- ヘルスチェック用の `/up` は GET / HEAD の制限対象から除外されています。
+
+**Note:** With the current configuration, Rack::Attack state is effectively scoped to a single host. In other words, this setup is useful for single-host deployments, but if you later scale out to multiple application hosts, you should revisit the cache design and consider a shared external store such as Redis.
+
+**注意:** 現在の構成では、 Rack::Attack の状態は実質的に単一ホスト単位で扱われます。つまり単一ホスト構成では有用ですが、将来的に複数ホストへスケールする場合は、キャッシュ構成を見直し、 Redis などの共有可能な外部ストアの利用を検討してください。
+
 
 ### Image Processing Backend / 画像処理バックエンド
 
