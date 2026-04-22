@@ -161,9 +161,17 @@ Setting these values enables Basic Authentication.
 これらの値を設定すると、 Basic 認証 を有効にします。
 
 ```
-BASIC_AUTH_USER=guest
-BASIC_AUTH_PASSWORD=annabelle
+ENABLED_BASIC_AUTH=1
+BASIC_AUTH_PAIRS=guest:annabelle,readonly:readonlypass
 ```
+
+`ENABLED_BASIC_AUTH` controls whether Basic Authentication is enabled. When enabled, it is required to set `BASIC_AUTH_PAIRS` for credentials.
+
+`ENABLED_BASIC_AUTH` は Basic 認証を有効化するかどうかを制御します。認証情報として `BASIC_AUTH_PAIRS` が必要です。
+
+`BASIC_AUTH_PAIRS` supports multiple `username:password` pairs separated by commas.
+
+`BASIC_AUTH_PAIRS` はカンマ区切りで複数の `username:password` ペアを指定できます。
 
 ### Rack::Attack Configuration / Rack::Attack 設定
 
