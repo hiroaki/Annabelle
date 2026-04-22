@@ -49,6 +49,7 @@ env:
     APP_HTTP_HOST: <%= ENV.fetch('APP_HTTP_HOST', 'localhost') %>
     APP_HTTP_PROTOCOL: <%= ENV.fetch('APP_HTTP_PROTOCOL', 'https') %>
     APP_HTTP_PORT: <%= ENV.fetch('APP_HTTP_PORT', 443) %>
+    ENABLED_BASIC_AUTH: <%= ENV.fetch('ENABLED_BASIC_AUTH', '""') %>
     ENABLE_2FA: <%= ENV.fetch('ENABLE_2FA', '""') %>
     SMTP_ADDRESS: <%= ENV.fetch('SMTP_ADDRESS', 'smtp') %>
     SMTP_PORT: <%= ENV.fetch('SMTP_PORT', 1025) %>
@@ -66,6 +67,7 @@ env:
     - ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
     - GITHUB_CLIENT_ID
     - GITHUB_CLIENT_SECRET
+    - BASIC_AUTH_PAIRS
     - BASIC_AUTH_USER
     - BASIC_AUTH_PASSWORD
     - SECRET_KEY_BASE
