@@ -20,6 +20,7 @@ RSpec.describe 'Basic Auth', type: :request do
   around do |example|
     ApplicationController.legacy_basic_auth_warning_emitted = false
     with_env(env_vars) { example.run }
+  ensure
     ApplicationController.legacy_basic_auth_warning_emitted = false
   end
 
@@ -191,6 +192,45 @@ RSpec.describe 'Basic Auth', type: :request do
         subject
         expect(response).not_to have_http_status(:unauthorized)
         expect(response).not_to have_http_status(:forbidden)
+      end
+    end
+
+    context 'when ENABLED_BASIC_AUTH is blank and legacy env pair is set' do
+      let(:env_vars) do
+        super().merge(
+          'ENABLED_BASIC_AUTH' => '',
+          'BASIC_AUTH_USER' => legacy_user,
+          'BASIC_AUTH_PASSWORD' => legacy_password
+        )
+      end
+
+      context 'with correct credentials' do
+        let(:headers) { basic_auth_header(legacy_user, legacy_password) }
+
+        it 'allows access because blank flag is treated as unset' do
+          subject
+          expect(response).not_to have_http_status(:unauthorized)
+          expect(response).not_to have_http_status(:forbidden)
+        end
+      end
+    end
+
+    context 'when ENABLED_BASIC_AUTH is true and BASIC_AUTH_PAIRS contains separator whitespace' do
+      let(:env_vars) do
+        super().merge(
+          'ENABLED_BASIC_AUTH' => '1',
+          'BASIC_AUTH_PAIRS' => "#{pair1_user}:#{pair1_password}, #{pair2_user}:#{pair2_password}"
+        )
+      end
+
+      context 'with second pair credentials' do
+        let(:headers) { basic_auth_header(pair2_user, pair2_password) }
+
+        it 'allows access' do
+          subject
+          expect(response).not_to have_http_status(:unauthorized)
+          expect(response).not_to have_http_status(:forbidden)
+        end
       end
     end
 

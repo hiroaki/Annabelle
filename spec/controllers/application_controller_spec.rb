@@ -10,6 +10,7 @@ RSpec.describe ApplicationController, type: :controller do
   around do |example|
     ApplicationController.legacy_basic_auth_warning_emitted = false
     example.run
+  ensure
     ApplicationController.legacy_basic_auth_warning_emitted = false
   end
 
@@ -22,6 +23,12 @@ RSpec.describe ApplicationController, type: :controller do
 
     it 'returns false when ENABLED_BASIC_AUTH is false' do
       with_env('ENABLED_BASIC_AUTH' => 'false') do
+        expect(controller.send(:basic_auth_enabled?)).to eq(false)
+      end
+    end
+
+    it 'returns false when ENABLED_BASIC_AUTH is blank' do
+      with_env('ENABLED_BASIC_AUTH' => '') do
         expect(controller.send(:basic_auth_enabled?)).to eq(false)
       end
     end
@@ -80,18 +87,21 @@ RSpec.describe ApplicationController, type: :controller do
       end
     end
 
-    it 'returns empty array when BASIC_AUTH_PAIRS is not set' do
+    it 'strips separator whitespace around BASIC_AUTH_PAIRS entries' do
       with_env(
         'ENABLED_BASIC_AUTH' => '1',
-        'BASIC_AUTH_PAIRS' => nil,
-        'BASIC_AUTH_USER' => 'legacy_user',
-        'BASIC_AUTH_PASSWORD' => 'legacy_pass'
+        'BASIC_AUTH_PAIRS' => 'user1:pass1, user2:pass2',
+        'BASIC_AUTH_USER' => nil,
+        'BASIC_AUTH_PASSWORD' => nil
       ) do
-        expect(controller.send(:configured_basic_auth_pairs)).to eq([])
+        expect(controller.send(:configured_basic_auth_pairs)).to eq([
+          %w[user1 pass1],
+          %w[user2 pass2]
+        ])
       end
     end
 
-    it 'returns empty array when ENABLED_BASIC_AUTH is set but BASIC_AUTH_PAIRS is missing' do
+    it 'returns empty array when BASIC_AUTH_PAIRS is not set' do
       with_env(
         'ENABLED_BASIC_AUTH' => '1',
         'BASIC_AUTH_PAIRS' => nil,

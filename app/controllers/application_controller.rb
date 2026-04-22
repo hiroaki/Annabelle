@@ -39,18 +39,22 @@ class ApplicationController < ActionController::Base
   # ENABLED_BASIC_AUTH が設定されている場合は新方式のみを利用し、
   # 未設定時のみ互換性のため BASIC_AUTH_USER/BASIC_AUTH_PASSWORD を利用します。
   def http_basic_authenticate
-    if ENV.key?('ENABLED_BASIC_AUTH')
+    if basic_auth_switch_configured?
       authenticate_with_basic_auth
     else
       authenticate_with_basic_auth_legacy
     end
   end
 
+  def basic_auth_switch_configured?
+    ENV['ENABLED_BASIC_AUTH'].present?
+  end
+
   def basic_auth_enabled?
     # Note: This guard is important for future cleanup.
     # When legacy support is removed, http_basic_authenticate will always call this method,
     # so this check will become the main gate for enabling Basic Auth.
-    return false unless ENV.key?('ENABLED_BASIC_AUTH')
+    return false unless basic_auth_switch_configured?
 
     ActiveModel::Type::Boolean.new.cast(ENV['ENABLED_BASIC_AUTH'])
   end
@@ -61,6 +65,7 @@ class ApplicationController < ActionController::Base
 
   def parse_basic_auth_pairs(raw_pairs)
     raw_pairs.to_s.split(',').filter_map do |pair|
+      pair = pair.strip
       user, pswd = pair.split(':', 2)
       next if user.blank? || pswd.blank?
 
