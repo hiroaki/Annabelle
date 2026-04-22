@@ -1,7 +1,4 @@
 class ApplicationController < ActionController::Base
-  class << self
-    attr_accessor :legacy_basic_auth_warning_emitted
-  end
 
   before_action :http_basic_authenticate
   before_action :set_locale
@@ -36,14 +33,9 @@ class ApplicationController < ActionController::Base
 
   private
 
-  # ENABLED_BASIC_AUTH が設定されている場合は新方式のみを利用し、
-  # 未設定時のみ互換性のため BASIC_AUTH_USER/BASIC_AUTH_PASSWORD を利用します。
+  # ENABLED_BASIC_AUTH と BASIC_AUTH_PAIRS で Basic 認証を制御します。
   def http_basic_authenticate
-    if basic_auth_switch_configured?
-      authenticate_with_basic_auth
-    else
-      authenticate_with_basic_auth_legacy
-    end
+    authenticate_with_basic_auth
   end
 
   def basic_auth_switch_configured?
@@ -90,47 +82,6 @@ class ApplicationController < ActionController::Base
       Digest::SHA256.hexdigest(string_b.to_s)
     )
   end
-
-  #---
-
-  def authenticate_with_basic_auth_legacy
-    pairs = configured_basic_auth_pairs_legacy
-    return if pairs.empty?
-
-    authenticate_or_request_with_http_basic do |username, password|
-      pairs.any? do |user, pswd|
-        secure_eq(username, user) & secure_eq(password, pswd)
-      end
-    end
-  end
-
-  def basic_auth_enabled_legacy?
-    basic_auth_user_legacy && basic_auth_password_legacy
-  end
-
-  def configured_basic_auth_pairs_legacy
-    return [] unless basic_auth_enabled_legacy?
-
-    warn_legacy_basic_auth_env_once
-    [[basic_auth_user_legacy, basic_auth_password_legacy]]
-  end
-
-  def warn_legacy_basic_auth_env_once
-    return if ApplicationController.legacy_basic_auth_warning_emitted
-
-    Rails.logger.warn('[BasicAuth] BASIC_AUTH_USER/BASIC_AUTH_PASSWORD are deprecated. Use BASIC_AUTH_PAIRS instead.')
-    ApplicationController.legacy_basic_auth_warning_emitted = true
-  end
-
-  def basic_auth_user_legacy
-    ENV['BASIC_AUTH_USER'].presence
-  end
-
-  def basic_auth_password_legacy
-    ENV['BASIC_AUTH_PASSWORD'].presence
-  end
-
-  #---
 
   def handle_invalid_locale(exception)
     Rails.logger.error("[Locale] Invalid locale error: #{exception.message} (params: #{params.inspect})")
