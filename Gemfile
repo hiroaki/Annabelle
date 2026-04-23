@@ -1,6 +1,15 @@
 source 'https://rubygems.org'
 
-ruby '3.4.7'
+ruby '3.4.9'
+
+# psychのバージョンを5.2.2に固定
+# Ruby 3.4.xにはpsych 5.2.2がdefault gemとして含まれているが、
+# rdocなど一部のgemがpsych (>= 4.0.0)を要求するため、bundle update時に
+# より新しいpsych（例: 5.3.1）が追加され、複数バージョンが共存し
+# Bundlerの警告（WARN: Unresolved or ambiguous specs during Gem::Specification.reset）が発生する。
+# セキュリティアップデートが必要な場合はRuby自体のアップデートで対応するのが基本であり、
+# psychのバージョン固定は警告回避のための対応。
+gem 'psych', '5.2.2'
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem 'rails', '~> 8.1', '>= 8.1.1'
@@ -87,15 +96,13 @@ group :test do
 end
 
 gem 'solid_cable', '~> 3.0'
+gem 'solid_cache', '~> 1.0'
 
 gem 'tailwindcss-rails', '~> 4.0'
 
 gem 'kaminari', '~> 1.2'
 
-# The version is specified to avoid "Unresolved or ambiguous specs" warnings.
-gem 'stringio', '~> 3.1.5'
-
-gem 'devise', '~> 4.9'
+gem 'devise', '~> 5.0', '>= 5.0.1'
 gem 'devise-two-factor'
 gem 'omniauth'
 gem 'omniauth-rails_csrf_protection'
@@ -111,3 +118,6 @@ gem 'thruster', require: false
 
 # Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
 gem 'kamal', require: false
+
+# Rack middleware for blocking & throttling
+gem 'rack-attack', '~> 6.8'

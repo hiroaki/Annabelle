@@ -23,9 +23,9 @@
 
   <%= content_tag :div, simple_format(message.content),
     class: "container text-nowrap",
-    **data_with_testid("message-content-#{message.id}") %>
+    **data_with_testid("message-content-#{message.id}", message_body: true) %>
 
-  <div class="container flex">
+  <div class="container flex" data-message-attachments="true">
     <% if message.attachments.attached? %>
       <% message.attachments.each do |att| %>
         <div class="container shrink-0 w-auto mx-2">
