@@ -106,7 +106,7 @@ $ bin/rails c
 $ bin/rails tailwindcss:build
 ```
 
-そして、CSS の変更のたびに、ビルドが必要です。したがって開発中は、Tailwind CSS の自動ビルドのために `bin/rails tailwindcss:watch` を同時に実行しておくと便利です。また、複数のプロセスを同時に起動するために `bin/dev` も利用可能です。雛形として `Procfile.dev.sample` が用意されているので、必要に応じてカスタマイズしてください。
+そして、CSS の変更のたびに、ビルドが必要です。したがって開発中は、Tailwind CSS の自動ビルドのために `bin/rails tailwindcss:watch` を同時に実行しておくと便利です。また、複数のプロセスを同時に起動するために `bin/dev` も利用可能です。
 
 -----
 

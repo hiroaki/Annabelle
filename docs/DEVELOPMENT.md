@@ -108,7 +108,7 @@ This project uses Tailwind for CSS. Before starting the server for the first tim
 $ bin/rails tailwindcss:build
 ```
 
-Whenever you make changes to the CSS, you need to rebuild it. During development, it is convenient to run `bin/rails tailwindcss:watch` concurrently for automatic Tailwind CSS builds. You can also use `bin/dev` to launch multiple processes at once. A sample configuration is provided in `Procfile.dev.sample`, which you can customize as needed.
+Whenever you make changes to the CSS, you need to rebuild it. During development, it is convenient to run `bin/rails tailwindcss:watch` concurrently for automatic Tailwind CSS builds. You can also use `bin/dev` to launch multiple processes at once.
 
 -----
 
