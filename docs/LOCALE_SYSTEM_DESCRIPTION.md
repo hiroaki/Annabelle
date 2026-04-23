@@ -1,105 +1,106 @@
-(NOTE: このファイルは、ロケールシステムの実装現状を GPT-4.1 に指示してまとめさせたものです)
+[Japanese version is here](LOCALE_SYSTEM_DESCRIPTION.ja.md)
 
-# Annabelle ロケールシステム設計・実装ガイド
+# Annabelle Locale System Design and Implementation Guide
 
-## 1. 概要
-Annabelleのロケール（多言語）システムは、明示的なURLプレフィックス（例: `/ja/`, `/en/`）によるルーティングを基本とし、ユーザーやリクエストごとに最適なロケール判定・切替を行う仕組みです。
-この設計により、アプリケーション全体で一貫した多言語対応と、柔軟な拡張性・保守性を実現しています。
+## 1. Overview
 
----
-
-## 2. ロケール設計と動作の原則
-
-- **ロケール付きURLの原則**
-  主要な画面やAPIは `/ja/...` や `/en/...` のようなロケールスコープ付きURLで提供されます。
-  これにより、URL自体が現在の言語状態を明示し、SEOやブックマーク、外部連携にも強い構造となります。
-
-  ```
-  # ロケール付きURLの例
-  /ja                           # 日本語トップページ（messages#index）
-  /en                           # 英語トップページ（messages#index）
-  /ja/messages                  # 日本語メッセージ一覧
-  /en/messages                  # 英語メッセージ一覧
-  /ja/dashboard                 # 日本語ダッシュボード
-  /en/dashboard                 # 英語ダッシュボード
-  /ja/profile/edit              # 日本語プロフィール編集
-  /en/profile/edit              # 英語プロフィール編集
-  ```
-
-- **例外パス（ロケール管理の適用外パス）**
-  OAuth認証コールバックや一部の外部サービス連携用エンドポイントなど、ロケールスコープ外で動作するパスが存在します。
-  これらのパスはAnnabelleのロケール管理（ロケール自動判定・リダイレクト・ロケール付き404処理など）の適用範囲外であり、通常のRailsルーティングやコントローラで個別に処理されます。
-
-  ```
-  # 例外パスの例
-  /users/auth/github/callback   # GitHub OAuth コールバック
-  /users/auth/failure           # OAuth 認証失敗
-  /up                           # ヘルスチェック
-  ```
-
-- **ルートアクセス時の自動ロケール判定とリダイレクト**
-  `/`（ルート）へのアクセス時は、LocaleUtilsのロジックにより「パラメータ → ユーザー設定 → Accept-Languageヘッダ → デフォルト」の順でロケールを決定し、該当ロケールのトップページ（例: `/ja` または `/en`）へリダイレクトします。
-
-  ```
-  # リダイレクトの例
-  GET /                           → リダイレクト → GET /ja （日本語ユーザーの場合）
-  GET /?locale=en                 → リダイレクト → GET /en （パラメータ指定）
-  GET / (Accept-Language: en-US)  → リダイレクト → GET /en （ヘッダ判定）
-  ```
-
-- **専用エンドポイントによるロケール切替**
-  `/locale/:locale` へのアクセスで、指定ロケールが有効な場合は `redirect_to`パラメータで指定されたパス、またはロケールトップへリダイレクトします。
-
-  ```
-  # ロケール切替の例
-  GET /locale/ja                                   → リダイレクト → GET /ja
-  GET /locale/en?redirect_to=/en/dashboard         → リダイレクト → GET /en/dashboard
-  GET /locale/ja?redirect_to=/ja/messages          → リダイレクト → GET /ja/messages
-  GET /locale/invalid                              → リダイレクト → GET / （アラート表示）
-  ```
-
-- **スコープ内での言語切替**
-  ロケールスコープ内では、言語切替UIやURL操作ヘルパを通じて、現在のページのまま他言語の同一パスへ遷移できます。
-
-  ```
-  現在のページ: /en/dashboard
-  ↓ 日本語切替リンクをクリック
-  遷移先: /ja/dashboard
-  ```
-
-- **共通エラーハンドリング**
-  サポートされていないロケールが指定された場合は、ルートへリダイレクトし、必要に応じてアラートを表示します（この挙動は全体共通です）。
-
-  ```
-  # エラーハンドリングの例
-  GET /fr/messages                → 404 Not Found （フランス語は未サポート）
-  GET /locale/fr                  → リダイレクト → GET / （アラート表示）
-  ```
+Annabelle's locale system is based on routing with explicit URL prefixes such as `/ja/` and `/en/`, and it determines or switches to the most appropriate locale for each user and request.
+This design provides consistent multilingual behavior throughout the application while keeping the system flexible and maintainable.
 
 ---
 
-## 3. 主要コンポーネントと責務
+## 2. Locale Design Principles and Runtime Behavior
+
+- **Principle of locale-prefixed URLs**
+  Major screens and APIs are provided under locale-scoped URLs such as `/ja/...` and `/en/...`.
+  This makes the current language state explicit in the URL itself, which is strong for SEO, bookmarks, and external integrations.
+
+  ```
+  # Examples of locale-prefixed URLs
+  /ja                           # Japanese top page (messages#index)
+  /en                           # English top page (messages#index)
+  /ja/messages                  # Japanese message index
+  /en/messages                  # English message index
+  /ja/dashboard                 # Japanese dashboard
+  /en/dashboard                 # English dashboard
+  /ja/profile/edit              # Japanese profile edit
+  /en/profile/edit              # English profile edit
+  ```
+
+- **Exception paths outside locale management**
+  Some paths operate outside the locale scope, such as OAuth callbacks and certain external service endpoints.
+  These paths are outside the scope of Annabelle's locale management, including automatic locale detection, redirects, and locale-aware 404 handling, and are handled individually through normal Rails routing and controllers.
+
+  ```
+  # Examples of exception paths
+  /users/auth/github/callback   # GitHub OAuth callback
+  /users/auth/failure           # OAuth authentication failure
+  /up                           # Health check
+  ```
+
+- **Automatic locale detection and redirect on root access**
+  When `/` is accessed, `LocaleUtils` determines the locale in the following order: parameter, user preference, `Accept-Language` header, and default locale. It then redirects to the top page for the resolved locale such as `/ja` or `/en`.
+
+  ```
+  # Redirect examples
+  GET /                           -> redirect -> GET /ja
+  GET /?locale=en                 -> redirect -> GET /en
+  GET / (Accept-Language: en-US)  -> redirect -> GET /en
+  ```
+
+- **Locale switching through a dedicated endpoint**
+  Accessing `/locale/:locale` redirects to the path specified by the `redirect_to` parameter when the given locale is valid, or to the locale top page otherwise.
+
+  ```
+  # Locale switch examples
+  GET /locale/ja                                   -> redirect -> GET /ja
+  GET /locale/en?redirect_to=/en/dashboard         -> redirect -> GET /en/dashboard
+  GET /locale/ja?redirect_to=/ja/messages          -> redirect -> GET /ja/messages
+  GET /locale/invalid                              -> redirect -> GET / with alert
+  ```
+
+- **Language switching within the locale scope**
+  Within the locale scope, the language switch UI and URL helper utilities allow navigation to the same path in another language.
+
+  ```
+  Current page: /en/dashboard
+  -> Click Japanese language switch link
+  Destination: /ja/dashboard
+  ```
+
+- **Common error handling**
+  When an unsupported locale is specified, the application redirects to the root path and displays an alert when appropriate. This behavior is shared across the system.
+
+  ```
+  # Error handling examples
+  GET /fr/messages                -> 404 Not Found
+  GET /locale/fr                  -> redirect -> GET / with alert
+  ```
+
+---
+
+## 3. Main Components and Responsibilities
 
 - **LocaleController**
-  ルートアクセス時の自動リダイレクト、明示的なロケール切替（`/locale/:locale`）、不正ロケール時のエラーハンドリングを担当。
+  Handles automatic redirects on root access, explicit locale switching through `/locale/:locale`, and error handling for invalid locales.
 
 - **LocaleUtils**
-  ロケール決定ロジックを提供。判定優先順位は「パラメータ → ユーザー設定 → Accept-Languageヘッダ → デフォルト」。
+  Provides locale resolution logic. The priority order is parameter, user preference, `Accept-Language` header, and default locale.
 
 - **LocaleValidator**
-  サポート対象ロケールかどうかのバリデーションを一元化。
+  Centralizes validation of whether a locale is supported.
 
 - **LocaleHelper**
-  パスからのロケール抽出・付与・除去、OAuth用パラメータ生成など、URL操作や補助的な処理を提供。
+  Provides path-based locale extraction, insertion, removal, OAuth-related parameter generation, and other URL utility behavior.
 
 - **LocaleConfiguration**
-  `config/locales.yml`から利用可能ロケール・デフォルトロケール・メタデータを読み込み、APIとして提供。
+  Loads available locales, the default locale, and metadata from `config/locales.yml`, and provides them through an API.
 
 ---
 
-## 4. 設定ファイル（config/locales.yml）の構成と役割
+## 4. Structure and Role of `config/locales.yml`
 
-Annabelleのロケール設定は `config/locales.yml` で一元管理されています。
+Annabelle manages locale settings centrally in `config/locales.yml`.
 
 ```yaml
 locales:
@@ -114,18 +115,17 @@ locales:
       direction: ltr
     ja:
       name: "Japanese"
-      native_name: "日本語"
+      native_name: "Japanese"
       direction: ltr
 ```
 
 - **default**
-  デフォルトロケール。ルートアクセス時や判定不能時に使用されます。
+  The default locale. It is used on root access and when locale resolution fails.
 
 - **available**
-  利用可能なロケールのリスト。ここに記載されたロケールのみが有効です。
+  The list of available locales. Only locales listed here are valid.
 
 - **metadata**
-  各ロケールの表示名（`name`）、ネイティブ名（`native_name`）、テキスト方向（`direction`）などのメタデータ。
-  これらはUI表示や言語切替UIの生成などに利用されます。
-  - `direction`はテキストの表示方向（`ltr`=左→右, `rtl`=右→左）を示します。
-
+  Locale metadata such as display name (`name`), native name (`native_name`), and text direction (`direction`).
+  These values are used in UI rendering and language switch UI generation.
+  `direction` indicates text flow direction, where `ltr` means left-to-right and `rtl` means right-to-left.

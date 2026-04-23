@@ -1,52 +1,53 @@
-# Chromium ブラウザのインストールとセットアップ
+[Japanese version is here](SETUP_BROWSER.ja.md)
 
-このドキュメントは、RSpec のシステム・テストで使用する Chromium ブラウザを、開発用コンテナにインストールする手順です。
+# Install and Set Up the Chromium Browser
 
-## 背景
+This document explains how to install the Chromium browser used in RSpec system tests into the development container.
 
-このプロジェクトでは Capybara のドライバーとして cuprite を採用しています。cuprite は Chrome/Chromium を CDP (Chrome DevTools Protocol) 経由でリモートのホストからも操作ができることから Docker 環境ではアプリケーションとは別のプロセス（コンテナ）で実行する構成が望まれますが、Apple Silicon (ARM64) では動作が安定しません。
+## Background
 
-このような事情から、（そして何より大前提としてプロジェクトオーナーの開発環境が M1 Mac 上であるため、）その環境で現時点で比較的安定して動作する方法として、テスト対象アプリケーションのコンテナ内に Chrome 互換の Chromium を直接インストールする構成を採用しています。
+This project uses a shared Dockerfile for both development and deployment-oriented environments. Chromium is needed only for specific development tasks such as system specs and visual browser debugging, so it is treated as an optional tool rather than a default dependency.
 
-ほかのアーキテクチャ上で開発を行う場合はこのドキュメントに従う必要はありません。任意に Chrome をインストールし、自ら環境を構築してください。（そのためブラウザはイメージには含めずに、後から任意に追加する形を採用しています）
+Keeping Chromium out of the base image helps keep the shared image smaller, reduces build time, and avoids increasing the maintenance surface of the default container environment. For that reason, the browser is not included in the image by default and is instead installed afterward only when needed.
 
-## 前提
+## Prerequisites
 
-- macOS（Apple Silicon 含む）
-- 開発環境はトップの `Dockerfile` と `compose.yml` を使用
-- コンテナは起動済み
+- The development environment uses the top-level `Dockerfile` and `compose.yml`
+- The container is already running
 
 ```bash
 $ docker compose up
 ```
 
-## 手順
+## Steps
 
-ルートユーザでインストールします。バッチスクリプトが用意されていますのでそれを実行します：
+Install as the root user. A batch script is provided for this:
 
 ```bash
 $ docker compose exec --user root web bash -lc \
   "/bin/bash /rails/scripts/install-browser-chromium.sh"
 ```
 
-このスクリプトは次を行います：
-- `chromium` 本体と基本フォント（Liberation/Noto）をインストール
-- 互換のため `/usr/bin/google-chrome` と `/usr/bin/chromium-browser` を `chromium` へシンボリックリンク
+This script does the following:
 
-## RSpec での利用
+- Installs `chromium` itself and basic fonts such as Liberation and Noto
+- Creates compatibility symlinks from `/usr/bin/google-chrome` and `/usr/bin/chromium-browser` to `chromium`
 
-RSpec は、デフォルトではブラウザはヘッドレス・モードで動作するようになっており、特に気にすることはありません。
+## Using It with RSpec
+
+By default, RSpec runs the browser in headless mode, so no extra setup is required.
 
 ```bash
 $ docker compose exec web bash -lc "bundle exec rspec spec/system"
 ```
 
-環境変数 `HEADLESS=0` でヘッドレスを無効化できますが、その場合 X ディスプレイが必要になるため、 VNC を使うようにセットアップしてください（`docs/SETUP_VNC.md` を参照）。
+You can disable headless mode with the environment variable `HEADLESS=0`, but in that case an X display is required, so set it up with VNC as described in [docs/SETUP_VNC.md](/docs/SETUP_VNC.md).
 
-## トラブルシュート
+## Troubleshooting
 
-- Chromium が見つからない／起動しない
-  - `apt` の更新後に再実行：
-    ```bash
-    $ docker compose exec --user root web bash -lc "apt-get update -qq && /bin/bash /rails/scripts/install-browser-chromium.sh"
-    ```
+- Chromium cannot be found or does not start
+  Re-run the installer after updating `apt`:
+
+  ```bash
+  $ docker compose exec --user root web bash -lc "apt-get update -qq && /bin/bash /rails/scripts/install-browser-chromium.sh"
+  ```

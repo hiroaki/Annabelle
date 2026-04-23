@@ -1,32 +1,26 @@
 ![Coveralls](https://img.shields.io/coverallsCoverage/github/hiroaki/Annabelle?branch=develop)
 
-# Annabelle / アナベル
+[日本語版はこちら](README.ja.md)
+
+# Annabelle
 
 Annabelle is a lightweight message board developed as part of my personal Ruby on Rails training. It is intended for exchanging files and messages between PCs and smartphones on a local area network (LAN). As it includes experimental features, it is not recommended for public use or access by the general public.
 
-Annabelle は、私個人の Ruby on Rails トレーニングの一環として開発された簡易な掲示板です。 LAN 内の PC やスマートフォン間でファイルやメッセージをやり取りすることを目的としています。実験的な実装も盛り込むため、不特定多数に公開するサイトとしての利用は推奨しません。
+## Features
 
-## Features / 機能
-
-### Realtime Messaging / リアルタイム・メッセージ
+### Realtime Messaging
 
 Messages posted or deleted by other users are instantly reflected on the screen via Action Cable. It can also be used like a chat interface.
 
-他のユーザによるメッセージの投稿や削除が、Action Cable を通じて即座に画面に反映されます。チャットのように利用することも可能です。
-
-### File Upload / ファイルアップロード
+### File Upload
 
 Multiple files can be selected and uploaded at once as message attachments. (Note: Currently, uploaded files are saved unencrypted on the local disk.)
 
-メッセージに添付する形で、複数のファイルを同時に選択してアップロードできます。（注：現時点では、アップロードされたファイルは暗号化されずにローカルディスクに保存されます。）
-
-### Layout / 画面レイアウト
+### Layout
 
 The screen layout is designed for quick and easy preview of uploaded media such as images and videos. On desktop screens, the right half of the screen is used for previews, while on mobile devices, previews are shown in a modal window.
 
-アップロードされたメディア（画像や動画）をすばやく確認できるように、画面レイアウトが工夫されています。プレビュー領域は、デスクトップ向けには画面の右半分が、モバイルではモーダルウィンドウが使用されます。
-
-### Preview Features/ プレビュー機能
+### Preview Features
 
 Supported media for preview. More media types will be supported in future updates:
 - Text
@@ -34,130 +28,89 @@ Supported media for preview. More media types will be supported in future update
 - Videos
 - GPX (location and tracks shown on OpenStreetMap)
 
-プレビュー可能なメディアは次のとおりです。これら以外のメディア対応についても今後追加していく予定です：
-- テキスト
-- 画像（画像と、位置情報が含まれていれば OpenStreetMap の地図で位置を表示します）
-- 動画
-- GPX（位置情報を OpenStreetMap の地図でウェイポイントやトラックを表示します）
-
-### User Authentication / ユーザ認証
+### User Authentication
 
 Users can sign in using either their email address or via OAuth (currently, only GitHub is supported). OAuth is optional. Even when registering via OAuth, the user account will be created based on the email address retrieved during authentication.
 
-ユーザはメールアドレスまたは OAuth を利用してサインインできます（現時点では GitHub のみ対応）。 OAuth はオプションで、 OAuth を使って初回登録した場合でも、認証時に取得されるメールアドレスをもとにユーザが登録されます。
-
-### Two Factor Authentication / 二要素認証
+### Two Factor Authentication
 
 An additional option for user authentication is available: two-factor authentication (2FA) using time-based one-time passwords (TOTP).
 
-ユーザ認証に追加のオプションで、タイムベースのワンタイムパスワード (TOTP) による二要素認証 (2FA) が利用できます。
-
 This implementation is based on an article by James Ridgway, which was extremely helpful. Thank you.
-
-なおこの実装にあたっては James Ridgway 氏による記事が大変参考になりました。ありがとうございます。
 
 [Implementing OTP two-factor authentication as a second login step with Rails and Devise](https://www.jamesridgway.co.uk/implementing-a-two-step-otp-u2f-login-workflow-with-rails-and-devise/)
 
-### Basic Authentication / Basic 認証
+### Basic Authentication
 
 In addition to user authentication, Basic Authentication can also be enabled. While user authentication allows registered users to access the site, enabling Basic Authentication provides an extra layer of access control for the entire site.
 
-ユーザ認証とは別に、 Basic 認証をかけることができます。ユーザ認証はユーザを登録することでサイトを利用できますが、 Basic 認証を構えることでサイトそのものの利用を制限できます。
+## Requirements
 
-## Requirements / 要件
-
-### Image Processing Library / 画像処理ライブラリ
+### Image Processing Library
 
 This project uses the image_processing gem for Active Storage image and video processing.
 
-このプロジェクトでは、Active Storage の画像・動画処理に image_processing (gem) を使用しています。
-
 For better compatibility with older operating systems and environments, ImageMagick is selected as the default backend. Therefore, you need to have ImageMagick installed. However, if you can use libvips, you may install and use it instead of ImageMagick.
 
-そのバックエンドには古い OS や環境との互換性向上のため、デフォルトで ImageMagick を選択していますので、 ImageMagick がインストールされている必要があります。ただし、 libvips を利用できる場合は ImageMagick の代わりにそれをインストールし、利用することができます。
-
-### Video Processing / 動画処理
+### Video Processing
 
 To generate previews (thumbnails) or perform transcoding for video files uploaded via Active Storage, you must have `ffmpeg` installed on your system.
 
-Active Storage でアップロードされた動画ファイルのプレビュー（サムネイル生成）や変換処理には、システムに `ffmpeg` がインストールされている必要があります。
-
-### SMTP Server / SMTP サーバ
+### SMTP Server
 
 A valid email address is required for sign-up, and the email address serves as the account identifier. Therefore, SMTP server configuration is required.
 
-利用者はサインアップに有効なメールアドレスが求められ、またメールアドレスがアカウントの識別子になります。そのためメールを配送する SMTP サーバの設定が必要です。
-
-### Google Chrome Browser / Google Chrome ブラウザ
+### Google Chrome Browser
 
 For testing, this project uses the cuprite (gem) as the driver for Capybara. Therefore, the test environment requires the Google Chrome browser.
 
-テストには Capybara のドライバとして cuprite (gem) を利用しているため、テスト実行環境に Google Chrome ブラウザが必要です。
-
-### Database / データベース
+### Database
 
 This project uses SQLite3 as its database. No separate database server process is required.
 
-本プロジェクトは、データベースとして SQLite3 を使用します。データベース専用のプロセスは不要です。
-
-### GitHub Account / GitHub アカウント
+### GitHub Account
 
 To enable GitHub OAuth authentication, a GitHub OAuth App must be created for the project.
 
-GitHub OAuth 認証を利用する場合は、プロジェクト用の GitHub OAuth App を作成する必要があります。
+## Environment Setup
 
-## Environment Setup / 環境構築
-
-### Development Environment / 開発環境の構築
+### Development Environment
 
 See [/docs/DEVELOPMENT.md](/docs/DEVELOPMENT.md). If you have Docker Compose available, you can start the development environment simply by building:
-
-[/docs/DEVELOPMENT.md](/docs/DEVELOPMENT.md) を参照してください。 Docker Compose が利用できるのであれば、ビルドするだけです：
 
 ```
 $ docker compose up --build
 ```
 
-### Staging Environment / ステージング環境の構築
+### Staging Environment
 
 See [/docs/DEPLOY.md](/docs/DEPLOY.md)
 
-[/docs/DEPLOY.md](/docs/DEPLOY.md) を参照してください。
+## Operation
 
-## Operation / 運用について
-
-### Session information Cleanup / セッション情報のクリーンアップ
+### Session information Cleanup
 
 Session information is stored in the database using [activerecord-session_store](https://github.com/rails/activerecord-session_store). Since old session records will remain unless cleaned up, please make sure to delete them periodically. A rake task is provided for this purpose, which deletes sessions older than 30 days by default. To specify a different threshold, set the number of days via the SESSION_DAYS_TRIM_THRESHOLD environment variable before running the task.
-
-セッション情報は [activerecord-session_store](https://github.com/rails/activerecord-session_store) を用いてデータベースに保存しています。古いセッションのレコードが残るため、定期的に削除してください。削除のための rake タスクがあり、実行すると、デフォルトでは 30日を経過したものが削除されます。この日数を指定したい場合は環境変数 `SESSION_DAYS_TRIM_THRESHOLD` に日数を指定して実行してください。
 
 ```
 $ SESSION_DAYS_TRIM_THRESHOLD=30 bin/rails db:sessions:trim
 ```
 
-### Active Storage Cleanup / Active Storage のクリーンアップ
+### Active Storage Cleanup
 
- A rake task is available to safely clean up orphaned Active Storage blobs (for example, when a message is deleted but its attachments are not physically removed).
-
-Active Storage の孤立ファイル（例：メッセージを削除しても添付が物理削除されない場合）を安全にクリーンアップするための rake タスクを用意しています。
+A rake task is available to safely clean up orphaned Active Storage blobs (for example, when a message is deleted but its attachments are not physically removed).
 
 ```bash
 # Dry run (no deletion)
-# 確認のみ（削除はしません）
 $ bin/rake active_storage:cleanup
 
 # Execute deletion (enqueue purge_later)
-# 削除を実行（purge_later をエンキュー）
 $ bin/rake active_storage:cleanup FORCE=true
 
 # Target orphaned blobs older than 7 days (default: 2)
-# 7日より古い孤立ファイルを削除対象（デフォルト2日）
 $ bin/rake active_storage:cleanup FORCE=true DAYS_OLD=7
 ```
 
-## License / ライセンス
+## License
 
 This project is licensed under the Zero-Clause BSD License (0BSD). See the [LICENSE](LICENSE) file for details.
-
-このプロジェクトは Zero-Clause BSD ライセンス（0BSD）の下で提供されています。詳細は [LICENSE](LICENSE) ファイルを参照してください。

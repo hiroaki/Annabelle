@@ -1,31 +1,33 @@
-# VNC（TigerVNC）をインストールして GUI で Chromium を操作する
+[Japanese version is here](SETUP_VNC.ja.md)
 
-このドキュメントは、コンテナ内に VNC サーバ（TigerVNC/Xvnc）をインストールし、ホスト・マシンから Chromium などを  GUI で操作できるようにするための手順です。
+# Install TigerVNC and Control Chromium Through a GUI
 
-VNC は任意（オプション）です。ブラウザをヘッドレス・モードで使うだけであったり、その他 GUI が不要である場合は、本手順を実施する必要はありません。ブラウザ導入手順は `docs/SETUP_BROWSER.md` にあります。
+This document explains how to install a VNC server (TigerVNC/Xvnc) inside the container so that you can control Chromium and similar applications through a GUI from the host machine.
 
-## 背景
+VNC is optional. If you only need to use the browser in headless mode, or if you do not need a GUI for other reasons, you do not need to follow these steps. The browser installation procedure is documented in [docs/SETUP_BROWSER.md](/docs/SETUP_BROWSER.md).
 
-RSpec のシステム・テスト（system spec）には Chrome ブラウザが必要ですが、 GUI が利用できなくてもヘッドレス・モードで実行できます。
+## Background
 
-しかしながら、失敗時の調査や手動での動作確認ではブラウザ画面を直接見たいことがあります。そこで軽量な TigerVNC（Xvnc）と Fluxbox を用い、必要なときだけ GUI セッションを開けるようにしています。
+Chrome or Chromium is required for RSpec system tests, but the tests can run in headless mode even without a GUI.
 
-## 前提
+However, during failure investigation or manual verification, there are times when you want to see the browser window directly. For that purpose, this setup uses lightweight TigerVNC (Xvnc) and Fluxbox so that you can open a GUI session only when needed.
 
-- 開発環境はトップの `Dockerfile` と `compose.yml` を使用
-- コンテナは起動済み
+## Prerequisites
+
+- The development environment uses the top-level `Dockerfile` and `compose.yml`
+- The container is already running
 
 ```bash
 $ docker compose up
 ```
 
-## ポート公開
+## Expose the Port
 
-VNC はポート 5901/tcp を使用します。セキュリティのため、ホストのループバック・アドレスのみにこのポートを公開することを推奨します。また VNC は平文通信をするため、より安全な接続が必要になる場合は別途 SSH トンネルを使う/または VNC over TLS を検討してください。
+VNC uses TCP port 5901. For security reasons, it is recommended to expose this port only on the host's loopback address. Also, because VNC uses plaintext communication, consider using an SSH tunnel or VNC over TLS if you need a more secure connection.
 
-リポジトリにコミットしない個人用の `compose.override.yml` をトップ・ディレクトリに用意してください。compose でコンテナを起動すると、自動で読み込まれます。
+Create a personal `compose.override.yml` file in the top-level directory and do not commit it to the repository. Docker Compose loads it automatically when starting the container.
 
-`compose.override.yml`（例）：
+Example `compose.override.yml`:
 
 ```yaml
 services:
@@ -34,62 +36,65 @@ services:
       - "127.0.0.1:5901:5901"
 ```
 
-## 1) VNC 関連パッケージ一式をインストール
+## 1. Install VNC-related packages
 
-ルートユーザでインストールします。バッチスクリプトが用意されていますのでそれを実行します：
+Install as the root user. A batch script is provided for this:
 
 ```bash
 $ docker compose exec --user root web bash -lc \
   "/bin/bash /rails/scripts/install-vnc-tigervnc.sh"
 ```
 
-このスクリプトは次を行います：
-- `tigervnc-standalone-server`/`tigervnc-common`/`tigervnc-tools`、`fluxbox`、`autocutsel` のインストール（正規の `vncpasswd` は `tigervnc-tools` により提供）
-- `rails` ユーザの作成（なければ）
-- `/tmp/.X11-unix` の準備
+This script does the following:
 
-## 2) VNC サーバ起動
+- Installs `tigervnc-standalone-server`, `tigervnc-common`, `tigervnc-tools`, `fluxbox`, and `autocutsel`
+- Creates the `rails` user if it does not already exist
+- Prepares `/tmp/.X11-unix`
 
-任意のパスワードを設定しながら、用意されているバッチ・スクリプトを用いて起動させます：
+## 2. Start the VNC server
+
+Start it with an arbitrary password using the provided batch script:
 
 ```bash
 $ docker compose exec web bash -lc \
   "VNC_PASSWORD='set-your-vnc-pass' VNC_DISPLAY_NUMBER=1 VNC_GEOMETRY='1280x800' /bin/bash /rails/scripts/vnc-start.sh"
 ```
 
-停止/状態確認のためのバッチ・スクリプトがあります：
+Batch scripts are also available to stop the server and check its status:
 
 ```bash
 $ docker compose exec web bash -lc "/bin/bash /rails/scripts/vnc-stop.sh"
 $ docker compose exec web bash -lc "/bin/bash /rails/scripts/vnc-status.sh"
 ```
 
-なお `vnc-start.sh` は `scripts/xstartup.template` を `~/.vnc/xstartup` にコピーして起動します。必要に応じてこのテンプレートを編集してカスタマイズすることができます。
+`vnc-start.sh` copies `scripts/xstartup.template` to `~/.vnc/xstartup` before starting. You can edit that template if you need to customize the session.
 
-## 3) ホストから接続
+## 3. Connect from the host
 
-- 接続先：`127.0.0.1:5901`
-- パスワード： VNC サーバ起動時に指定したパスワード
+- Destination: `127.0.0.1:5901`
+- Password: the password specified when starting the VNC server
 
-VNC クライアントには TigerVNC が使えますが、安定性に不安があります。ただしこれは私の macOS (Monterey) が古いせいかもしれませんが、利用できた実績があるバージョンは "TigerVNC Viewer 1.12.0.app" です。しかしこのバージョンでも "Option..." メニューを開こうとするとクラッシュすることがあり、また現時点で最新の "TigerVNC Viewer 1.15.0.app" は "Option..." を開くことができますが、接続するとクラッシュします。したがって私は 1.15.0 を起動してオプションを設定し、別途 1.12.0 で接続するようにしています。
+TigerVNC can be used as the VNC client, but its stability may vary. That may be related to the author's older macOS version, Monterey, but one confirmed working version was `TigerVNC Viewer 1.12.0.app`. Even in that version, opening the `Option...` menu sometimes caused a crash. The newer `TigerVNC Viewer 1.15.0.app` could open `Option...`, but crashed when connecting. As a result, the author used 1.15.0 to set options and 1.12.0 to actually connect.
 
-macOS 標準の "画面共有" アプリも利用できますが、クリップボードが使えません。しかしながら接続は安定しているので、クリップボードの制約が許容できるのであれば、こちらがおすすめです。
+The macOS built-in Screen Sharing app can also be used, although clipboard support is not available. However, the connection is stable, so if that clipboard limitation is acceptable, it is a practical option.
 
-## 4) RSpec + Cuprite で画面を見ながら実行
+## 4. Run RSpec and Cuprite while watching the screen
 
-ブラウザの画面を見ながらシステム・テストを動かしたい場合、環境変数 `HEADLESS=0` を指定し、かつ `DISPLAY=:1` も指定してください。（なお HEADLESS 環境変数を使うことについては spec/support/capybara.rb にて定義しています。その他 cuprite のドライバー・オプションがそこで定義されています。）
+If you want to watch the browser screen while running system tests, specify `HEADLESS=0` and `DISPLAY=:1`. The use of the `HEADLESS` environment variable is defined in `spec/support/capybara.rb`, along with other cuprite driver options.
 
 ```bash
 $ docker compose exec web bash -lc "HEADLESS=0 DISPLAY=:1 bundle exec rspec spec/system"
 ```
 
-## トラブルシュート
+## Troubleshooting
 
-- 接続できない
-  - compose.override.yml のポート公開が有効か確認（docker compose ps）。
-  - コンテナ側で vncserver -list や pgrep -a Xvnc を実行し、プロセスが生きているか確認。
-- 画面が真っ黒
-  - `fluxbox`/`chromium` のインストール確認、`/rails/scripts/vnc-start.sh` を手動実行。
-- パスワード関連
-  - `~/.vnc/passwd` の権限（600）とファイルサイズ（空でない）を確認。
-  - VNC を停止の上、インストールスクリプトを root で再実行して vncpasswd を確保し、 VNC を再起動してください。
+- Cannot connect
+  Check whether the port mapping in `compose.override.yml` is active with `docker compose ps`.
+  On the container side, run `vncserver -list` or `pgrep -a Xvnc` to confirm that the process is alive.
+
+- The screen is completely black
+  Check whether `fluxbox` and `chromium` are installed, and try running `/rails/scripts/vnc-start.sh` manually.
+
+- Password-related problems
+  Check the permissions of `~/.vnc/passwd` so that they are `600`, and confirm that the file is not empty.
+  Stop VNC, rerun the installation script as root to ensure `vncpasswd` is available, then restart VNC.
