@@ -8,6 +8,7 @@
 #   # which is just to keep the container running.
 #   # The Rails server will NOT start automatically,
 #   # so please operate inside the container as described below.
+#   # SQLite helper services are excluded from the default startup.
 #   $ docker compose up --build
 #
 # 2. In another terminal, enter the container
@@ -31,10 +32,12 @@
 #   http://127.0.0.1:1080/
 #
 #   # SQLite Web UI
+#   $ docker compose --profile tools up sqlite-web
+#   # Then access:
 #   http://127.0.0.1:8080/
 #
 #   # SQLite CLI
-#   $ docker compose run --rm sqlite sqlite3 /rails/storage/development.sqlite3
+#   $ docker compose run --rm sqlite /rails/storage/development.sqlite3
 #
 # development 環境用 compose.yml
 #
@@ -45,6 +48,7 @@
 #   # これによりコンテナ内で /bin/sh が起動しますが、
 #   # これはコンテナを維持するためだけのものです。
 #   # Rails サーバーは起動しませんので、後に述べるようにコンテナ内で操作してください。
+#   # SQLite 補助サービスはデフォルトでは起動しません。
 #   $ docker compose up --build
 #
 # 2. 別ターミナルでコンテナ内にはいる
@@ -68,10 +72,12 @@
 #   http://127.0.0.1:1080/
 #
 #   # SQLite Web UI
+#   $ docker compose --profile tools up sqlite-web
+#   # 起動後にアクセス:
 #   http://127.0.0.1:8080/
 #
 #   # SQLite CLI
-#   $ docker compose run --rm sqlite sqlite3 /rails/storage/development.sqlite3
+#   $ docker compose run --rm sqlite /rails/storage/development.sqlite3
 #
 services:
   web:
@@ -110,6 +116,7 @@ services:
 
   sqlite:
     # DBメンテナンス用サービス — 詳細は docker/sqlite/Dockerfile を参照
+    profiles: ["tools"]
     build:
       context: ./docker/sqlite
     volumes:
@@ -119,6 +126,7 @@ services:
 
   sqlite-web:
     # SQLite をブラウザで操作するための Web UI (coleifer/sqlite-web)
+    profiles: ["tools"]
     image: coleifer/sqlite-web
     platform: linux/amd64
     volumes:
