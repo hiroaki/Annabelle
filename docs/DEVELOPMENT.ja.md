@@ -13,7 +13,7 @@ Compose の設定によって、カレント・ディレクトリがコンテナ
 
 ### A-1. ビルド、コンテナ起動
 
-これによりコンテナ内で Rails コンソールが起動しますが、これはコンテナを維持するためだけのものです。
+これによりコンテナ内で /bin/sh が起動しますが、これはコンテナを維持するためだけのものです。
 Rails サーバーは起動しませんので、その後に述べるようにコンテナ内で操作してください。
 
 ```
@@ -26,13 +26,14 @@ $ docker compose up --build
 
 Rails に関するコマンドはコンテナ内で実行します。以下の例では、ホスト側のシェルから `docker compose exec web ...` を使って実行しています。
 
-初回は、データベースのセットアップを行ってください。
+初回は、データベースのセットアップと CSS の最初のビルドを行ってください。
 
 ```
 $ docker compose exec web bin/rails db:prepare
+$ docker compose exec web bin/rails tailwindcss:build
 ```
 
-開発状況に応じて、サーバーの起動やマイグレーションなど、任意の Rails コマンドをコンテナ内で実行します。
+その後は開発状況に応じて、サーバーの起動やマイグレーションなど、任意の Rails コマンドをコンテナ内で実行します。
 
 ```
 # サーバー起動
@@ -42,6 +43,18 @@ $ docker compose exec web bin/rails s -b 0.0.0.0 -p 3000
 ```
 # マイグレーションなどの Rails コマンド
 $ docker compose exec web bin/rails db:migrate
+```
+
+データベースは Docker ボリューム内に配置されているため、 SQLite コマンドはコンテナ内から実行する必要があります。コマンドラインから操作したい場合は、次のワンショット実行を使ってください。
+
+```
+$ docker compose run --rm sqlite /rails/storage/development.sqlite3
+```
+
+またデータベースを Web UI で操作したい場合は、 `sqlite-web` を利用できます。コンテナを起動し、ブラウザで `8080` ポートにアクセスしてください。
+
+```
+$ docker compose --profile tools up sqlite-web
 ```
 
 ### A-3. ホスト上のブラウザでアクセス

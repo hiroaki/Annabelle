@@ -15,7 +15,7 @@ With the Compose settings, the current directory on the host is mounted as the t
 
 ### A-1. Build and start the container
 
-This starts a Rails console inside the container, which is used only to keep the container running.
+This starts a /bin/sh shell inside the container, which is used only to keep the container running.
 The Rails server does not start automatically, so continue operating inside the container as described below.
 
 ```
@@ -28,13 +28,14 @@ Before running the application, make sure to set the required environment variab
 
 Rails-related commands should be run inside the container. In the examples below, the commands are executed from the host shell by using `docker compose exec web ...`.
 
-On the first run, set up the database manually as follows:
+On the first run, prepare the database and perform the initial CSS build.
 
 ```
 $ docker compose exec web bin/rails db:prepare
+$ docker compose exec web bin/rails tailwindcss:build
 ```
 
-Depending on your development needs, you can run any Rails command inside the container, such as starting the server or running migrations.
+After that, depending on your development needs, you can run any Rails command inside the container, such as starting the server or running migrations.
 
 ```
 # Start the server
@@ -44,6 +45,18 @@ $ docker compose exec web bin/rails s -b 0.0.0.0 -p 3000
 ```
 # Run migrations or other Rails commands
 $ docker compose exec web bin/rails db:migrate
+```
+
+Because the database is stored in a Docker volume, SQLite commands need to be run from inside a container. If you want to work with it from the command line, use the following one-shot command.
+
+```
+$ docker compose run --rm sqlite /rails/storage/development.sqlite3
+```
+
+If you want to use a Web UI for the database, you can use `sqlite-web`. Start the container, then access port `8080` in your browser.
+
+```
+$ docker compose --profile tools up sqlite-web
 ```
 
 ### A-3. Access from your browser on the host
