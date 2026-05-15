@@ -191,4 +191,32 @@ RSpec.describe Users::SessionsController, type: :request do
       end
     end
   end
+
+  describe 'ログアウト時の Action Cable 接続切断' do
+    let(:remote_connections) { double('RemoteConnections') }
+    let(:disconnect_scope) { double('RemoteConnectionScope', disconnect: true) }
+
+    before do
+      sign_in user
+      allow(ActionCable.server).to receive(:remote_connections).and_return(remote_connections)
+      allow(remote_connections).to receive(:where).and_return(disconnect_scope)
+    end
+
+    it '現在のユーザーの接続を切断する' do
+      delete destroy_user_session_path
+
+      expect(remote_connections).to have_received(:where).with(
+        hash_including(current_user: have_attributes(id: user.id))
+      )
+      expect(disconnect_scope).to have_received(:disconnect)
+    end
+
+    it '切断に失敗してもログアウトを継続する' do
+      allow(remote_connections).to receive(:where).and_raise(StandardError, 'disconnect failed')
+
+      delete destroy_user_session_path
+
+      expect(response).to redirect_to(new_user_session_path)
+    end
+  end
 end
