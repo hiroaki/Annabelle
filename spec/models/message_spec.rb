@@ -33,7 +33,12 @@ RSpec.describe Message, type: :model do
         message = build(:message, content: '123456')
 
         expect(message).not_to be_valid
-        expect(message.errors[:content]).to include(I18n.t('errors.messages.too_long', count: 5))
+        expect(message.errors[:content]).to include(
+          I18n.t(
+            'activerecord.errors.models.message.attributes.content.request_body_too_large',
+            max_size: '5 Bytes'
+          )
+        )
       end
     end
 

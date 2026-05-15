@@ -53,7 +53,7 @@ module Factory
     ip_address = params.delete(:ip_address)
     user_agent = params.delete(:user_agent)
 
-    attachments = extract_attachments(params)
+    attachments = normalize_attachments(extract_attachments(params))
     validate_submission_size!(params, attachments)
 
     message = nil
@@ -133,6 +133,10 @@ module Factory
       Array.wrap(raw)
     end
 
+    def normalize_attachments(attachments)
+      attachments.filter_map { |attachment| normalize_attachment(attachment) }
+    end
+
     def validate_submission_size!(params, attachments)
       max_request_body = configured_max_request_body
       return if max_request_body <= 0
@@ -157,8 +161,6 @@ module Factory
         upload.blob.byte_size
       when ActiveStorage::Blob
         upload.byte_size
-      when String
-        find_blob_from_signed_id(upload)&.byte_size.to_i
       else
         attachment_io_byte_size(upload)
       end

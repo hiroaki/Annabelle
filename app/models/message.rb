@@ -14,6 +14,10 @@ class Message < ApplicationRecord
     return if content.blank?
     return if content.to_s.bytesize <= max_request_body
 
-    errors.add(:content, :too_long, count: max_request_body)
+    errors.add(
+      :content,
+      :request_body_too_large,
+      max_size: ActiveSupport::NumberHelper.number_to_human_size(max_request_body, precision: 3)
+    )
   end
 end
