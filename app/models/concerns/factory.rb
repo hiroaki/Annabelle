@@ -27,6 +27,7 @@ module Factory
   #   consistent and testable upload lifecycle.
 
   MessageNotOwnedError = Class.new(StandardError)
+  SubmissionSizeExceededError = Class.new(StandardError)
 
   # Create a Message and attach files inside a transaction, then enqueue a
   # broadcast job after the transaction commits.
@@ -52,7 +53,8 @@ module Factory
     ip_address = params.delete(:ip_address)
     user_agent = params.delete(:user_agent)
 
-    attachments = extract_attachments(params)
+    attachments = normalize_attachments(extract_attachments(params))
+    validate_submission_size!(params, attachments)
 
     message = nil
     Message.transaction do
@@ -129,6 +131,54 @@ module Factory
       raw = params.delete(:attachments)
       raw = params.delete('attachments') if raw.nil? && params.respond_to?(:key?)
       Array.wrap(raw)
+    end
+
+    def normalize_attachments(attachments)
+      attachments.filter_map { |attachment| normalize_attachment(attachment) }
+    end
+
+    def validate_submission_size!(params, attachments)
+      max_request_body = configured_max_request_body
+      return if max_request_body <= 0
+
+      total_size = params[:content].to_s.bytesize + attachments.sum { |attachment| attachment_byte_size(attachment) }
+      return if total_size <= max_request_body
+
+      raise SubmissionSizeExceededError, I18n.t(
+        'messages.form.size_limit_exceeded',
+        max_size: ActiveSupport::NumberHelper.number_to_human_size(max_request_body, precision: 3)
+      )
+    end
+
+    def configured_max_request_body
+      raw_value = Rails.configuration.x.max_request_body
+      raw_value.present? ? raw_value.to_i : 0
+    end
+
+    def attachment_byte_size(upload)
+      case upload
+      when ActiveStorage::Attachment
+        upload.blob.byte_size
+      when ActiveStorage::Blob
+        upload.byte_size
+      else
+        attachment_io_byte_size(upload)
+      end
+    end
+
+    def attachment_io_byte_size(upload)
+      if upload.respond_to?(:to_h)
+        io = upload.to_h.symbolize_keys[:io]
+        return io.size.to_i if io.respond_to?(:size)
+      end
+
+      if upload.respond_to?(:tempfile) && upload.tempfile.respond_to?(:size)
+        upload.tempfile.size.to_i
+      elsif upload.respond_to?(:size)
+        upload.size.to_i
+      else
+        0
+      end
     end
 
     # Attach a file with metadata handling (strip, EXIF extraction).

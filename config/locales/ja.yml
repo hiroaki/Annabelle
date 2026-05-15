@@ -72,6 +72,12 @@ ja:
       authorization: "認証情報"
       message: "メッセージ"
       user: "ユーザー"
+    errors:
+      models:
+        message:
+          attributes:
+            content:
+              request_body_too_large: "は大きすぎます（最大 %{max_size}）"
   errors:
     locale:
       invalid_type: "は文字列またはシンボルである必要があります"
