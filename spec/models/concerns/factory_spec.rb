@@ -40,9 +40,9 @@ RSpec.describe Factory, type: :model do
     end
 
     it 'rejects submissions that exceed max_request_body before creating records' do
-      allow(Rails.configuration.x).to receive(:max_request_body).and_return(3)
+      allow(Rails.configuration.x).to receive(:max_request_body).and_return(5)
       file = {
-        io: StringIO.new('12'),
+        io: StringIO.new('12345'),
         filename: 'tiny.txt',
         content_type: 'text/plain'
       }
@@ -56,7 +56,7 @@ RSpec.describe Factory, type: :model do
         factory.create_message!(params)
       }.to raise_error(
         Factory::SubmissionSizeExceededError,
-        I18n.t('messages.form.size_limit_exceeded', max_size: '3 Bytes')
+        I18n.t('messages.form.size_limit_exceeded', max_size: '5 Bytes')
       )
       expect(Message.exists?(content: 'a')).to be false
     end

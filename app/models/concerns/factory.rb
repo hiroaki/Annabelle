@@ -167,13 +167,15 @@ module Factory
     end
 
     def attachment_io_byte_size(upload)
-      if upload.respond_to?(:size)
-        upload.size.to_i
-      elsif upload.respond_to?(:tempfile) && upload.tempfile.respond_to?(:size)
-        upload.tempfile.size.to_i
-      elsif upload.respond_to?(:to_h)
+      if upload.respond_to?(:to_h)
         io = upload.to_h.symbolize_keys[:io]
-        io.respond_to?(:size) ? io.size.to_i : 0
+        return io.size.to_i if io.respond_to?(:size)
+      end
+
+      if upload.respond_to?(:tempfile) && upload.tempfile.respond_to?(:size)
+        upload.tempfile.size.to_i
+      elsif upload.respond_to?(:size)
+        upload.size.to_i
       else
         0
       end
