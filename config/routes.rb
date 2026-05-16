@@ -42,7 +42,10 @@ Rails.application.routes.draw do
     resources :messages, only: [:index, :create, :destroy]
     resources :attachments, only: [] do
       member do
+        get :blob, action: :show
+        get :download
         get :metadata
+        get 'representation/:variation_key', action: :representation, as: :representation
       end
     end
 
