@@ -102,17 +102,22 @@ GITHUB_CLIENT_ID=Ov23abcde...
 GITHUB_CLIENT_SECRET=abcdef0123456789abcdef...
 ```
 
-### Client-side Request Size Limit
+### Request Size Limit
 
-This application does not enforce request size limits internally. Instead, it assumes that such limits are handled by the proxy server.
+The primary request size limit is enforced by the proxy server.
 
-However, to provide immediate feedback to users before a request is actually sent, the client performs a size check when submitting forms. Set the maximum allowed size in bytes for this client-side check.
+The application also uses `MAX_REQUEST_BODY` as a secondary check:
 
-This value should align with `DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY`, but for safety, set it slightly lower to allow some margin.
+- the browser uses it to show a validation error before submission when possible
+- the Rails application uses it to reject oversized message content and oversized message submissions before blobs are created
+
+Set this value in bytes and keep it aligned with `DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY`. In normal operation, the proxy remains the first line of defense, while the application-side check acts as a safety net for bypassed client checks and configuration drift.
 
 ```
 MAX_REQUEST_BODY=10485760
 ```
+
+If you intentionally use different values, keep `MAX_REQUEST_BODY` less than or equal to the proxy limit so the application-side check does not allow payloads that the proxy will later reject.
 
 ### Basic Authentication
 
@@ -247,11 +252,25 @@ Set `DEPLOY_PROXY_HOST` to the host where `kamal-proxy` is deployed. This value 
 DEPLOY_PROXY_HOST=www.example.com
 ```
 
-`DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY` sets the maximum request size in bytes allowed by the proxy. If a request exceeds this size, the proxy returns HTTP status 413 and the request does not reach the application. The value of `MAX_REQUEST_BODY` mentioned earlier should be based on this value.
+`DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY` sets the maximum request size in bytes allowed by the proxy. If a request exceeds this size, the proxy returns HTTP status 413 and the request does not reach the application. Keep `MAX_REQUEST_BODY` aligned with this value so the client-side and application-side checks match the proxy behavior as closely as possible.
 
 ```
 DEPLOY_PROXY_BUFFERING_MAX_REQUEST_BODY=10485760
 ```
+
+### Background Job Runtime
+
+Annabelle is designed to work in a lightweight single-server setup without requiring a separate worker process by default.
+
+At the same time, some operations use background jobs, such as `perform_later` and Active Storage `purge_later`. In the default lightweight setup, those jobs should be treated as best-effort behavior: they are acceptable for small installations, but queued work may be delayed or lost across restarts depending on how the process is run.
+
+If you want to run Solid Queue together with the web process in a single-server deployment, Puma can start the Solid Queue supervisor when the following environment variable is enabled:
+
+```
+SOLID_QUEUE_IN_PUMA=1
+```
+
+See `config/puma.rb` for the corresponding Puma plugin entry.
 
 To use a custom SSL or TLS certificate, set the contents of the PEM-formatted certificate and private key directly in the corresponding environment variables.
 

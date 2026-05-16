@@ -111,6 +111,12 @@ $ bin/rake active_storage:cleanup FORCE=true
 $ bin/rake active_storage:cleanup FORCE=true DAYS_OLD=7
 ```
 
+### リクエストサイズ制限とバックグラウンドジョブ
+
+リクエストサイズの第一防衛線はプロキシです。`MAX_REQUEST_BODY` は、それに加えてブラウザと Rails アプリケーション側の二重チェックにも利用され、過大な本文や過大な投稿をより早い段階で一貫して拒否できるようにしています。
+
+標準構成では、Annabelle は Web サーバープロセスだけで動作します。つまり、Annabelle は別 worker プロセスを必須にしません。ただし `perform_later` や `purge_later` を使う処理はあるため、この構成ではジョブは best effort と考えてください。再起動や停止のタイミングによっては遅延したり失われたりし得ます。単一サーバ構成のまま Puma に Solid Queue を同居させたい場合は、`SOLID_QUEUE_IN_PUMA=1` を有効にしてください。
+
 ## ライセンス
 
 このプロジェクトは Zero-Clause BSD ライセンス（0BSD）の下で提供されています。詳細は [LICENSE](LICENSE) ファイルを参照してください。
