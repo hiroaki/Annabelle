@@ -28,13 +28,17 @@ class AttachmentsController < ApplicationController
   def representation
     attachment = find_message_attachment
     return head :not_found if attachment.nil?
+    return head :not_found unless attachment.representable?
 
     representation = attachment.representation(variation_transformations).processed
 
     http_cache_forever public: false do
       send_blob_stream representation, disposition: params[:disposition] || 'inline'
     end
-  rescue ActiveStorage::InvariableError, ActiveSupport::MessageVerifier::InvalidSignature
+  rescue ActiveStorage::InvariableError,
+         ActiveStorage::UnrepresentableError,
+         ActiveStorage::UnpreviewableError,
+         ActiveSupport::MessageVerifier::InvalidSignature
     head :not_found
   end
 
