@@ -98,7 +98,7 @@ end
 gem 'solid_cable', '~> 3.0'
 gem 'solid_cache', '~> 1.0'
 
-gem 'tailwindcss-rails', '~> 4.0'
+gem 'tailwindcss-rails', '~> 4.5'
 
 gem 'kaminari', '~> 1.2'
 
