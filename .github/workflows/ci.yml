@@ -42,7 +42,7 @@ jobs:
       - name: Install tools (ImageMagick, SQLite3, etc.)
         run: |
           sudo apt-get update
-          sudo apt-get install -y imagemagick sqlite3 libsqlite3-dev
+          sudo apt-get install -y imagemagick sqlite3 libsqlite3-dev libvips
 
       - name: Install Google Chrome
         run: |
