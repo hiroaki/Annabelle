@@ -83,8 +83,11 @@ services:
   web:
     build:
       context: .
+      target: runtime-dev
       args:
         RAILS_ENV: development
+        BUNDLE_WITHOUT: ""
+        PRECOMPILE_ASSETS: 0
     environment:
       DOCKER: 1
       RAILS_ENV: development
