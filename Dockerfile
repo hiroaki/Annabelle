@@ -58,6 +58,7 @@ FROM base AS build-base
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
   && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     build-essential \
+    libvips \
     libsqlite3-dev \
     libyaml-dev \
     pkg-config \
