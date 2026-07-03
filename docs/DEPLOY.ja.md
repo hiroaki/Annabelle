@@ -9,16 +9,26 @@
 プロジェクトのトップディレクトリにある Dockerfile は、ステージング環境およびプロダクション環境のためのものです。これを用いてデプロイ用の Docker イメージを作成することができます。ただしこれは、以下の「Kamal でステージング環境を構築する」の「構成」で述べている環境を前提として設計されていますので、それとは異なるニーズが要求される部分については適宜カスタマイズしてください。
 
 **注意:**
-この Dockerfile のビルドには `--build-arg` の引数に `RAILS_ENV` が必須となっており、これに "staging" または "production" をセットしてビルドする必要があります。この引数の `RAILS_ENV` はあくまで引数の名称であり、ユーザの環境変数に `RAILS_ENV` （これは環境変数の変数名）が設定されていても、それが暗黙のうちに使われるわけではありません。もちろん環境変数を参照させて `--build-arg RAILS_ENV=$RAILS_ENV` という書き方もできますが、事故を未然に防ぐために文字列で指定してください、次のように：
+デプロイ用にこの Dockerfile をビルドする場合は、`runtime` ターゲットを選び、build arg を明示的に指定してください。`RAILS_ENV` は Rails の実行環境だけを表し、Bundler の導入対象や assets precompile の有無は別の build arg で制御します。
 
 ```
 # Production
-$ docker build --build-arg RAILS_ENV=production -t annabelle-production:latest .
+$ docker build \
+  --target runtime \
+  --build-arg RAILS_ENV=production \
+  --build-arg BUNDLE_WITHOUT=development:test \
+  --build-arg PRECOMPILE_ASSETS=1 \
+  -t annabelle-production:latest .
 ```
 
 ```
 # Staging
-$ docker build --build-arg RAILS_ENV=staging -t annabelle-staging:latest .
+$ docker build \
+  --target runtime \
+  --build-arg RAILS_ENV=staging \
+  --build-arg BUNDLE_WITHOUT=development:test \
+  --build-arg PRECOMPILE_ASSETS=1 \
+  -t annabelle-staging:latest .
 ```
 
 **重要:**
