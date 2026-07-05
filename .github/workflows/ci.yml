@@ -6,6 +6,36 @@ on:
   workflow_dispatch:
 
 jobs:
+  rubocop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      IMAGE_NAME: annabelle-rubocop:latest
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Build runtime-dev image
+        run: |
+          docker build \
+            --target runtime-dev \
+            --build-arg RAILS_ENV=development \
+            --build-arg BUNDLE_WITHOUT= \
+            --build-arg PRECOMPILE_ASSETS=0 \
+            --tag "$IMAGE_NAME" \
+            .
+
+      - name: Run RuboCop inside container
+        run: |
+          docker run --rm "$IMAGE_NAME" bash -lc '
+            if [ -x bin/rubocop ]; then
+              bin/rubocop
+            else
+              bundle exec rubocop
+            fi
+          '
+
   rspec:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -34,7 +64,7 @@ jobs:
             --tag "$IMAGE_NAME" \
             .
 
-      - name: Run lint and test suite inside container
+      - name: Run test suite inside container
         run: |
           docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
           docker run --name "$CONTAINER_NAME" \
@@ -45,11 +75,6 @@ jobs:
             -e ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT \
             "$IMAGE_NAME" \
             bash -lc '
-              if [ -x bin/rubocop ]; then
-                bin/rubocop
-              else
-                bundle exec rubocop
-              fi &&
               bundle exec rspec &&
               RSPEC_DISABLE_OAUTH_GITHUB=1 bin/rspec spec/system/oauth_github_disabled/
             '
