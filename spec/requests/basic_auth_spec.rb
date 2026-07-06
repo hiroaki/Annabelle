@@ -9,7 +9,7 @@ RSpec.describe 'Basic Auth', type: :request do
   let(:env_vars) do
     {
       'ENABLED_BASIC_AUTH' => nil,
-      'BASIC_AUTH_PAIRS' => nil,
+      'BASIC_AUTH_PAIRS' => nil
     }
   end
 

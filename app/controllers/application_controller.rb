@@ -1,5 +1,4 @@
 class ApplicationController < ActionController::Base
-
   before_action :http_basic_authenticate
   before_action :set_locale
   before_action :configure_permitted_parameters, if: :devise_controller?
