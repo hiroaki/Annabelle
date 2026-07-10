@@ -106,6 +106,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
     ffmpeg \
     libsqlite3-0 \
     libvips \
+    imagemagick \
     tzdata \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
