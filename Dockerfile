@@ -39,7 +39,7 @@ ARG PRECOMPILE_ASSETS=0
 ARG THRUSTER_HTTP_PORT=3001
 ARG THRUSTER_TARGET_PORT=3000
 
-FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim AS base
+FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim-bookworm AS base
 
 ARG BUNDLER_VERSION
 ARG RAILS_ENV
