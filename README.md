@@ -60,9 +60,9 @@ To generate previews (thumbnails) or perform transcoding for video files uploade
 
 A valid email address is required for sign-up, and the email address serves as the account identifier. Therefore, SMTP server configuration is required.
 
-### Google Chrome Browser
+### Chromium Browser
 
-For testing, this project uses the cuprite (gem) as the driver for Capybara. Therefore, the test environment requires the Google Chrome browser.
+For testing, this project uses cuprite as the Capybara driver. Therefore, the test environment requires a Chrome-compatible browser such as Chromium.
 
 ### Database
 

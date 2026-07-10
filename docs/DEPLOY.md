@@ -9,16 +9,26 @@ Deployment environments can vary greatly depending on the user, so it is not pos
 The Dockerfile located at the top level of the project is intended for both staging and production environments. You can use it to build Docker images for deployment. Please note that this Dockerfile is designed for the environment described in the "Configuration" section below. If your requirements differ, feel free to customize it as needed.
 
 **Note:**
-When building this Dockerfile, you must specify the `RAILS_ENV` build argument as either "staging" or "production". This argument is not automatically set from your environment variables, so be sure to specify it explicitly as shown below:
+When building this Dockerfile for deployment, build the `runtime` target and specify the build arguments explicitly. `RAILS_ENV` only expresses the Rails runtime environment, while Bundler groups and asset precompilation are controlled separately.
 
 ```
 # Production
-$ docker build --build-arg RAILS_ENV=production -t annabelle-production:latest .
+$ docker build \
+  --target runtime \
+  --build-arg RAILS_ENV=production \
+  --build-arg BUNDLE_WITHOUT=development:test \
+  --build-arg PRECOMPILE_ASSETS=1 \
+  -t annabelle-production:latest .
 ```
 
 ```
 # Staging
-$ docker build --build-arg RAILS_ENV=staging -t annabelle-staging:latest .
+$ docker build \
+  --target runtime \
+  --build-arg RAILS_ENV=staging \
+  --build-arg BUNDLE_WITHOUT=development:test \
+  --build-arg PRECOMPILE_ASSETS=1 \
+  -t annabelle-staging:latest .
 ```
 
 **Important:**

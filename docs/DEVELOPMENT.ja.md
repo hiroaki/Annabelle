@@ -69,7 +69,7 @@ http://127.0.0.1:1080/
 
 ### A-4. VNC 経由の GUI ブラウザ（オプション）
 
-System spec のデバッグや手元での GUI 確認が必要な場合は、コンテナ内に Chromium と VNC を追加インストールして利用できます。詳細手順は次を参照してください。
+Docker Compose が利用する `runtime-dev` イメージには、すでに Chromium が含まれているため、ヘッドレスの system spec であれば追加セットアップは不要です。System spec のデバッグや手元での GUI 確認が必要な場合は、VNC サーバを追加して次の資料を参照してください。
 
 - [/docs/SETUP_BROWSER.ja.md](/docs/SETUP_BROWSER.ja.md)
 - [/docs/SETUP_VNC.ja.md](/docs/SETUP_VNC.ja.md)
@@ -174,11 +174,13 @@ $
 
 ## テスト
 
-RSpec のテストが用意されています。Capybara の `javascript_driver` に cuprite を使用しているため、テスト実行環境に Google Chrome ブラウザが必要です。
+RSpec のテストが用意されています。Capybara の `javascript_driver` に cuprite を使用しているため、テスト実行環境に Chromium などの Chrome 互換ブラウザが必要です。
 
 ```
 $ bin/rspec
 ```
+
+Docker Compose を使う場合、`web` サービスは共有 Dockerfile の `runtime-dev` ターゲットを build するため、Chromium はコンテナ内でそのまま利用できます。
 
 OAuth (GitHub) に関するテストについては、その機能を有効化した場合と無効化した場合のコンテキストを同時にテストすることができません。Rails の初期化の段階で有効・無効が確定し、セットアップされるためです。したがって RSpec のテストを二回に分けて、別々のプロセスで行う必要があります。
 
