@@ -132,7 +132,6 @@ USER root
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
   && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
-    ca-certificates \
     chromium \
     fonts-liberation \
     fonts-noto-cjk \
