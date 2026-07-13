@@ -89,9 +89,10 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     when :auth_failure
       new_user_session_path(locale: locale)
     else
-      # :nocov: ここには到達しません（到達した場合はバグです）
+      # :simplecov:disable
+      # ここには到達しません（到達した場合はバグです）
       raise ArgumentError, "Unknown redirect action: #{action}"
-      # :nocov:
+      # :simplecov:enable
     end
   end
 
