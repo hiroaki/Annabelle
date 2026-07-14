@@ -13,7 +13,11 @@ CI.run do
   step "Tests: RSpec(2/2)", "env RSPEC_DISABLE_OAUTH_GITHUB=1 bin/rspec spec/system/oauth_github_disabled/"
 
   step "Docker: Build and boot staging image", <<~SH
-    docker build --build-arg RAILS_ENV=staging -t annabelle-staging-check .
+    docker build --target runtime \
+      --build-arg RAILS_ENV=staging \
+      --build-arg BUNDLE_WITHOUT=development:test \
+      --build-arg PRECOMPILE_ASSETS=1 \
+      -t annabelle-staging-check .
     docker run --rm \
       -e RAILS_ENV=staging \
       -e SECRET_KEY_BASE_DUMMY=1 \
