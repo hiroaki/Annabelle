@@ -1,22 +1,26 @@
 # Run using bin/ci
 
 CI.run do
-  step "Setup", "bin/setup --skip-server"
+  step "Setup: Local test prerequisites", <<~SH
+    bundle check || bundle install
+    env RAILS_ENV=test bin/rails db:prepare
+  SH
 
-  step "Style: Ruby", "bin/rubocop"
-
+  step "Style: RuboCop", "bin/rubocop"
+  step "Security: Brakeman", "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
   step "Security: Importmap vulnerability audit", "bin/importmap audit"
-  step "Tests: Rails", "bin/rails test"
-  step "Tests: Seeds", "env RAILS_ENV=test bin/rails db:seed:replant"
+  step "Tests: RSpec(1/2)", "bin/rspec"
+  step "Tests: RSpec(2/2)", "env RSPEC_DISABLE_OAUTH_GITHUB=1 bin/rspec spec/system/oauth_github_disabled/"
 
-  # Optional: Run system tests
-  # step "Tests: System", "bin/rails test:system"
-
-  # Optional: set a green GitHub commit status to unblock PR merge.
-  # Requires the `gh` CLI and `gh extension install basecamp/gh-signoff`.
-  # if success?
-  #   step "Signoff: All systems go. Ready for merge and deploy.", "gh signoff"
-  # else
-  #   failure "Signoff: CI failed. Do not merge or deploy.", "Fix the issues and try again."
-  # end
+  step "Docker: Build and boot staging image", <<~SH
+    docker build --build-arg RAILS_ENV=staging -t annabelle-staging-check .
+    docker run --rm \
+      -e RAILS_ENV=staging \
+      -e SECRET_KEY_BASE_DUMMY=1 \
+      -e DOCKER=1 \
+      -e ANNABELLE_VARIANT_PROCESSOR=vips \
+      --entrypoint bin/rails \
+      annabelle-staging-check \
+      runner 'Rails.application.eager_load!; puts :ok'
+  SH
 end
