@@ -31,7 +31,7 @@
 #     --build-arg PRECOMPILE_ASSETS=0 \
 #     -t annabelle-development:latest .
 
-ARG RUBY_VERSION=3.4.9
+ARG RUBY_VERSION=3.4.10
 ARG BUNDLER_VERSION=4.0.8
 ARG RAILS_ENV=production
 ARG BUNDLE_WITHOUT=""
