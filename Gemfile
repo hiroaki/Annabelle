@@ -68,6 +68,10 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem 'rubocop-rails-omakase', require: false
 
+  # Brakeman is a free vulnerability scanner designed for Ruby on Rails applications.
+  # Statically analyze Rails application code to find security issues at any stage of development.
+  gem 'brakeman', '>= 8.0.5', require: false
+
   # Prosopite is able to auto-detect Rails N+1 queries with zero false positives / false negatives.
   gem 'prosopite'
   gem 'pg_query'
