@@ -56,6 +56,24 @@ RSpec.describe "Messages", type: :request do
     end
   end
 
+  describe "GET /messages" do
+    before { sign_in confirmed_user }
+
+    it "renders authenticated attachment routes for attached messages" do
+      file = fixture_file_upload('test_image.jpg', 'image/jpeg')
+      message.attachments.attach(file)
+      variation_key = ActiveStorage::Variation.wrap(resize_to_limit: [640, 480]).key
+
+      get messages_path(locale: :en)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(blob_attachment_path(message.attachments.first, locale: :en))
+      expect(response.body).to include(download_attachment_path(message.attachments.first, locale: :en))
+      expect(response.body).to include(metadata_attachment_path(message.attachments.first, locale: :en))
+      expect(response.body).to include(representation_attachment_path(message.attachments.first, variation_key: variation_key, locale: :en))
+    end
+  end
+
   describe "DELETE /messages/:id" do
     context "when user is confirmed" do
       before { sign_in confirmed_user }

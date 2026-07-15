@@ -2,23 +2,34 @@
 
 # デプロイ
 
-デプロイ環境は利用者によって様々に異なるため、汎用的で明確な手順を作成することができません。ただしプロジェクトには、デプロイツールとして Kamal が（ Bundler によって）インストールされており、デプロイは Kamal を使用することができます。
+デプロイ環境は利用者によって様々に異なるため汎用的な手順はありませんが、基本的には Docker イメージを作成し、それをデプロイすることを想定しています。またこのプロジェクトには、デプロイツールとして Kamal が（ Bundler によって）インストールされており、デプロイは Kamal を使用することができます。
+
+---
 
 ## Dockerfile
 
-プロジェクトのトップディレクトリにある Dockerfile は、ステージング環境およびプロダクション環境のためのものです。これを用いてデプロイ用の Docker イメージを作成することができます。ただしこれは、以下の「Kamal でステージング環境を構築する」の「構成」で述べている環境を前提として設計されていますので、それとは異なるニーズが要求される部分については適宜カスタマイズしてください。
+プロジェクトのトップディレクトリにある Dockerfile を用いてデプロイ用の Docker イメージを作成することができます。
 
-**注意:**
-この Dockerfile のビルドには `--build-arg` の引数に `RAILS_ENV` が必須となっており、これに "staging" または "production" をセットしてビルドする必要があります。この引数の `RAILS_ENV` はあくまで引数の名称であり、ユーザの環境変数に `RAILS_ENV` （これは環境変数の変数名）が設定されていても、それが暗黙のうちに使われるわけではありません。もちろん環境変数を参照させて `--build-arg RAILS_ENV=$RAILS_ENV` という書き方もできますが、事故を未然に防ぐために文字列で指定してください、次のように：
+この Dockerfile をビルドする場合は、ターゲットに `runtime` を選び、build arg を明示的に指定してください。`RAILS_ENV` は Rails の実行環境だけを表し、Bundler の導入対象や assets precompile の有無は別の build arg で制御します。
 
 ```
 # Production
-$ docker build --build-arg RAILS_ENV=production -t annabelle-production:latest .
+$ docker build \
+  --target runtime \
+  --build-arg RAILS_ENV=production \
+  --build-arg BUNDLE_WITHOUT=development:test \
+  --build-arg PRECOMPILE_ASSETS=1 \
+  -t annabelle-production:latest .
 ```
 
 ```
 # Staging
-$ docker build --build-arg RAILS_ENV=staging -t annabelle-staging:latest .
+$ docker build \
+  --target runtime \
+  --build-arg RAILS_ENV=staging \
+  --build-arg BUNDLE_WITHOUT=development:test \
+  --build-arg PRECOMPILE_ASSETS=1 \
+  -t annabelle-staging:latest .
 ```
 
 **重要:**
@@ -26,11 +37,11 @@ $ docker build --build-arg RAILS_ENV=staging -t annabelle-staging:latest .
 
 ---
 
-# Kamal でステージング環境を構築する
+## Kamal でステージング環境を構築する
 
 Kamal によるステージング環境へのデプロイ手順の一例を紹介します。
 
-## 構成
+### 構成
 
 これから紹介する例では、次のような構成を前提とします。
 
@@ -80,7 +91,7 @@ Kamal によるステージング環境へのデプロイ手順の一例を紹�
     +----------------------------------------------------+
   ```
 
-## デプロイ先の Docker エンジン
+### デプロイ先の Docker エンジン
 
 この例では、デプロイ先サーバーでは Docker エンジンがすでに稼働している状態を前提としてます。
 
@@ -102,7 +113,7 @@ $ sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin
 $ sudo systemctl enable --now docker
 ```
 
-## 永続化ボリューム
+### 永続化ボリューム
 
 アプリケーションの Docker コンテナにマウントするボリュームとして、任意のディレクトリを環境変数 `DEPLOY_VOLUMES_STORAGE` にて設定することになりますが、そのディレクトリを作成してください。
 
@@ -112,7 +123,7 @@ $ mkdir $HOME/data
 
 このディレクトリは最初のデプロイの前に作成しなければいけません。もし後になってしまった場合は、おそらく、デプロイ後のアプリケーションの起動に失敗するかもしれません。その場合はディレクトリにアプリケーションが書き込みできる権限があるか、パーミッションを確認してください。
 
-## config/deploy.yml
+### config/deploy.yml
 
 Kamal の設定ファイルである `config/deploy.yml` にはただ一つの記述 `require_destination: true` という設定だけがあります。これはデプロイ先に応じた別の設定ファイルの存在を暗示しており、実行時にはそのデプロイ先を指定する必要があることを設定しています。
 
@@ -120,33 +131,33 @@ Kamal の設定ファイルである `config/deploy.yml` にはただ一つの�
 
 いま説明している例の構成においては、何も変更する箇所はありません。変更するべきすべての値は環境変数から読み取るようになっています。設定する必要がある環境変数については後述します。
 
-## .kamal/secrets
+### .kamal/secrets
 
 ファイル `config/deploy.staging.yml` の記述の中で秘匿情報にあたる部分は、別管理のファイル `.kamal/secrets` があります。そしてこれもまた、 Kamal のデプロイ先に応じた別のファイルがあります。この例ではステージング環境であるので、ここでは `.kamal/secrets.staging` がその扱うべき対象のファイルとなります。
 
 前項で述べた設定ファイル `config/deploy.staging.yml` を変更していないのであれば、 `.kamal/secrets.staging` についても修正箇所はありません。変更するべきすべての値は、環境変数から読み取るようになっています。
 
-## コンテナ・レジストリ
+### コンテナ・レジストリ
 
 Kamal のデプロイでは、ビルドされたイメージは、コンテナー・レジストリへ push されることになります。
 
-Kamal のバージョン 2.8 からは、ホストマシン上の（ローカルの） Docker コンテナを指定することができるようになり、外部のコンテナ・レジストリ・サービスは必ずしも必要ではなくなりました。
+Kamal のバージョン 2.8 からは、ホストマシン上の（ローカルの） Docker コンテナを指定することができるようになり、外部のコンテナ・レジストリ・サービスは必要ではなくなりました。
 
 外部サービスを利用する場合は、そのアカウントが必要です。ローカルのコンテナ・レジストリを利用する場合は、 Kamal がデプロイ時に設置しますので、別途必要なものはありません。
 
-## SSL (TLS) 証明書と hosts ファイル
+### SSL (TLS) 証明書と hosts ファイル
 
 SSL(TLS) のサーバー証明書については、 Kamal では Let's Encrypt （外部サービス）を利用した証明書の作成（更新）を自動で行う機能がありますが、この例では LAN 内に構築するステージング環境という都合から、 mkcert を利用した自前のルート認証局をあらかじめ作成し、そのルート証明書を User の環境およびデプロイ先の環境にインストールしておくことになります。
 
 またその際、 Common Name となるホスト名が解決できなければいけないため、 `/etc/hosts` ファイルにホスト名を登録しておきます（もし LAN 内のアドレスを解決できる DNS が利用できるのであれば、それで十分です）
 
-## 環境変数の設定
+### 環境変数の設定
 
 アプリケーション設定や、デプロイ設定のために必要な、環境変数を設定します。
 
 アプリケーション設定のための環境変数、およびデプロイ設定のための環境変数については [/docs/ENVIRONMENT_VARIABLES.md](/docs/ENVIRONMENT_VARIABLES.md) を参照してください。
 
-## デプロイの実行
+### デプロイの実行
 
 シェルに環境変数をセットしたのち、デプロイします。最初のデプロイ時にはアクセサリを先にデプロイします：
 

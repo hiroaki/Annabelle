@@ -2,13 +2,13 @@
 
 # Chromium ブラウザのインストールとセットアップ
 
-このドキュメントは、RSpec のシステム・テストで使用する Chromium ブラウザを、開発用コンテナにインストールする手順です。
+このドキュメントは、Docker ベースの開発環境で RSpec の system spec 用 Chromium がどのように提供されるかを説明するものです。
 
 ## 背景
 
-このプロジェクトでは、開発環境とデプロイ向け環境で Dockerfile を共通化しています。一方で Chromium は、system spec の実行やブラウザの目視デバッグなど、一部の開発用途でのみ必要になる補助的なツールです。そのため、デフォルトの依存には含めず、オプション扱いにしています。
+このプロジェクトでは、development、CI、staging、production の各環境で Dockerfile を共通化しています。一方で Chromium は system spec の実行やブラウザの目視デバッグに必要ですが、本番向けランタイムには含めたくありません。
 
-ブラウザをベースイメージから外すことで、共有イメージのサイズ増加を抑え、ビルド時間を短くし、デフォルトのコンテナ環境の保守対象を増やしすぎないようにしています。このため Chromium はイメージに最初から含めず、必要な場合にだけ後から追加インストールする方針にしています。
+そこで Dockerfile では複数の最終ターゲットを用意し、Docker Compose は `runtime-dev`、CI は `runtime-test` を利用します。これらのターゲットには Chromium が含まれますが、デプロイ用の `runtime` には含まれません。
 
 ## 前提
 
@@ -19,19 +19,19 @@
 $ docker compose up
 ```
 
-## 手順
+## 利用可能な状態
 
-ルートユーザでインストールします。バッチスクリプトが用意されているので、それを実行します。
+現在の Docker ワークフローでは、手動インストールは不要です。
+
+- `docker compose build web` は `runtime-dev` ターゲットを build し、その中に Chromium が含まれます
+- GitHub Actions は `runtime-test` ターゲットを build し、同様に Chromium を含みます
+- デプロイ用の `runtime` ターゲットには意図的に Chromium を含めません
+
+Dockerfile を変更した場合や古いイメージから更新する場合は、コンテナイメージを再 build してください。
 
 ```bash
-$ docker compose exec --user root web bash -lc \
-  "/bin/bash /rails/scripts/install-browser-chromium.sh"
+$ docker compose build web
 ```
-
-このスクリプトは次を行います。
-
-- `chromium` 本体と基本フォント（Liberation / Noto）をインストール
-- 互換のため `/usr/bin/google-chrome` と `/usr/bin/chromium-browser` を `chromium` へシンボリックリンク
 
 ## RSpec での利用
 
@@ -46,8 +46,8 @@ $ docker compose exec web bash -lc "bundle exec rspec spec/system"
 ## トラブルシュート
 
 - Chromium が見つからない、または起動しない
-  `apt` の更新後に再実行してください。
+  `runtime-dev` ターゲットを作り直してください。
 
   ```bash
-  $ docker compose exec --user root web bash -lc "apt-get update -qq && /bin/bash /rails/scripts/install-browser-chromium.sh"
+  $ docker compose build --no-cache web
   ```

@@ -39,6 +39,46 @@ RSpec.describe Factory, type: :model do
       expect(message.attachments.size).to eq(1)
     end
 
+    it 'rejects submissions that exceed max_request_body before creating records' do
+      allow(Rails.configuration.x).to receive(:max_request_body).and_return(5)
+      file = {
+        io: StringIO.new('12345'),
+        filename: 'tiny.txt',
+        content_type: 'text/plain'
+      }
+      params = {
+        content: 'a',
+        user_id: user.id,
+        attachments: [file]
+      }
+
+      expect {
+        factory.create_message!(params)
+      }.to raise_error(
+        Factory::SubmissionSizeExceededError,
+        I18n.t('messages.form.size_limit_exceeded', max_size: '5 Bytes')
+      )
+      expect(Message.exists?(content: 'a')).to be false
+    end
+
+    it 'resolves signed blob ids only once per attachment' do
+      blob = ActiveStorage::Blob.create_and_upload!(
+        io: StringIO.new('signed blob'),
+        filename: 'signed.txt',
+        content_type: 'text/plain'
+      )
+      signed_id = blob.signed_id
+      params = {
+        content: 'with signed id',
+        user_id: user.id,
+        attachments: [signed_id]
+      }
+
+      expect(ActiveStorage::Blob).to receive(:find_signed).once.and_call_original
+
+      factory.create_message!(params)
+    end
+
     it 'logs a warning when an invalid signed blob id is provided' do
       params = attributes_for(:message).merge(user_id: user.id, attachments: ['invalid-signed-id'])
 

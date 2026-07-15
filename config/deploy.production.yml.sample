@@ -37,8 +37,11 @@ builder:
     - arm64
   context: .
   dockerfile: Dockerfile
+  target: runtime
   args:
     RAILS_ENV: production
+    BUNDLE_WITHOUT: development:test
+    PRECOMPILE_ASSETS: "1"
 
 env:
   clear:
@@ -68,8 +71,6 @@ env:
     - GITHUB_CLIENT_ID
     - GITHUB_CLIENT_SECRET
     - BASIC_AUTH_PAIRS
-    - BASIC_AUTH_USER
-    - BASIC_AUTH_PASSWORD
     - SECRET_KEY_BASE
 
 ssh:

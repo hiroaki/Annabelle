@@ -2,23 +2,32 @@
 
 # Deploy
 
-Deployment environments can vary greatly depending on the user, so it is not possible to provide a universal, step-by-step guide. However, this project includes Kamal (installed via Bundler) as a deployment tool, and you can use Kamal for deployment.
+Deployment environments vary depending on the user, so there are no generic procedures. However, it is basically assumed that a Docker image will be created and deployed. In addition, Kamal is installed as a deployment tool in this project (via Bundler), and deployment can be done using Kamal.
 
 ## Dockerfile
 
-The Dockerfile located at the top level of the project is intended for both staging and production environments. You can use it to build Docker images for deployment. Please note that this Dockerfile is designed for the environment described in the "Configuration" section below. If your requirements differ, feel free to customize it as needed.
+The Dockerfile in the top directory of the project can be used to create a Docker image for deployment.
 
-**Note:**
-When building this Dockerfile, you must specify the `RAILS_ENV` build argument as either "staging" or "production". This argument is not automatically set from your environment variables, so be sure to specify it explicitly as shown below:
+When building this Dockerfile, select `runtime` as the target and explicitly specify the build args. `RAILS_ENV` only represents the Rails execution environment, while the inclusion of Bundler and whether to precompile assets is controlled by separate build args.
 
 ```
 # Production
-$ docker build --build-arg RAILS_ENV=production -t annabelle-production:latest .
+$ docker build \
+  --target runtime \
+  --build-arg RAILS_ENV=production \
+  --build-arg BUNDLE_WITHOUT=development:test \
+  --build-arg PRECOMPILE_ASSETS=1 \
+  -t annabelle-production:latest .
 ```
 
 ```
 # Staging
-$ docker build --build-arg RAILS_ENV=staging -t annabelle-staging:latest .
+$ docker build \
+  --target runtime \
+  --build-arg RAILS_ENV=staging \
+  --build-arg BUNDLE_WITHOUT=development:test \
+  --build-arg PRECOMPILE_ASSETS=1 \
+  -t annabelle-staging:latest .
 ```
 
 **Important:**
@@ -26,11 +35,11 @@ The build context will include all files in the current directory, including fil
 
 ---
 
-# Example: Deploying a Staging Environment with Kamal
+## Example: Deploying a Staging Environment with Kamal
 
 Below is an example procedure for deploying to a staging environment using Kamal.
 
-## Configuration
+### Configuration
 
 This example assumes the following architecture:
 
@@ -80,7 +89,7 @@ This example assumes the following architecture:
     +----------------------------------------------------+
   ```
 
-## Docker Engine on the Target Host
+### Docker Engine on the Target Host
 
 This example assumes that Docker Engine is already running on the target server.
 
@@ -102,7 +111,7 @@ $ sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin
 $ sudo systemctl enable --now docker
 ```
 
-## Persistent Volumes
+### Persistent Volumes
 
 You need to create a directory to be used as a volume for the application's Docker container, and set its path in the `DEPLOY_VOLUMES_STORAGE` environment variable.
 
@@ -112,7 +121,7 @@ $ mkdir $HOME/data
 
 This directory must be created before the first deployment. If you forget to create it, the application may fail to start after deployment. In that case, please check that the application has write permissions to the directory and adjust the permissions if necessary.
 
-## config/deploy.yml
+### config/deploy.yml
 
 The Kamal configuration file `config/deploy.yml` contains only the setting `require_destination: true`. This indicates that a separate configuration file is required for each deployment target, and you must specify the destination when running Kamal.
 
@@ -120,33 +129,33 @@ For staging, a sample file `config/deploy.staging.yml.sample` is provided. Copy 
 
 In this example configuration, no changes are required. All values to be changed are read from environment variables, which are described later.
 
-## .kamal/secrets
+### .kamal/secrets
 
 Sensitive information referenced in `config/deploy.staging.yml` is managed separately in `.kamal/secrets`. There is also a separate secrets file for each deployment target; for staging, use `.kamal/secrets.staging`.
 
 If you have not modified `config/deploy.staging.yml`, you do not need to change `.kamal/secrets.staging` either. All values are read from environment variables.
 
-## Container Registry
+### Container Registry
 
 In Kamal deployments, the built image is pushed to a container registry.
 
-Starting with Kamal version 2.8, you can specify a local Docker container registry running on the host machine, so using an external container registry service is no longer strictly required.
+Starting with Kamal version 2.8, you can specify a local Docker container on the host machine, eliminating the need for an external container registry service.
 
 If you use an external service, you will need an account for that service. If you use a local container registry, Kamal will set it up automatically during deployment, so no additional configuration is needed.
 
-## SSL (TLS) Certificates and hosts File
+### SSL (TLS) Certificates and hosts File
 
 Kamal can automatically generate and renew certificates using Let's Encrypt. However, for a LAN-based staging environment, this example uses `mkcert` to create a local root CA, which must be installed on both the user's and the deployment target's environments.
 
 The Common Name (hostname) must be resolvable, so register it in `/etc/hosts` if necessary. If you have a DNS server for your LAN, that is also sufficient.
 
-## Environment Variables
+### Environment Variables
 
 Set the required environment variables for application and deployment configuration.
 
 For details on application and deployment environment variables, see [/docs/ENVIRONMENT_VARIABLES.md](/docs/ENVIRONMENT_VARIABLES.md).
 
-## Running the Deployment
+### Running the Deployment
 
 After setting the environment variables in your shell, proceed with deployment. For the initial deployment, deploy the accessory first, then deploy the main application:
 

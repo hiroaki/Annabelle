@@ -71,7 +71,7 @@ http://127.0.0.1:1080/
 
 ### A-4. Optional: GUI browser for debugging via VNC
 
-If you need to debug system specs or visually inspect the browser locally, you can install Chromium and a VNC server inside the container and use them. See the following documents for detailed instructions:
+The `runtime-dev` image used by Docker Compose already includes Chromium, so headless system specs work without additional setup. If you want to debug system specs or visually inspect the browser locally, add a VNC server and use the following documents:
 
 - [/docs/SETUP_BROWSER.md](/docs/SETUP_BROWSER.md)
 - [/docs/SETUP_VNC.md](/docs/SETUP_VNC.md)
@@ -176,11 +176,13 @@ For more details, see the gem's project page: [https://github.com/hiroaki/flash-
 
 ## Testing
 
-RSpec tests are provided. Since Capybara uses cuprite as its `javascript_driver`, Google Chrome is required in the test environment.
+RSpec tests are provided. Since Capybara uses cuprite as its `javascript_driver`, the test environment requires a Chrome-compatible browser such as Chromium.
 
 ```
 $ bin/rspec
 ```
+
+When you use Docker Compose, the `web` service builds the `runtime-dev` target from the shared Dockerfile, so Chromium is already available inside the container.
 
 For OAuth (GitHub) tests, you cannot simultaneously test both contexts, enabled and disabled. This is because the enabled or disabled state is determined during Rails initialization. Therefore, you need to run the RSpec tests twice in separate processes.
 

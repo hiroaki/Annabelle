@@ -62,5 +62,25 @@ RSpec.describe MessagesController, type: :controller do
       expect(captured[:strip_metadata]).to be false
       expect(captured[:allow_location_public]).to be true
     end
+
+    it 'renders the generic flash message when submission size validation fails' do
+      allow(controller).to receive(:create_message!).and_raise(
+        Factory::SubmissionSizeExceededError,
+        'The data you are trying to submit exceeds the allowed size (1 Byte).'
+      )
+
+      post :create, params: {
+        locale: :en,
+        content: 'with attachment'
+      }, format: :turbo_stream
+
+      expect(flash.now[:alert]).to eq(
+        I18n.t(
+          'messages.errors.generic',
+          error_message: 'The data you are trying to submit exceeds the allowed size (1 Byte).'
+        )
+      )
+      expect(response).to have_http_status(:ok)
+    end
   end
 end

@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '3.4.9'
+ruby '3.4.10'
 
 # psychのバージョンを5.2.2に固定
 # Ruby 3.4.xにはpsych 5.2.2がdefault gemとして含まれているが、
@@ -51,7 +51,9 @@ gem 'tzinfo-data', platforms: %i[ windows jruby ]
 gem 'bootsnap', require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem 'image_processing', '~> 1.2'
+gem 'image_processing', '>= 2.0.2'
+gem 'mini_magick', '>= 5.3.1'
+gem 'ruby-vips', '>= 2.3'
 gem 'exifr'
 
 group :development, :test do
@@ -65,6 +67,10 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem 'rubocop-rails-omakase', require: false
+
+  # Brakeman is a free vulnerability scanner designed for Ruby on Rails applications.
+  # Statically analyze Rails application code to find security issues at any stage of development.
+  gem 'brakeman', '>= 8.0.5', require: false
 
   # Prosopite is able to auto-detect Rails N+1 queries with zero false positives / false negatives.
   gem 'prosopite'
@@ -90,12 +96,12 @@ group :test do
   gem 'capybara'
   gem 'cuprite'
   gem 'selenium-webdriver'
-  gem 'shoulda-matchers', '~> 7.0'
+  gem 'shoulda-matchers', '~> 8.0'
   gem 'simplecov', require: false
   gem 'simplecov-lcov', require: false
 end
 
-gem 'solid_cable', '~> 3.0'
+gem 'solid_cable', '>= 4.0'
 gem 'solid_cache', '~> 1.0'
 
 gem 'tailwindcss-rails', '~> 4.0'

@@ -72,6 +72,12 @@ en:
       authorization: "Authorization"
       message: "Message"
       user: "User"
+    errors:
+      models:
+        message:
+          attributes:
+            content:
+              request_body_too_large: "is too large (maximum is %{max_size})"
   errors:
     locale:
       invalid_type: "must be a String or Symbol"
