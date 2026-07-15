@@ -1,10 +1,43 @@
 import consumer from "channels/consumer"
 import { appendMessageToStorage, renderFlashMessages, clearFlashMessages } from "flash_unified/all"
 
-consumer.subscriptions.create("MessagesChannel", {
+let subscription = null
+
+function hasMessagesChannelTargets(root = document) {
+  return !!root.querySelector?.('#messages[data-current-user-id], [data-messages-channel="notification"]')
+}
+
+// Only keep a Cable subscription on pages that can actually render message
+// updates or the notification badge. This avoids warning flashes on signed-out pages.
+function createSubscription() {
+  if (subscription) return subscription
+
+  subscription = consumer.subscriptions.create("MessagesChannel", channelDefinition)
+  return subscription
+}
+
+function removeSubscription({ silent = false } = {}) {
+  if (!subscription) return
+
+  subscription.intentionalDisconnect = silent
+  subscription.unsubscribe()
+  subscription = null
+}
+
+function syncSubscriptionForPage() {
+  if (hasMessagesChannelTargets()) {
+    createSubscription()
+    return
+  }
+
+  removeSubscription({ silent: true })
+}
+
+const channelDefinition = {
   connected() {
     // Called when the subscription is ready for use on the server
     console.log("MessagesChannel: connected")
+    this.intentionalDisconnect = false
     this.boundDocumentClick = this.handleDocumentClick.bind(this)
     this.boundSyncMessagesUi = this.syncMessagesUi.bind(this)
 
@@ -22,6 +55,8 @@ consumer.subscriptions.create("MessagesChannel", {
     document.removeEventListener('click', this.boundDocumentClick)
     document.removeEventListener('turbo:load', this.boundSyncMessagesUi)
     document.removeEventListener('turbo:render', this.boundSyncMessagesUi)
+
+    if (this.intentionalDisconnect || !hasMessagesChannelTargets()) return
 
     const flashMessage = this.disconnectedMessage();
     clearFlashMessages(flashMessage);
@@ -252,4 +287,16 @@ consumer.subscriptions.create("MessagesChannel", {
     const fallbackMessage = "Connection to the server has been lost. Please reload the page to reconnect";
     return this.localeMessage('cable_disconnected') || fallbackMessage;
   }
-});
+};
+
+document.addEventListener('turbo:before-render', (event) => {
+  // Tear down quietly before navigating to a page that has no message-related UI.
+  if (hasMessagesChannelTargets(event.detail.newBody)) return
+
+  removeSubscription({ silent: true })
+})
+
+document.addEventListener('turbo:load', syncSubscriptionForPage)
+document.addEventListener('turbo:render', syncSubscriptionForPage)
+
+syncSubscriptionForPage()

@@ -6,6 +6,7 @@ class Users::SessionsController < Devise::SessionsController
 
   protect_from_forgery with: :exception, prepend: true, except: :destroy
   before_action :store_language_for_logout, only: [:destroy]  # ログアウト前に言語設定を保存
+  before_action :disconnect_action_cable_connections, only: [:destroy]
 
   # (override)
   # デフォルトの root_path はログインが必須なため、ログイン画面へリダイレクトします。
@@ -23,6 +24,14 @@ class Users::SessionsController < Devise::SessionsController
   end
 
   private
+
+  def disconnect_action_cable_connections
+    return unless current_user
+
+    ActionCable.server.remote_connections.where(current_user: current_user).disconnect
+  rescue StandardError => e
+    Rails.logger.warn("[ActionCable] Failed to disconnect user connections on logout: #{e.class}: #{e.message}")
+  end
 
   def store_language_for_logout
     # 現在の言語設定を一時的に保存

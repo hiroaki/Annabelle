@@ -94,7 +94,7 @@ module ImageMetadata
     # This branch requires the host OS to have libvips and the ruby-vips
     # extension installed. CI/lint environments often omit those native
     # dependencies, so we exclude it from coverage to avoid flaky builds.
-    # :nocov:
+    # simplecov:disable
     def process_with_vips(data, ext)
       return unless defined?(ImageProcessing::Vips) && defined?(Vips)
 
@@ -106,12 +106,12 @@ module ImageMetadata
       nil
     end
     private_class_method :process_with_vips
-    # :nocov:
+    # simplecov:enable
 
     # This branch depends on ImageMagick binaries being present and
     # discoverable by MiniMagick. Because contributors' environments vary
     # (especially on macOS/CI), we treat it as un-coverable in practice.
-    # :nocov:
+    # simplecov:disable
     def process_with_image_processing_minimagick(data, ext)
       return unless defined?(ImageProcessing::MiniMagick)
 
@@ -125,7 +125,7 @@ module ImageMetadata
       nil
     end
     private_class_method :process_with_image_processing_minimagick
-    # :nocov:
+    # simplecov:enable
 
     def process_with_minimagick(data, ext)
       return unless defined?(MiniMagick)

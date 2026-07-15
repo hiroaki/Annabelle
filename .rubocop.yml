@@ -15,9 +15,7 @@ AllCops:
     - 'db/schema.rb'
     - 'db/migrate/*'
     - 'db/seeds.rb'
-    - 'config/environments/*'
-    - 'config/puma.rb'
-    - 'config/initializers/*'
+    - 'config/**/*'
     - 'node_modules/**/*'
 
     - 'tmp/**/*'

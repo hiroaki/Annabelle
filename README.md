@@ -60,9 +60,9 @@ To generate previews (thumbnails) or perform transcoding for video files uploade
 
 A valid email address is required for sign-up, and the email address serves as the account identifier. Therefore, SMTP server configuration is required.
 
-### Google Chrome Browser
+### Chromium Browser
 
-For testing, this project uses the cuprite (gem) as the driver for Capybara. Therefore, the test environment requires the Google Chrome browser.
+For testing, this project uses cuprite as the Capybara driver. Therefore, the test environment requires a Chrome-compatible browser such as Chromium.
 
 ### Database
 
@@ -110,6 +110,12 @@ $ bin/rake active_storage:cleanup FORCE=true
 # Target orphaned blobs older than 7 days (default: 2)
 $ bin/rake active_storage:cleanup FORCE=true DAYS_OLD=7
 ```
+
+### Request Size Limits and Background Jobs
+
+The primary request size limit is enforced by the proxy. `MAX_REQUEST_BODY` is also used by the browser and the Rails application as a secondary check so oversized message content and oversized submissions can be rejected earlier and more consistently.
+
+The default runtime model stays lightweight: Annabelle does not require a separate worker process by default. However, features that use `perform_later` or `purge_later` should be treated as best effort in that mode, because queued work may be delayed or lost across restarts. If you want Puma to run Solid Queue in the same server process for a single-server deployment, enable `SOLID_QUEUE_IN_PUMA=1`.
 
 ## License
 

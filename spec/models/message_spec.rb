@@ -20,6 +20,28 @@ RSpec.describe Message, type: :model do
       end
     end
 
+    describe "バリデーション" do
+      it "content が必須であること" do
+        message = build(:message, content: nil)
+
+        expect(message).not_to be_valid
+        expect(message.errors[:content]).to include(I18n.t('errors.messages.blank'))
+      end
+
+      it "max_request_body を超える content を無効にすること" do
+        allow(Rails.configuration.x).to receive(:max_request_body).and_return(5)
+        message = build(:message, content: '123456')
+
+        expect(message).not_to be_valid
+        expect(message.errors[:content]).to include(
+          I18n.t(
+            'activerecord.errors.models.message.attributes.content.request_body_too_large',
+            max_size: '5 Bytes'
+          )
+        )
+      end
+    end
+
     describe "ファイルの添付" do
       it "ファイルを添付できること" do
         message = create(:message)

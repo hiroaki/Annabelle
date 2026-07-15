@@ -2,13 +2,13 @@
 
 # Install and Set Up the Chromium Browser
 
-This document explains how to install the Chromium browser used in RSpec system tests into the development container.
+This document explains how Chromium is provided for RSpec system tests in the Docker-based development environment.
 
 ## Background
 
-This project uses a shared Dockerfile for both development and deployment-oriented environments. Chromium is needed only for specific development tasks such as system specs and visual browser debugging, so it is treated as an optional tool rather than a default dependency.
+This project uses a shared Dockerfile for development, CI, staging, and production. Chromium is needed for system specs and local browser debugging, but it should not be included in the production-oriented runtime image.
 
-Keeping Chromium out of the base image helps keep the shared image smaller, reduces build time, and avoids increasing the maintenance surface of the default container environment. For that reason, the browser is not included in the image by default and is instead installed afterward only when needed.
+To balance those requirements, the Dockerfile exposes multiple final targets. Docker Compose uses `runtime-dev`, and CI uses `runtime-test`. Both targets include Chromium, while the deployment target `runtime` does not.
 
 ## Prerequisites
 
@@ -19,19 +19,19 @@ Keeping Chromium out of the base image helps keep the shared image smaller, redu
 $ docker compose up
 ```
 
-## Steps
+## Availability
 
-Install as the root user. A batch script is provided for this:
+No manual installation is required in the current Docker workflow.
+
+- `docker compose build web` builds the `runtime-dev` target, which already includes Chromium
+- GitHub Actions builds the `runtime-test` target, which also includes Chromium
+- The deployment target `runtime` intentionally excludes Chromium
+
+If you changed the Dockerfile or are updating from an older image, rebuild the container image:
 
 ```bash
-$ docker compose exec --user root web bash -lc \
-  "/bin/bash /rails/scripts/install-browser-chromium.sh"
+$ docker compose build web
 ```
-
-This script does the following:
-
-- Installs `chromium` itself and basic fonts such as Liberation and Noto
-- Creates compatibility symlinks from `/usr/bin/google-chrome` and `/usr/bin/chromium-browser` to `chromium`
 
 ## Using It with RSpec
 
@@ -46,8 +46,8 @@ You can disable headless mode with the environment variable `HEADLESS=0`, but in
 ## Troubleshooting
 
 - Chromium cannot be found or does not start
-  Re-run the installer after updating `apt`:
+  Rebuild the `web` image so that the `runtime-dev` target is recreated:
 
   ```bash
-  $ docker compose exec --user root web bash -lc "apt-get update -qq && /bin/bash /rails/scripts/install-browser-chromium.sh"
+  $ docker compose build --no-cache web
   ```
