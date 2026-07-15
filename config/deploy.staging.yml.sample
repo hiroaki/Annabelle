@@ -39,8 +39,11 @@ builder:
     - arm64
   context: .
   dockerfile: Dockerfile
+  target: runtime
   args:
     RAILS_ENV: staging
+    BUNDLE_WITHOUT: development:test
+    PRECOMPILE_ASSETS: "1"
 
 env:
   clear:
