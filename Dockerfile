@@ -111,12 +111,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /rails /rails
-COPY --from=build /usr/local/bundle /usr/local/bundle
-
 RUN useradd rails --create-home --shell /bin/bash \
-  && mkdir -p /rails/db /rails/log /rails/storage /rails/tmp /usr/local/bundle \
-  && chown -R rails:rails /rails /usr/local/bundle
+  && mkdir -p /rails/db /rails/log /rails/storage /rails/tmp /usr/local/bundle
+
+COPY --from=build --chown=rails:rails /rails /rails
+COPY --from=build --chown=rails:rails /usr/local/bundle /usr/local/bundle
 
 FROM runtime-base AS runtime
 
@@ -140,7 +139,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
   && ln -sf /usr/bin/chromium /usr/bin/google-chrome \
   && ln -sf /usr/bin/chromium /usr/bin/chromium-browser \
   && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  && install -d -o rails -g rails /rails/coverage
 
 USER rails:rails
 
