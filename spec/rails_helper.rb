@@ -10,6 +10,13 @@ if ENV['RSPEC_DISABLE_OAUTH_GITHUB']
 else
   SimpleCov.command_name 'rspec_oauth_github_enabled'
 end
+# NOTE:
+# This SimpleCov output directory is coupled with Docker/CI settings.
+# If you change c.output_directory, update all related paths together:
+# - runtime-test image setup that prepares the coverage directory
+# - coverage artifact collection path (if applicable)
+# Any mismatch can cause CI failures such as permission denied
+# or missing coverage artifacts.
 SimpleCov::Formatter::LcovFormatter.config do |c|
   c.output_directory = 'coverage'
   c.lcov_file_name = 'lcov.info'
