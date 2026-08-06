@@ -139,7 +139,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
   && ln -sf /usr/bin/chromium /usr/bin/google-chrome \
   && ln -sf /usr/bin/chromium /usr/bin/chromium-browser \
   && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  && install -d -o rails -g rails /rails/coverage
 
 USER rails:rails
 
