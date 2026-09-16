@@ -20,7 +20,7 @@ RSpec.describe 'Messages proxy error', type: :system do
     # Cuprite (Ferrum) の network intercept で 413 エラーを返します
     page.driver.browser.network.intercept
     page.driver.browser.on(:request) do |request|
-      if request.match?('/messages') && request.method == 'POST'
+      if request.match?(%r{/messages}) && request.method == 'POST'
         request.respond(
           responseCode: 413,
           responseHeaders: { 'Content-Type' => 'text/plain' },
