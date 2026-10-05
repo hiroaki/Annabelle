@@ -169,22 +169,22 @@ GEM
       turbo-rails (>= 2.0)
     globalid (1.4.0)
       activesupport (>= 6.1)
-    google-protobuf (4.36.1)
+    google-protobuf (4.36.2)
       bigdecimal
       rake (~> 13.3)
-    google-protobuf (4.36.1-aarch64-linux-gnu)
+    google-protobuf (4.36.2-aarch64-linux-gnu)
       bigdecimal
       rake (~> 13.3)
-    google-protobuf (4.36.1-arm64-darwin)
+    google-protobuf (4.36.2-arm64-darwin)
       bigdecimal
       rake (~> 13.3)
-    google-protobuf (4.36.1-x86-linux-gnu)
+    google-protobuf (4.36.2-x86-linux-gnu)
       bigdecimal
       rake (~> 13.3)
-    google-protobuf (4.36.1-x86_64-darwin)
+    google-protobuf (4.36.2-x86_64-darwin)
       bigdecimal
       rake (~> 13.3)
-    google-protobuf (4.36.1-x86_64-linux-gnu)
+    google-protobuf (4.36.2-x86_64-linux-gnu)
       bigdecimal
       rake (~> 13.3)
     hashie (5.1.0)
@@ -317,7 +317,7 @@ GEM
     parser (3.3.12.0)
       ast (~> 2.4.1)
       racc
-    pg_query (6.2.3)
+    pg_query (6.2.5)
       google-protobuf (>= 4.34.0)
     pp (0.6.4)
       prettyprint
@@ -664,12 +664,12 @@ CHECKSUMS
   ffi (1.17.4-x86_64-linux-gnu) sha256=9d3db14c2eae074b382fa9c083fe95aec6e0a1451da249eab096c34002bc752d
   flash_unified (0.4.0) sha256=08bb7e7571d40fececb4417028ae031602ffa4f84cb90749283ba910518c4fa9
   globalid (1.4.0) sha256=037f12fbf1d9d7a014d501c2d5c77356fd4ddd96d7a7991d6700bba96706f427
-  google-protobuf (4.36.1) sha256=893ac9d66b36b6ea50da5418f856bc7c2d2072099a578aeefc2d7757dcab6a77
-  google-protobuf (4.36.1-aarch64-linux-gnu) sha256=3883fa1b0e99221f68f4a8511bc4fb1888897dcb6cc8bf2805c92c16fc99b499
-  google-protobuf (4.36.1-arm64-darwin) sha256=4d82184f4582dfa123f9793cd7a73beca9b0d3f0d3717948c4120b6cc0d50f2d
-  google-protobuf (4.36.1-x86-linux-gnu) sha256=4ea208a8d1a2369728da03e256fc7b454c6781bac486cbfa57d0ed7a0e6352f0
-  google-protobuf (4.36.1-x86_64-darwin) sha256=e92bf3c90c0a9c410cbe430cf366190b1b9b5b2b784f6195a43a178c2ef7e338
-  google-protobuf (4.36.1-x86_64-linux-gnu) sha256=e735a3f3d6596b1010013c2030778bc030770e659106fe7e4ae0f07631b551cb
+  google-protobuf (4.36.2) sha256=2f8daff50ae14aad36ab0ccdcf284065fa71d726c444efe114e6db82ffe62494
+  google-protobuf (4.36.2-aarch64-linux-gnu) sha256=c3279ec6eaa59f6ed6276eda2a33cffb4306471183ab79a332e698b8564f5169
+  google-protobuf (4.36.2-arm64-darwin) sha256=f70d810e6bbab9d8ad9c1d5fd685a21de4c10ad3ad32efb9455e17e5b1286917
+  google-protobuf (4.36.2-x86-linux-gnu) sha256=ffcd06d49bffca24afff18c900dd61a51ea3028d43c47d0d9621d00bf38a5866
+  google-protobuf (4.36.2-x86_64-darwin) sha256=8d1bd2a344f7f589703b202ad2ee4cca8ef731b4ced45782ef92d385967384ba
+  google-protobuf (4.36.2-x86_64-linux-gnu) sha256=d25a820873e423f1d209ae8c672a4a28b019e2429debd0901d26670a0b4e14db
   hashie (5.1.0) sha256=c266471896f323c446ea8207f8ffac985d2718df0a0ba98651a3057096ca3870
   http_accept_language (2.1.1) sha256=0043f0d55a148cf45b604dbdd197cb36437133e990016c68c892d49dbea31634
   i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
@@ -723,7 +723,7 @@ CHECKSUMS
   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
   parallel (2.2.0) sha256=e1059c5fd7b649558a0aec38a769f06a42942bdb40503d005a59c352fe011cd8
   parser (3.3.12.0) sha256=21a6d7f755d5a24dfbdc6e6b772e4e879a52e7631a88bc5a3a134606052c9828
-  pg_query (6.2.3) sha256=450bea944058d5cbe2547a6ee86a19bc639c265b26047b8bc937e009df6771df
+  pg_query (6.2.5) sha256=2117d4228c3c1359afca62fddba6ce5d8c56bf5e0eff148e2f2bf5292bcd676d
   pp (0.6.4) sha256=dfcb0fce700c41456265922884f9fe195d7fbb0674a3578e6c0f69588e82b570
   prettyprint (0.2.0) sha256=2bc9e15581a94742064a3cc8b0fb9d45aae3d03a1baa6ef80922627a0766f193
   prism (1.9.0) sha256=7b530c6a9f92c24300014919c9dcbc055bf4cdf51ec30aed099b06cd6674ef85
