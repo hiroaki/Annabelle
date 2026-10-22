@@ -568,7 +568,6 @@ DEPENDENCIES
   image_processing (>= 2.0.2)
   importmap-rails
   jbuilder
-  json (~> 2.15)
   kamal
   kaminari (~> 1.2)
   mini_magick (>= 5.3.1)
