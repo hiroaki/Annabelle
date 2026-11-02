@@ -9,7 +9,7 @@ workflows:
         - 'coverallsapp/github-action@v2.3.8'
     '.github/workflows/rubocop.yml':
         - 'actions/checkout@v7.0.1'
-        - 'ruby/setup-ruby@v1.331.0'
+        - 'ruby/setup-ruby@v1.336.0'
     '.github/workflows/verify-lockfile.yml':
         - 'actions/checkout@v7.0.1'
 dependencies:
@@ -28,8 +28,8 @@ dependencies:
         commit: 'sha1-8d6379e14d29928660c4ba802d8e85393440b329'
         owner_id: 16691566
         repo_id: 200696780
-    'ruby/setup-ruby@v1.331.0':
-        ref: 'v1.331.0'
-        commit: 'sha1-824c0e29fdfc7d689c191c27acc969d2d04b7dd8'
+    'ruby/setup-ruby@v1.336.0':
+        ref: 'v1.336.0'
+        commit: 'sha1-de492cf36cbab201753d720ce4f4e336cd688c94'
         owner_id: 210414
         repo_id: 231208785
