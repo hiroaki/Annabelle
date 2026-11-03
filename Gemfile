@@ -106,7 +106,7 @@ gem 'solid_cache', '~> 1.0'
 
 gem 'tailwindcss-rails', '~> 4.0'
 
-gem 'kaminari', '~> 1.2'
+gem 'kaminari', '~> 1.3'
 
 gem 'devise', '~> 5.0', '>= 5.0.1'
 gem 'devise-two-factor'
