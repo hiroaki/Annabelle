@@ -19,7 +19,7 @@ jobs:
         run: echo "RUBY_VERSION=$(cat .ruby-version)" >> $GITHUB_ENV
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1.336.0
+        uses: ruby/setup-ruby@v1.338.0
         with:
           ruby-version: ${{ env.RUBY_VERSION }}
           bundler-cache: true
