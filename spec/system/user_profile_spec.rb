@@ -77,7 +77,7 @@ RSpec.describe 'User profile editing', type: :system do
 
     context 'when using browser language setting' do
       it 'redirects based on browser language when empty string is selected' do
-        page.driver.headers = { 'Accept-Language' => 'ja,en-US;q=0.9,en;q=0.8' }
+        page.driver.browser.headers.set('Accept-Language' => 'ja,en-US;q=0.9,en;q=0.8')
         visit edit_profile_path
 
         select 'Use browser language', from: 'Display Language'
